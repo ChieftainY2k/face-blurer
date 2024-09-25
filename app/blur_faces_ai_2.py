@@ -25,8 +25,8 @@ def blur_faces_in_directory(input_dir, output_dir, models_dir):
     detector = cv2.FaceDetectorYN_create(
         model=model_path,
         config="",
-        input_size=(1900, 1200),  # You can adjust the input size for performance/accuracy trade-off
-        score_threshold=0.5,    # Confidence threshold
+        input_size=(3840, 2160),  # You can adjust the input size for performance/accuracy trade-off
+        score_threshold=0.4,    # Confidence threshold
         nms_threshold=0.3, # Non-maximum suppression threshold
         top_k=20, # Maximum number of detections
         backend_id=cv2.dnn.DNN_BACKEND_DEFAULT,
