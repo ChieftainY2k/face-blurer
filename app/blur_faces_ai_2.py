@@ -117,7 +117,7 @@ def blur_faces_in_directory(input_dir, output_dir, models_dir):
 if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
-    models_dir = os.getenv('MODELS_DIR', '/opencv_zoo/face_detection_yunet')
+    models_dir = os.getenv('MODELS_DIR', '/opencv_zoo/models/face_detection_yunet')
 
     if not input_dir or not output_dir or not models_dir:
         print("Error: INPUT_DIR, OUTPUT_DIR, or MODELS_DIR environment variables are not set.")

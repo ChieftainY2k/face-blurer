@@ -21,6 +21,7 @@ RUN git clone https://github.com/opencv/opencv_zoo /opencv_zoo \
    && cd /opencv_zoo \
    && git lfs install \
    && git lfs pull
+
 # Copy the face blurring script into the container
 #COPY blur_faces.py /app/
 
