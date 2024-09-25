@@ -1,0 +1,40 @@
+# Use an official Python runtime as a parent image
+FROM python:3.9-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Install necessary system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git git-lfs \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxrender1 \
+    libxext6 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+RUN pip install --no-cache-dir opencv-contrib-python numpy opencv-python
+RUN git clone https://github.com/opencv/opencv_zoo /opencv_zoo \
+   && cd /opencv_zoo \
+   && git lfs install \
+   && git lfs pull
+# Copy the face blurring script into the container
+#COPY blur_faces.py /app/
+
+# Create directories for input, output, and models
+#RUN mkdir /input /output /models
+
+# Download the YuNet face detection model
+#RUN curl -L -o /models/face_detection_yunet_2023mar.onnx \
+#    https://github.com/opencv/opencv_zoo/raw/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx
+
+# Set environment variables
+#ENV INPUT_DIR=/input \
+#    OUTPUT_DIR=/output \
+#    MODELS_DIR=/models
+
+# Set the entry point to run the script
+CMD ["python", "blur_faces.py"]
