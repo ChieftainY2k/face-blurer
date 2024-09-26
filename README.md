@@ -7,11 +7,13 @@ Decompose info frames:
 # Lossless
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -fps_mode passthrough -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
-# 20 FPS
-docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 20 -q:v 0 -c:v png "/data/input/frame_%10d.png"
+# Custom FPS
+docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
 # With extra info overlay
-docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 20 -vf "drawtext=text='%{pts\:hms}':x=w-tw-10:y=h-th-40:fontcolor=white:fontsize=24, drawtext=text='Frame\: %{n}':x=w-tw-10:y=h-th-10:fontcolor=white:fontsize=24" -q:v 0 -c:v png "/data/input/frame_%10d.png"
+docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -vf "drawtext=text='%{pts\:hms}':x=w-tw-10:y=h-th-10:fontcolor=white:fontsize=24" -q:v 0 -c:v png "/data/input/frame_%010d.png"
+docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -vf "drawtext=text='T: %{pts\:hms}':x=w-tw-10:y=h-th-100:fontcolor=white:fontsize=24,drawtext=text='IF: %{frame_num}':x=w-tw-10:y=h-th-70:fontcolor=white:fontsize=24,drawtext=text='OF: %{n}':x=w-tw-10:y=h-th-40:fontcolor=white:fontsize=24" -q:v 0 -c:v png "/data/input/frame_%010d.png"
+
 
 ```
 
