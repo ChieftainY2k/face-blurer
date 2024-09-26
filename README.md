@@ -30,11 +30,14 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "
 Examples:
 
 Source frames:
+
 ![image](https://github.com/user-attachments/assets/1cfc54bc-e62b-4494-8317-2470775c180c)
 
 Face blurer in action:
+
 ![image](https://github.com/user-attachments/assets/f67fdcc6-3054-4fe4-b527-c5ad70e21ddd)
 
 Processed frames:
+
 ![image](https://github.com/user-attachments/assets/d8c5ded2-f60c-4651-abb7-6275118f069b)
 
