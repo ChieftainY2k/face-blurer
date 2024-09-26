@@ -19,6 +19,7 @@ def blur_faces_in_directory(input_dir, output_dir):
 
     if total_files == 0:
         print("No image files found in the input directory.")
+        sys.stdout.flush()
         return
 
     # Start time for ETA calculation
@@ -27,25 +28,27 @@ def blur_faces_in_directory(input_dir, output_dir):
     # Loop through all image files in the input directory
     for idx, filename in enumerate(image_files):
         input_path = os.path.join(input_dir, filename)
-        output_path = os.path.join(output_dir, filename)
+        output_path = os.path.join(output_dir, filename,".blurred.jpg")
+
+        # Start line with file name
+        print(f"* processing: {input_path}", end="")
+        sys.stdout.flush()
 
         # skip if the output file already exists
         if os.path.exists(output_path):
-            print(f"Skipping {input_path} as {output_path} already exists")
+            print(f", skipping as {output_path} already exists")
+            sys.stdout.flush()
             continue
 
         # Read the image
         image = cv2.imread(input_path)
         if image is None:
-            print(f"\nCould not open or find the image: {filename}")
-            continue
+            print(f", could not open or find the image: {filename}")
+            sys.stdout.flush()
+            exit(1)
 
         # Detect faces using RetinaFace
         faces = RetinaFace.detect_faces(image)
-
-        # Start line with file name
-        print(f"Processing: {input_path}", end="")
-        sys.stdout.flush()
 
         face_count = 0  # Counter for faces in the current image
 
@@ -89,7 +92,8 @@ def blur_faces_in_directory(input_dir, output_dir):
         # Write image with max quality
         print(" , saving file", end="")
         sys.stdout.flush()
-        cv2.imwrite(output_path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+        #cv2.imwrite(output_path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+        cv2.imwrite(output_path, image)
 
         # Update progress
         processed_files += 1
@@ -98,11 +102,16 @@ def blur_faces_in_directory(input_dir, output_dir):
         files_left = total_files - processed_files
         eta = average_time_per_file * files_left
 
+        # Calculate days, hours, and minutes
+        eta_days = int(eta // (24 * 3600))
+        eta_hours = int((eta % (24 * 3600)) // 3600)
+        eta_minutes = int((eta % 3600) // 60)
+
         percent_complete = (processed_files / total_files) * 100
 
         # Print completion message for the current file
         print(f", faces detected: {face_count} , processed {processed_files}/{total_files} files ({percent_complete:.2f}% complete). "
-              f"ETA: {int(eta // 60)}m {int(eta % 60)}s")
+              f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m")
         sys.stdout.flush()
 
     print("Processing complete.")
