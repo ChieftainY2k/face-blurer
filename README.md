@@ -2,9 +2,9 @@ References:
 * https://github.com/markusschmitz53/demo-face-blur
 
 
-Decompose video info frames:
+Decompose video into frames:
 ```
-# Default
+# Preserve original
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -fps_mode passthrough -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
 # Custom FPS
