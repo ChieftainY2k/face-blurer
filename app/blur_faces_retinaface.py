@@ -28,10 +28,10 @@ def blur_faces_in_directory(input_dir, output_dir):
     # Loop through all image files in the input directory
     for idx, filename in enumerate(image_files):
         input_path = os.path.join(input_dir, filename)
-        output_path = os.path.join(output_dir, filename,".blurred.jpg")
+        output_path = os.path.join(output_dir, filename) + ".blurred.png"
 
         # Start line with file name
-        print(f"* processing: {input_path}", end="")
+        print(f"* processing: {input_path} to {output_path}", end="")
         sys.stdout.flush()
 
         # skip if the output file already exists
