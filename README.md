@@ -16,7 +16,7 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -
 
 
 ```
-Process frames:
+Process frames, detect and blur faces on each frame:
 ```
 docker build . -t blurer 
 docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache:/root/.deepface blurer python blur_faces_retinaface.py
