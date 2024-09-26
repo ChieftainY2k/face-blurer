@@ -16,11 +16,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-RUN pip install --no-cache-dir opencv-contrib-python numpy opencv-python
 RUN git clone https://github.com/opencv/opencv_zoo /opencv_zoo \
    && cd /opencv_zoo \
    && git lfs install \
    && git lfs pull
+
+RUN pip install opencv-contrib-python numpy opencv-python retina-face tf-keras
 
 # Copy the face blurring script into the container
 #COPY blur_faces.py /app/

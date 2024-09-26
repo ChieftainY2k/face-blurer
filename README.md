@@ -1,4 +1,5 @@
-# face-blurer
+References:
+* https://github.com/markusschmitz53/demo-face-blur
 
 
 Decompose info frames:
@@ -9,7 +10,7 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -vf "p
 Process frames:
 ```
 docker build . -t blurer 
-docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output blurer python blur_faces_ai_2.py
+docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output blurer python blur_faces_opencv_dnn.py
 ```
 
 Compose video:

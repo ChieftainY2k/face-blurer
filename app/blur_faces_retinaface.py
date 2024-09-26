@@ -3,8 +3,9 @@ import os
 import sys
 import numpy as np
 import time
+from retinaface import RetinaFace
 
-def blur_faces_in_directory(input_dir, output_dir, models_dir):
+def blur_faces_in_directory(input_dir, output_dir):
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -20,25 +21,18 @@ def blur_faces_in_directory(input_dir, output_dir, models_dir):
         print("No image files found in the input directory.")
         return
 
-    # Load the YuNet face detector
-    model_path = os.path.join(models_dir, "face_detection_yunet_2023mar.onnx")
-    detector = cv2.FaceDetectorYN_create(
-        model=model_path,
-        config="",
-        input_size=(3840, 2160),  # You can adjust the input size for performance/accuracy trade-off
-        score_threshold=0.4,    # Confidence threshold
-        nms_threshold=0.3, # Non-maximum suppression threshold
-        top_k=20, # Maximum number of detections
-        backend_id=cv2.dnn.DNN_BACKEND_DEFAULT,
-        target_id=cv2.dnn.DNN_TARGET_CPU
-    )
-
     # Start time for ETA calculation
     start_time = time.time()
 
     # Loop through all image files in the input directory
     for idx, filename in enumerate(image_files):
         input_path = os.path.join(input_dir, filename)
+        output_path = os.path.join(output_dir, filename)
+
+        # skip if the output file already exists
+        if os.path.exists(output_path):
+            print(f"Skipping {input_path} as {output_path} already exists")
+            continue
 
         # Read the image
         image = cv2.imread(input_path)
@@ -46,12 +40,8 @@ def blur_faces_in_directory(input_dir, output_dir, models_dir):
             print(f"\nCould not open or find the image: {filename}")
             continue
 
-        # Prepare the image
-        h_img, w_img, _ = image.shape
-        detector.setInputSize((w_img, h_img))
-
-        # Detect faces
-        faces = detector.detect(image)
+        # Detect faces using RetinaFace
+        faces = RetinaFace.detect_faces(image)
 
         # Start line with file name
         print(f"Processing: {input_path}", end="")
@@ -59,21 +49,17 @@ def blur_faces_in_directory(input_dir, output_dir, models_dir):
 
         face_count = 0  # Counter for faces in the current image
 
-        # faces[1] contains the detection results
-        if faces[1] is not None:
-            for face in faces[1]:
-                # Each face has 15 elements: [x1, y1, w, h, score, ...landmarks]
-                x, y, w, h = face[:4]
-                x = int(x)
-                y = int(y)
-                w = int(w)
-                h = int(h)
+        if faces:
+            for face_id, face_info in faces.items():
+                # Each face_info contains 'facial_area' and 'landmarks'
+                facial_area = face_info['facial_area']
+                x1, y1, x2, y2 = facial_area
 
                 # Ensure coordinates are within image bounds
-                x1 = max(0, x)
-                y1 = max(0, y)
-                x2 = min(w_img, x + w)
-                y2 = min(h_img, y + h)
+                x1 = max(0, x1)
+                y1 = max(0, y1)
+                x2 = min(image.shape[1], x2)
+                y2 = min(image.shape[0], y2)
 
                 # Validate dimensions
                 if x1 >= x2 or y1 >= y2:
@@ -100,8 +86,6 @@ def blur_faces_in_directory(input_dir, output_dir, models_dir):
                 #print(".", end="")
                 #sys.stdout.flush()
 
-        # Save the resulting image to the output directory
-        output_path = os.path.join(output_dir, filename)
         # Write image with max quality
         print(" , saving file", end="")
         sys.stdout.flush()
@@ -126,10 +110,9 @@ def blur_faces_in_directory(input_dir, output_dir, models_dir):
 if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
-    models_dir = os.getenv('MODELS_DIR', '/opencv_zoo/models/face_detection_yunet')
 
-    if not input_dir or not output_dir or not models_dir:
-        print("Error: INPUT_DIR, OUTPUT_DIR, or MODELS_DIR environment variables are not set.")
+    if not input_dir or not output_dir:
+        print("Error: INPUT_DIR or OUTPUT_DIR environment variables are not set.")
         sys.exit(1)
 
-    blur_faces_in_directory(input_dir, output_dir, models_dir)
+    blur_faces_in_directory(input_dir, output_dir)
