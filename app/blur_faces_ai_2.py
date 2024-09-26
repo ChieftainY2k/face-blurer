@@ -77,25 +77,34 @@ def blur_faces_in_directory(input_dir, output_dir, models_dir):
 
                 # Validate dimensions
                 if x1 >= x2 or y1 >= y2:
+                    print(" , warning: invalid detection", end="")
+                    sys.stdout.flush()
                     continue  # Skip invalid detections
 
                 # Extract the face region
                 face_roi = image[y1:y2, x1:x2]
                 if face_roi.size == 0:
+                    print(" , warning: empty region", end="")
+                    sys.stdout.flush()
                     continue  # Skip if the face region is empty
 
                 # Blur the face region
-                face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
+                face_roi_blurred = cv2.GaussianBlur(
+                  face_roi, # Input image
+                  (99, 99),  # Kernel size
+                  30) # SigmaX
                 image[y1:y2, x1:x2] = face_roi_blurred
 
                 # Increment face count and print a dot
                 face_count += 1
-                print(".", end="")
-                sys.stdout.flush()
+                #print(".", end="")
+                #sys.stdout.flush()
 
         # Save the resulting image to the output directory
         output_path = os.path.join(output_dir, filename)
         # Write image with max quality
+        print(" , saving file", end="")
+        sys.stdout.flush()
         cv2.imwrite(output_path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
 
         # Update progress
@@ -108,7 +117,7 @@ def blur_faces_in_directory(input_dir, output_dir, models_dir):
         percent_complete = (processed_files / total_files) * 100
 
         # Print completion message for the current file
-        print(f" processed {processed_files}/{total_files} files ({percent_complete:.2f}% complete). "
+        print(f", faces detected: {face_count} , processed {processed_files}/{total_files} files ({percent_complete:.2f}% complete). "
               f"ETA: {int(eta // 60)}m {int(eta % 60)}s")
         sys.stdout.flush()
 
