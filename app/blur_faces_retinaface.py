@@ -47,8 +47,14 @@ def blur_faces_in_directory(input_dir, output_dir):
             sys.stdout.flush()
             exit(1)
 
-        # Detect faces using RetinaFace
+        print(", detecting", end="")
+        sys.stdout.flush()
+        detection_start_time = time.time()
         faces = RetinaFace.detect_faces(image)
+        detection_end_time = time.time()
+        detection_time = detection_end_time - detection_start_time
+        print(f" ({detection_time:.2f}s)", end="")
+        sys.stdout.flush()
 
         face_count = 0  # Counter for faces in the current image
 
@@ -89,8 +95,8 @@ def blur_faces_in_directory(input_dir, output_dir):
                 #print(".", end="")
                 #sys.stdout.flush()
 
-        # Write image with max quality
-        print(" , saving file", end="")
+        print(f", {face_count} face(s)", end="")
+        print(f", saving", end="")
         sys.stdout.flush()
         #cv2.imwrite(output_path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
         cv2.imwrite(output_path, image)
@@ -110,7 +116,7 @@ def blur_faces_in_directory(input_dir, output_dir):
         percent_complete = (processed_files / total_files) * 100
 
         # Print completion message for the current file
-        print(f", faces detected: {face_count} , processed {processed_files}/{total_files} files ({percent_complete:.2f}% complete). "
+        print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
               f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m")
         sys.stdout.flush()
 
