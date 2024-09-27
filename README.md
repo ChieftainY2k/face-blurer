@@ -19,10 +19,10 @@ This is a simple PoC (proof of concept) how to blur faces in a video using AI an
 # Preserve original
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -fps_mode passthrough -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
-#Scale to 640px width
+# Scale to 640px width
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -vf "scale=640:-1" -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
-#Scale to 640px width and custom FPS
+# Scale to 640px width and custom FPS
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 10 -vf "scale=640:-1" -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
 # Custom FPS
@@ -49,7 +49,7 @@ docker run --rm -v ./app:/app -e DEBUG=1 -v ./input:/input:ro -v ./output:/outpu
 
 ### Compose video back from frames:
 ```
-docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 25 -pix_fmt yuv420p "/data/output/video1-blurred.mp4"
+docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 -pix_fmt yuv420p "/data/output/video1-blurred.mp4"
 ```
 
 # References:
