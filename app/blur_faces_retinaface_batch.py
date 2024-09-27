@@ -3,7 +3,7 @@ import os
 import sys
 import numpy as np
 import time
-from batch_face import RetinaFace
+from batch_face import RetinaFace  # Correct import from batch-face
 
 def blur_faces_in_directory(input_dir, output_dir):
     # Ensure the output directory exists
@@ -25,6 +25,9 @@ def blur_faces_in_directory(input_dir, output_dir):
     # Start time for ETA calculation
     start_time = time.time()
 
+    # Initialize RetinaFace detector
+    detector = RetinaFace()
+
     # Loop through all image files in the input directory
     for idx, filename in enumerate(image_files):
         input_path = os.path.join(input_dir, filename)
@@ -34,7 +37,7 @@ def blur_faces_in_directory(input_dir, output_dir):
         print(f"* processing: {input_path} to {output_path}", end="")
         sys.stdout.flush()
 
-        # skip if the output file already exists
+        # Skip if the output file already exists
         if os.path.exists(output_path):
             print(f", skipping as {output_path} already exists")
             sys.stdout.flush()
@@ -50,20 +53,39 @@ def blur_faces_in_directory(input_dir, output_dir):
         print(", detecting", end="")
         sys.stdout.flush()
         detection_start_time = time.time()
-        detector = RetinaFace(gpu_id=0)
-        faces = detector.detect_faces(image)
+
+        # Detect faces in the image by calling the detector directly
+        faces = detector(image)
+
         detection_end_time = time.time()
         detection_time = detection_end_time - detection_start_time
         print(f" ({detection_time:.2f}s)", end="")
         sys.stdout.flush()
 
         face_count = 0  # Counter for faces in the current image
+        score_threshold = 0.6  # Minimum score threshold for face detection
 
-        if faces:
-            for face_id, face_info in faces.items():
-                # Each face_info contains 'facial_area' and 'landmarks'
-                facial_area = face_info['facial_area']
-                x1, y1, x2, y2 = facial_area
+        if faces is not None and len(faces) > 0:
+            print(f", ", end="")
+            for face_info in faces:
+                # Each face_info is a tuple: (bbox, landmarks, score)
+                bbox, landmarks, score = face_info  # Unpack face_info
+
+                if (score >= score_threshold):
+                    print(f"[{score:.2f}+]", end="")
+                else:
+                    print(f"[{score:.2f}-]", end="")
+                    continue
+                sys.stdout.flush()
+
+                # Unpack bounding box coordinates
+                x1, y1, x2, y2 = bbox
+
+                # Convert coordinates to integers
+                x1 = int(round(x1))
+                y1 = int(round(y1))
+                x2 = int(round(x2))
+                y2 = int(round(y2))
 
                 # Ensure coordinates are within image bounds
                 x1 = max(0, x1)
@@ -86,20 +108,17 @@ def blur_faces_in_directory(input_dir, output_dir):
 
                 # Blur the face region
                 face_roi_blurred = cv2.GaussianBlur(
-                  face_roi, # Input image
-                  (99, 99),  # Kernel size
-                  30) # SigmaX
+                    face_roi,  # Input image
+                    (99, 99),  # Kernel size
+                    30)  # SigmaX
                 image[y1:y2, x1:x2] = face_roi_blurred
 
-                # Increment face count and print a dot
+                # Increment face count
                 face_count += 1
-                #print(".", end="")
-                #sys.stdout.flush()
 
         print(f", {face_count} face(s)", end="")
         print(f", saving", end="")
         sys.stdout.flush()
-        #cv2.imwrite(output_path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
         cv2.imwrite(output_path, image)
 
         # Update progress
