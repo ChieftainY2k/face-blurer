@@ -14,7 +14,7 @@ This is a simple PoC (proof of concept) how to blur faces in a video using AI an
 
 # How to use it
 
-### Decompose video into frames, each frame in a file with the index number:
+### Step 1: Decompose video into frames, each frame in a file with the index number:
 ```
 # Preserve original
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -fps_mode passthrough -q:v 0 -c:v png "/data/input/frame_%10d.png"
@@ -33,7 +33,7 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -vf "drawtext=text='T: %{pts\:hms}':x=w-tw-10:y=h-th-100:fontcolor=white:fontsize=24,drawtext=text='IF: %{frame_num}':x=w-tw-10:y=h-th-70:fontcolor=white:fontsize=24,drawtext=text='OF: %{n}':x=w-tw-10:y=h-th-40:fontcolor=white:fontsize=24" -q:v 0 -c:v png "/data/input/frame_%010d.png"
 ```
 
-### Process frames, detect and blur faces in each frame from the input directory:
+### Step 2: Process frames, detect and blur faces in each frame from the input directory:
 ```
 docker build . -t blurer 
 
@@ -51,7 +51,7 @@ Environment variables:
 * `DEBUG` - if set to `1` will draw rectangles around faces and print extra info
 * `THRESHOLD` - threshold for face detection, default is (see in the code)
 
-### Compose video back from frames:
+### Step 3: Compose video back from frames:
 ```
 docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 -pix_fmt yuv420p "/data/output/video1-blurred.mp4"
 ```
