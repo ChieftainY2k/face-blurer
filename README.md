@@ -1,11 +1,11 @@
 # What is it for ?
 
-This is a simple example of how to blur faces in a video using AI and ffmpeg.
+This is a simple PoC (proof of concept) how to blur faces in a video using AI and ffmpeg.
 
 # How it works
 
 1. Decompose video into frames using ffmpeg
-2. Process each frame with deepface to detect faces and blur them
+2. Process each frame with AI models to detect faces and blur them
 3. Compose video back from frames using ffmpeg
 
 # What you need:
@@ -43,7 +43,7 @@ docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/b
 # faster but less accurate:
 docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface_batch.py
 
-# faster but less accurate in DEBUG mode (showing faces but not blurring them, useful for debugging):
+# faster but less accurate in DEBUG mode (showing faces but not blurring them, only drawing rectangles):
 docker run --rm -v ./app:/app -e DEBUG=1 -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface_batch.py 
 ```
 
