@@ -67,7 +67,6 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "
 # References:
 * https://github.com/markusschmitz53/demo-face-blur
 
-
 # FAQ
 
 * Why do you break video into frames and then compose it back?
@@ -75,8 +74,6 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "
   * Because it's easier to delete the frames with a file manager if you want to reprocess just a part of the video.
   * Because it's easier to process frames with AI models and then compose video back. Also, it's easier to debug and improve the process.
   * Bacause it's easier to parallelize processing of frames.
-  * Bacause it's easier to process frames with different AI models and then compose video back. 
-
 
 # Examples:
 
