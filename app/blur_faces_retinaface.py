@@ -16,7 +16,6 @@ def blur_faces_in_directory(input_dir, output_dir):
     image_files = [f for f in files if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
     total_files = len(image_files)
     processed_files = 0
-    score_threshold = 0
 
     if total_files == 0:
         print("No image files found in the input directory.", flush=True)
@@ -145,6 +144,7 @@ if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     debug_mode = os.getenv('DEBUG', '')
+    score_threshold = float(os.getenv('THRESHOLD', 0.63))
 
     if not input_dir or not output_dir:
         print("Error: INPUT_DIR or OUTPUT_DIR environment variables are not set.")

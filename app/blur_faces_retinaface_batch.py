@@ -65,7 +65,6 @@ def process_faces_in_directory(input_dir, output_dir):
 
         face_count_processed = 0  # Counter for faces in the current image
         face_count_total = len(faces)  # Total number of faces detected
-        score_threshold = 0.63  # Minimum score threshold for face detection
 
         if faces is not None and len(faces) > 0:
             print(f", ", end="", flush=True)
@@ -171,6 +170,8 @@ if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     debug_mode = os.getenv('DEBUG', '')
+    #score_threshold = 0.63  # Minimum score threshold for face detection
+    score_threshold = float(os.getenv('THRESHOLD', 0.63))
 
     if not input_dir or not output_dir:
         print("Error: INPUT_DIR or OUTPUT_DIR environment variables are not set.")
