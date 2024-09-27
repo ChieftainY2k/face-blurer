@@ -30,7 +30,6 @@ def process_faces_in_directory(input_dir, output_dir):
     # Loop through all image files in the input directory
     for idx, filename in enumerate(image_files):
 
-        processed_files += 1
         input_path = os.path.join(input_dir, filename)
 
         if debug_mode:
@@ -148,6 +147,7 @@ def process_faces_in_directory(input_dir, output_dir):
         cv2.imwrite(output_path, image)
 
         # Update progress
+        processed_files += 1
         elapsed_time = time.time() - start_time
         average_time_per_file = elapsed_time / processed_files
         files_left = total_files - processed_files
