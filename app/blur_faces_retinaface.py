@@ -101,7 +101,7 @@ def blur_faces_in_directory(input_dir, output_dir):
                   30) # SigmaX
                 image[y1:y2, x1:x2] = face_roi_blurred
 
-                if debug_mode == "1":
+                if debug_mode:
 
                     # Draw a rectangle around the face
                     color = (0, 255, 0) if score >= score_threshold else (0, 0, 255)

@@ -101,7 +101,7 @@ def process_faces_in_directory(input_dir, output_dir):
                     throw ("Error: Invalid face dimensions")
 
                 # If in DEBUG mode, draw a rectangle based on the score, otherwise blur
-                if debug_mode == "1":
+                if debug_mode:
 
                     # increase count if above threshold
                     if score >= score_threshold:
