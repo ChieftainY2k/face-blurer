@@ -16,10 +16,10 @@ def blur_faces_in_directory(input_dir, output_dir):
     image_files = [f for f in files if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
     total_files = len(image_files)
     processed_files = 0
+    score_threshold = 0
 
     if total_files == 0:
-        print("No image files found in the input directory.")
-        sys.stdout.flush()
+        print("No image files found in the input directory.", flush=True)
         return
 
     # Start time for ETA calculation
@@ -38,38 +38,46 @@ def blur_faces_in_directory(input_dir, output_dir):
             output_path = os.path.join(output_dir, filename) + ".blurred.png"
 
         # Start line with file name
-        print(f"* processing: {input_path} to {output_path}", end="")
-        sys.stdout.flush()
+        print(f"* processing: {input_path} to {output_path}", end="", flush=True)
 
         # skip if the output file already exists
         if os.path.exists(output_path):
-            print(f", skipping as {output_path} already exists")
-            sys.stdout.flush()
+            print(f", skipping as {output_path} already exists", flush=True)
             continue
 
         # Read the image
         image = cv2.imread(input_path)
         if image is None:
-            print(f", could not open or find the image: {filename}")
-            sys.stdout.flush()
+            print(f", could not open or find the image: {filename}", flush=True)
             exit(1)
 
-        print(", detecting", end="")
-        sys.stdout.flush()
+        print(", detecting", end="", flush=True)
         detection_start_time = time.time()
         faces = RetinaFace.detect_faces(image)
         detection_end_time = time.time()
         detection_time = detection_end_time - detection_start_time
-        print(f" ({detection_time:.2f}s)", end="")
-        sys.stdout.flush()
+        print(f" ({detection_time:.2f}s)", end="", flush=True)
 
         face_count = 0  # Counter for faces in the current image
 
         if faces:
+            print(f", ", end="", flush=True)
             for face_id, face_info in faces.items():
                 # Each face_info contains 'facial_area' and 'landmarks'
+
+                # dump face_info
+                #print(f"\nface_info: {face_info}")
+
+                # face_info: {
+                # 'score': 0.9993743300437927, 'facial_area': [266, 46, 349, 159],
+                # 'landmarks': {'right_eye': [276.5431, 95.09499], 'left_eye': [309.75772, 85.50013],
+                # 'nose': [288.55124, 113.38841], 'mouth_right': [290.31442, 134.20258], 'mouth_left': [318.6419, 125.993256]}}
+
                 facial_area = face_info['facial_area']
                 x1, y1, x2, y2 = facial_area
+
+                score = face_info['score']
+                print(f"[{score:.2f}+]", end="", flush=True)
 
                 # Ensure coordinates are within image bounds
                 x1 = max(0, x1)
@@ -79,16 +87,13 @@ def blur_faces_in_directory(input_dir, output_dir):
 
                 # Validate dimensions
                 if x1 >= x2 or y1 >= y2:
-                    print(" , warning: invalid detection", end="")
-                    sys.stdout.flush()
-                    continue  # Skip invalid detections
+                    print(" , ERROR: invalid detection", end="", flush=True)
+                    exit(1)
 
                 # Extract the face region
                 face_roi = image[y1:y2, x1:x2]
                 if face_roi.size == 0:
-                    print(" , warning: empty region", end="")
-                    sys.stdout.flush()
-                    continue  # Skip if the face region is empty
+                    throw ("Error: face_roi is empty")
 
                 # Blur the face region
                 face_roi_blurred = cv2.GaussianBlur(
@@ -97,14 +102,22 @@ def blur_faces_in_directory(input_dir, output_dir):
                   30) # SigmaX
                 image[y1:y2, x1:x2] = face_roi_blurred
 
+                if debug_mode == "1":
+
+                    # Draw a rectangle around the face
+                    color = (0, 255, 0) if score >= score_threshold else (0, 0, 255)
+                    cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
+                    text = f"{score:.2f}"
+                    text_y = y2 + 20
+                    if text_y > image.shape[0]:
+                        text_y = y1 - 10
+                    cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+
                 # Increment face count and print a dot
                 face_count += 1
-                #print(".", end="")
-                #sys.stdout.flush()
 
         print(f", {face_count} face(s)", end="")
-        print(f", saving", end="")
-        sys.stdout.flush()
+        print(f", saving", end="", flush=True)
         #cv2.imwrite(output_path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
         cv2.imwrite(output_path, image)
 
@@ -124,8 +137,7 @@ def blur_faces_in_directory(input_dir, output_dir):
 
         # Print completion message for the current file
         print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
-              f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m")
-        sys.stdout.flush()
+              f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m", flush=True)
 
     print("Processing complete.")
 

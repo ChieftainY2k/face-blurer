@@ -99,8 +99,7 @@ def process_faces_in_directory(input_dir, output_dir):
 
                 # Validate dimensions
                 if x1 >= x2 or y1 >= y2:
-                    print(" , ERROR: invalid detection", end="", flush=True)
-                    exit(1)
+                    throw ("Error: Invalid face dimensions")
 
                 # If in DEBUG mode, draw a rectangle based on the score, otherwise blur
                 if debug_mode == "1":
@@ -132,6 +131,8 @@ def process_faces_in_directory(input_dir, output_dir):
                 else:
                     # Blur the face region
                     face_roi = image[y1:y2, x1:x2]
+                    if face_roi.size == 0:
+                        throw ("Error: face_roi is empty")
                     face_roi_blurred = cv2.GaussianBlur(
                         face_roi,  # Input image
                         (99, 99),  # Kernel size
