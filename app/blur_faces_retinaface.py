@@ -50,8 +50,7 @@ def blur_faces_in_directory(input_dir, output_dir):
         print(", detecting", end="")
         sys.stdout.flush()
         detection_start_time = time.time()
-        detector = RetinaFace(gpu_id=0)
-        faces = detector.detect_faces(image)
+        faces = RetinaFace.detect_faces(image)
         detection_end_time = time.time()
         detection_time = detection_end_time - detection_start_time
         print(f" ({detection_time:.2f}s)", end="")

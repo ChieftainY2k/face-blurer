@@ -40,6 +40,9 @@ docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/b
 
 # faster but less accurate:
 docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface_batch.py
+
+# faster but less accurate in DEBUG mode (showing faces but not blurring them, useful for debugging):
+docker run --rm -v ./app:/app -e DEBUG=1 -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface_batch.py 
 ```
 
 ### Compose video back from frames:

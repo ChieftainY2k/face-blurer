@@ -5,7 +5,7 @@ import numpy as np
 import time
 from batch_face import RetinaFace  # Correct import from batch-face
 
-def blur_faces_in_directory(input_dir, output_dir):
+def process_faces_in_directory(input_dir, output_dir):
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -18,8 +18,7 @@ def blur_faces_in_directory(input_dir, output_dir):
     processed_files = 0
 
     if total_files == 0:
-        print("No image files found in the input directory.")
-        sys.stdout.flush()
+        print("No image files found in the input directory.", flush=True)
         return
 
     # Start time for ETA calculation
@@ -31,27 +30,29 @@ def blur_faces_in_directory(input_dir, output_dir):
     # Loop through all image files in the input directory
     for idx, filename in enumerate(image_files):
         input_path = os.path.join(input_dir, filename)
-        output_path = os.path.join(output_dir, filename) + ".blurred.png"
+
+        if debug_mode:
+            # add debug.png to the output path if debug mode is enabled
+            output_path = os.path.join(output_dir, filename) + ".debug.png"
+        else:
+            # add processed.png to the output path if debug mode is disabled
+            output_path = os.path.join(output_dir, filename) + ".processed.png"
 
         # Start line with file name
-        print(f"* processing: {input_path} to {output_path}", end="")
-        sys.stdout.flush()
+        print(f"* processing: {input_path} to {output_path}", end="", flush=True)
 
         # Skip if the output file already exists
         if os.path.exists(output_path):
-            print(f", skipping as {output_path} already exists")
-            sys.stdout.flush()
+            print(f", skipping as {output_path} already exists", flush=True)
             continue
 
         # Read the image
         image = cv2.imread(input_path)
         if image is None:
-            print(f", could not open or find the image: {filename}")
-            sys.stdout.flush()
+            print(f", could not open or find the image: {filename}", flush=True)
             exit(1)
 
-        print(", detecting", end="")
-        sys.stdout.flush()
+        print(", detecting", end="", flush=True)
         detection_start_time = time.time()
 
         # Detect faces in the image by calling the detector directly
@@ -59,25 +60,26 @@ def blur_faces_in_directory(input_dir, output_dir):
 
         detection_end_time = time.time()
         detection_time = detection_end_time - detection_start_time
-        print(f" ({detection_time:.2f}s)", end="")
-        sys.stdout.flush()
+        print(f" ({detection_time:.2f}s)", end="", flush=True)
 
-        face_count_blurred = 0  # Counter for faces in the current image
+        face_count_processed = 0  # Counter for faces in the current image
         face_count_total = len(faces)  # Total number of faces detected
         score_threshold = 0.63  # Minimum score threshold for face detection
 
         if faces is not None and len(faces) > 0:
-            print(f", ", end="")
+            print(f", ", end="", flush=True)
             for face_info in faces:
                 # Each face_info is a tuple: (bbox, landmarks, score)
                 bbox, landmarks, score = face_info  # Unpack face_info
 
                 if (score >= score_threshold):
-                    print(f"[{score:.2f}+]", end="")
+                    # Print the score with a "+" if it's above the threshold
+                    print(f"[{score:.2f}+]", end="", flush=True)
                 else:
-                    print(f"[{score:.2f}-]", end="")
-                    continue
-                sys.stdout.flush()
+                    # Skip faces below the threshold
+                    print(f"[{score:.2f}-]", end="", flush=True)
+                    if not debug_mode:
+                        continue
 
                 # Unpack bounding box coordinates
                 x1, y1, x2, y2 = bbox
@@ -96,30 +98,40 @@ def blur_faces_in_directory(input_dir, output_dir):
 
                 # Validate dimensions
                 if x1 >= x2 or y1 >= y2:
-                    print(" , warning: invalid detection", end="")
-                    sys.stdout.flush()
-                    continue  # Skip invalid detections
+                    print(" , ERROR: invalid detection", end="", flush=True)
+                    exit(1)
 
-                # Extract the face region
-                face_roi = image[y1:y2, x1:x2]
-                if face_roi.size == 0:
-                    print(" , warning: empty region", end="")
-                    sys.stdout.flush()
-                    continue  # Skip if the face region is empty
+                # If in DEBUG mode, draw a rectangle based on the score, otherwise blur
+                if debug_mode:
+                    # Draw a green rectangle for scores above the threshold, otherwise red
+                    color = (0, 255, 0) if score >= score_threshold else (0, 0, 255)
 
-                # Blur the face region
-                face_roi_blurred = cv2.GaussianBlur(
-                    face_roi,  # Input image
-                    (99, 99),  # Kernel size
-                    30)  # SigmaX
-                image[y1:y2, x1:x2] = face_roi_blurred
+                    # Draw the rectangle around the face
+                    cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
 
-                face_count_blurred += 1
+                    # Print the score below the rectangle
+                    text = f"{score:.2f}"
+                    cv2.putText(image, text, (x1, y2 + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+
+                    # increase count if above threshold
+                    if score >= score_threshold:
+                        face_count_processed += 1
+
+                else:
+                    # Blur the face region
+                    face_roi = image[y1:y2, x1:x2]
+                    face_roi_blurred = cv2.GaussianBlur(
+                        face_roi,  # Input image
+                        (99, 99),  # Kernel size
+                        30)  # SigmaX
+                    image[y1:y2, x1:x2] = face_roi_blurred
+                    face_count_processed += 1
 
 
-        print(f", faces: {face_count_blurred}/{face_count_total}", end="")
-        print(f", saving", end="")
-        sys.stdout.flush()
+
+        # Save the resulting image to the output directory
+        print(f", faces: {face_count_processed}/{face_count_total}", end="", flush=True)
+        print(f", saving", end="", flush=True)
         cv2.imwrite(output_path, image)
 
         # Update progress
@@ -138,17 +150,17 @@ def blur_faces_in_directory(input_dir, output_dir):
 
         # Print completion message for the current file
         print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
-              f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m")
-        sys.stdout.flush()
+              f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m", flush=True)
 
     print("Processing complete.")
 
 if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
+    debug_mode = os.getenv('DEBUG', '')
 
     if not input_dir or not output_dir:
         print("Error: INPUT_DIR or OUTPUT_DIR environment variables are not set.")
         sys.exit(1)
 
-    blur_faces_in_directory(input_dir, output_dir)
+    process_faces_in_directory(input_dir, output_dir)
