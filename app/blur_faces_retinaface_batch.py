@@ -123,8 +123,10 @@ def process_faces_in_directory(input_dir, output_dir):
 
                     # Print the score below the rectangle
                     text = f"{score:.2f}"
-                    cv2.putText(image, text, (x1, y2 + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
-
+                    text_y = y2 + 20
+                    if text_y > image.shape[0]:
+                        text_y = y1 - 10
+                    cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
                 else:
                     # Blur the face region
