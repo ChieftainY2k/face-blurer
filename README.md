@@ -68,10 +68,15 @@ https://www.youtube.com/watch?v=Debjcl5z9Dw
 
 ### Face blurer in action:
 
-![image](https://github.com/user-attachments/assets/f67fdcc6-3054-4fe4-b527-c5ad70e21ddd)
+![image](https://github.com/user-attachments/assets/4cc09d54-09f7-47e6-b5de-1a0902cbc26e)
+
 
 ### Processed frames:
 
 ![image](https://github.com/user-attachments/assets/d8c5ded2-f60c-4651-abb7-6275118f069b)
 
+
+### Processed frames (DEBUG MODE):
+
+![image](https://github.com/user-attachments/assets/355871dd-30da-48b8-b89d-58f6a950331a)
 
