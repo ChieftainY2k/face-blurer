@@ -102,7 +102,19 @@ def process_faces_in_directory(input_dir, output_dir):
                     exit(1)
 
                 # If in DEBUG mode, draw a rectangle based on the score, otherwise blur
-                if debug_mode:
+                if debug_mode == "1":
+
+                    # increase count if above threshold
+                    if score >= score_threshold:
+                        # Blur the face region
+                        face_roi = image[y1:y2, x1:x2]
+                        face_roi_blurred = cv2.GaussianBlur(
+                            face_roi,  # Input image
+                            (99, 99),  # Kernel size
+                            30)  # SigmaX
+                        image[y1:y2, x1:x2] = face_roi_blurred
+                        face_count_processed += 1
+
                     # Draw a green rectangle for scores above the threshold, otherwise red
                     color = (0, 255, 0) if score >= score_threshold else (0, 0, 255)
 
@@ -113,9 +125,6 @@ def process_faces_in_directory(input_dir, output_dir):
                     text = f"{score:.2f}"
                     cv2.putText(image, text, (x1, y2 + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
-                    # increase count if above threshold
-                    if score >= score_threshold:
-                        face_count_processed += 1
 
                 else:
                     # Blur the face region
