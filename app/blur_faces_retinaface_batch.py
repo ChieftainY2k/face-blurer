@@ -29,6 +29,7 @@ def process_faces_in_directory(input_dir, output_dir):
 
     # Loop through all image files in the input directory
     for idx, filename in enumerate(image_files):
+
         input_path = os.path.join(input_dir, filename)
 
         if debug_mode:

@@ -27,8 +27,15 @@ def blur_faces_in_directory(input_dir, output_dir):
 
     # Loop through all image files in the input directory
     for idx, filename in enumerate(image_files):
+
         input_path = os.path.join(input_dir, filename)
-        output_path = os.path.join(output_dir, filename) + ".blurred.png"
+
+        if debug_mode:
+            # add debug.png to the output path if debug mode is enabled
+            output_path = os.path.join(output_dir, filename) + ".debug.png"
+        else:
+            # add processed.png to the output path if debug mode is disabled
+            output_path = os.path.join(output_dir, filename) + ".blurred.png"
 
         # Start line with file name
         print(f"* processing: {input_path} to {output_path}", end="")
@@ -125,6 +132,7 @@ def blur_faces_in_directory(input_dir, output_dir):
 if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
+    debug_mode = os.getenv('DEBUG', '')
 
     if not input_dir or not output_dir:
         print("Error: INPUT_DIR or OUTPUT_DIR environment variables are not set.")
