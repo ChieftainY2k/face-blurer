@@ -62,8 +62,9 @@ def blur_faces_in_directory(input_dir, output_dir):
         print(f" ({detection_time:.2f}s)", end="")
         sys.stdout.flush()
 
-        face_count = 0  # Counter for faces in the current image
-        score_threshold = 0.6  # Minimum score threshold for face detection
+        face_count_blurred = 0  # Counter for faces in the current image
+        face_count_total = len(faces)  # Total number of faces detected
+        score_threshold = 0.63  # Minimum score threshold for face detection
 
         if faces is not None and len(faces) > 0:
             print(f", ", end="")
@@ -113,10 +114,10 @@ def blur_faces_in_directory(input_dir, output_dir):
                     30)  # SigmaX
                 image[y1:y2, x1:x2] = face_roi_blurred
 
-                # Increment face count
-                face_count += 1
+                face_count_blurred += 1
 
-        print(f", {face_count} face(s)", end="")
+
+        print(f", faces: {face_count_blurred}/{face_count_total}", end="")
         print(f", saving", end="")
         sys.stdout.flush()
         cv2.imwrite(output_path, image)
