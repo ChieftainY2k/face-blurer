@@ -36,7 +36,7 @@ def process_faces_in_directory(input_dir, output_dir):
             output_path = os.path.join(output_dir, filename) + ".debug.png"
         else:
             # add processed.png to the output path if debug mode is disabled
-            output_path = os.path.join(output_dir, filename) + ".processed.png"
+            output_path = os.path.join(output_dir, filename) + ".blurred.png"
 
         # Start line with file name
         print(f"* processing: {input_path} to {output_path}", end="", flush=True)
