@@ -19,9 +19,11 @@ This is a simple example of how to blur faces in a video using AI and ffmpeg.
 # Preserve original
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -fps_mode passthrough -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
-
 #Scale to 640px width
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -vf "scale=640:-1" -q:v 0 -c:v png "/data/input/frame_%10d.png"
+
+#Scale to 640px width and custom FPS
+docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 10 -vf "scale=640:-1" -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
 # Custom FPS
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -q:v 0 -c:v png "/data/input/frame_%10d.png"
