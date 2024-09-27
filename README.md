@@ -14,7 +14,7 @@ This is a simple PoC (proof of concept) how to blur faces in a video using AI an
 
 # How to use it
 
-### Decompose video into frames, each frame with index number:
+### Decompose video into frames, each frame in a file with the index number:
 ```
 # Preserve original
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -fps_mode passthrough -q:v 0 -c:v png "/data/input/frame_%10d.png"
@@ -55,6 +55,14 @@ Environment variables:
 ```
 docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 -pix_fmt yuv420p "/data/output/video1-blurred.mp4"
 ```
+
+
+# Recommended flow of work:
+* Decompose video into frames
+* Process frames with fast model
+* Check the quality of the processing, delete frames that are not good enough
+* Process frames with slow model
+* Compose video back from frames 
 
 # References:
 * https://github.com/markusschmitz53/demo-face-blur
