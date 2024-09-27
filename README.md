@@ -47,6 +47,10 @@ docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/b
 docker run --rm -v ./app:/app -e DEBUG=1 -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface_batch.py 
 ```
 
+Environment variables:
+* `DEBUG` - if set to `1` will draw rectangles around faces and print extra info
+* `THRESHOLD` - threshold for face detection, default is (see in the code)
+
 ### Compose video back from frames:
 ```
 docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 -pix_fmt yuv420p "/data/output/video1-blurred.mp4"
