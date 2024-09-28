@@ -48,10 +48,10 @@ docker build -f Dockerfile.gpu --progress=plain . -t blurer
 docker run --rm  --gpus all -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py
 
 # faster but less accurate:
-docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py
+docker run --rm ---gpus all v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py
 
 # faster but less accurate in DEBUG mode (drawing rectangles extra info around faces):
-docker run --rm -v ./app:/app -e DEBUG=1 -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py 
+docker run --rm --gpus all -v ./app:/app -e DEBUG=1 -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py 
 ```
 
 Environment variables:
@@ -113,10 +113,19 @@ https://www.youtube.com/watch?v=Debjcl5z9Dw
 
 
 
-### TensorDock deployments:
+### TensorDock remote GPU examples:
 
 ```
-sudo apt-get install -y mc joe htop multitail docker-compose screen docker-buildx-plugin pydf
+
+export TPORT=XXXX ; export THOST=XXX.XXX.XXX.XXX
+
+sudo apt-get install -y mc joe htop multitail docker-compose screen docker-buildx-plugin pydf iotop
 git clone https://github.com/ChieftainY2k/face-blurer.git
-scp -P PORT /path/to/local/file user@SERVER_IP:/path/to/remote/file
+
+# upload files to server
+scp -P $TPORT ./input/video1.mp4 user@$THOST:/home/user/face-blurer/input
+
+# download files from server
+rsync -avz --delete -e "ssh -p $TPORT" user@$THOST:/home/user/face-blurer/output /tmp/output-$THOST
+
 ```
