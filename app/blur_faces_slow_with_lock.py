@@ -154,6 +154,10 @@ if __name__ == "__main__":
     debug_mode = os.getenv('DEBUG', '')
     score_threshold = float(os.getenv('THRESHOLD', 0.90))
 
+    # set CUDA_VISIBLE_DEVICES if not set
+    if 'CUDA_VISIBLE_DEVICES' not in os.environ:
+        os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+
     if not input_dir or not output_dir:
         print("Error: INPUT_DIR or OUTPUT_DIR environment variables are not set.")
         sys.exit(1)
