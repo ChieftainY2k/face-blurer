@@ -138,10 +138,10 @@ sudo systemctl restart docker
 cd /home/user
 git clone https://github.com/ChieftainY2k/face-blurer.git
 
-# sync files TO remote server
+# upload files TO remote server
 rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video* user@$THOST:/home/user/face-blurer/input/
 
-# sync files FROM remote server
+# download files FROM remote server
 rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" user@$THOST:/home/user/face-blurer/output/ /tmp/output-$THOST/
 
 ```
