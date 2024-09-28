@@ -104,6 +104,7 @@ https://www.youtube.com/watch?v=Debjcl5z9Dw
 ### TensorDock deployments:
 
 ```
-sudo apt-get install mc joe htop multitail docker-compose screen docker-buildx-plugin
+sudo apt-get install -y mc joe htop multitail docker-compose screen docker-buildx-plugin pydf
+git clone https://github.com/ChieftainY2k/face-blurer.git
 scp -P PORT /path/to/local/file user@SERVER_IP:/path/to/remote/file
 ```
