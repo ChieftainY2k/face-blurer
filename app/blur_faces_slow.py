@@ -44,99 +44,107 @@ def blur_faces_in_directory(input_dir, output_dir):
             print(f", skipping as {output_path} already exists", flush=True)
             continue
 
-        # Read the image
-        image = cv2.imread(input_path)
-        if image is None:
-            print(f", could not open or find the image: {filename}", flush=True)
-            exit(1)
+        # Now check if lock file exists, attempt to create lock file atomically
+        lock_path = output_path + '.lock'
+        try:
+            fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.close(fd)
+        except FileExistsError:
+            # The lock file exists, skip processing
+            print(f", skipping as lock file {lock_path} exists", flush=True)
+            continue
 
-        print(", detecting", end="", flush=True)
-        detection_start_time = time.time()
-        faces = RetinaFace.detect_faces(image)
-        detection_end_time = time.time()
-        detection_time = detection_end_time - detection_start_time
-        print(f" ({detection_time:.2f}s)", end="", flush=True)
+        try:
+            # Read the image
+            image = cv2.imread(input_path)
+            if image is None:
+                print(f", could not open or find the image: {filename}", flush=True)
+                exit(1)
 
-        face_count = 0  # Counter for faces in the current image
+            print(", detecting", end="", flush=True)
+            detection_start_time = time.time()
+            faces = RetinaFace.detect_faces(image)
+            detection_end_time = time.time()
+            detection_time = detection_end_time - detection_start_time
+            print(f" ({detection_time:.2f}s)", end="", flush=True)
 
-        if faces:
-            print(f", ", end="", flush=True)
-            for face_id, face_info in faces.items():
-                # Each face_info contains 'facial_area' and 'landmarks'
+            face_count = 0  # Counter for faces in the current image
 
-                # dump face_info
-                #print(f"\nface_info: {face_info}")
+            if faces:
+                print(f", ", end="", flush=True)
+                for face_id, face_info in faces.items():
+                    # Each face_info contains 'facial_area' and 'landmarks'
 
-                # face_info: {
-                # 'score': 0.9993743300437927, 'facial_area': [266, 46, 349, 159],
-                # 'landmarks': {'right_eye': [276.5431, 95.09499], 'left_eye': [309.75772, 85.50013],
-                # 'nose': [288.55124, 113.38841], 'mouth_right': [290.31442, 134.20258], 'mouth_left': [318.6419, 125.993256]}}
+                    facial_area = face_info['facial_area']
+                    x1, y1, x2, y2 = facial_area
 
-                facial_area = face_info['facial_area']
-                x1, y1, x2, y2 = facial_area
+                    score = face_info['score']
+                    print(f"[{score:.2f}+]", end="", flush=True)
 
-                score = face_info['score']
-                print(f"[{score:.2f}+]", end="", flush=True)
+                    # Ensure coordinates are within image bounds
+                    x1 = max(0, x1)
+                    y1 = max(0, y1)
+                    x2 = min(image.shape[1], x2)
+                    y2 = min(image.shape[0], y2)
 
-                # Ensure coordinates are within image bounds
-                x1 = max(0, x1)
-                y1 = max(0, y1)
-                x2 = min(image.shape[1], x2)
-                y2 = min(image.shape[0], y2)
+                    # Validate dimensions
+                    if x1 >= x2 or y1 >= y2:
+                        print(" , ERROR: invalid detection", end="", flush=True)
+                        exit(1)
 
-                # Validate dimensions
-                if x1 >= x2 or y1 >= y2:
-                    print(" , ERROR: invalid detection", end="", flush=True)
-                    exit(1)
+                    # Extract the face region
+                    face_roi = image[y1:y2, x1:x2]
+                    if face_roi.size == 0:
+                        raise ValueError("Error: face_roi is empty")
 
-                # Extract the face region
-                face_roi = image[y1:y2, x1:x2]
-                if face_roi.size == 0:
-                    throw ("Error: face_roi is empty")
+                    # Blur the face region
+                    face_roi_blurred = cv2.GaussianBlur(
+                      face_roi, # Input image
+                      (99, 99),  # Kernel size
+                      30) # SigmaX
+                    image[y1:y2, x1:x2] = face_roi_blurred
 
-                # Blur the face region
-                face_roi_blurred = cv2.GaussianBlur(
-                  face_roi, # Input image
-                  (99, 99),  # Kernel size
-                  30) # SigmaX
-                image[y1:y2, x1:x2] = face_roi_blurred
+                    if debug_mode:
+                        # Draw a rectangle around the face
+                        color = (0, 255, 0) if score >= score_threshold else (0, 0, 255)
+                        cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
+                        text = f"{score:.2f}"
+                        text_y = y2 + 20
+                        if text_y > image.shape[0]:
+                            text_y = y1 - 10
+                        cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
-                if debug_mode:
+                    # Increment face count and print a dot
+                    face_count += 1
 
-                    # Draw a rectangle around the face
-                    color = (0, 255, 0) if score >= score_threshold else (0, 0, 255)
-                    cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
-                    text = f"{score:.2f}"
-                    text_y = y2 + 20
-                    if text_y > image.shape[0]:
-                        text_y = y1 - 10
-                    cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+            print(f", {face_count} face(s)", end="")
+            print(f", saving", end="", flush=True)
+            #cv2.imwrite(output_path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+            cv2.imwrite(output_path, image)
 
-                # Increment face count and print a dot
-                face_count += 1
+            # Update progress
+            processed_files += 1
+            elapsed_time = time.time() - start_time
+            average_time_per_file = elapsed_time / processed_files
+            files_left = total_files - processed_files
+            eta = average_time_per_file * files_left
 
-        print(f", {face_count} face(s)", end="")
-        print(f", saving", end="", flush=True)
-        #cv2.imwrite(output_path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-        cv2.imwrite(output_path, image)
+            # Calculate days, hours, and minutes
+            eta_days = int(eta // (24 * 3600))
+            eta_hours = int((eta % (24 * 3600)) // 3600)
+            eta_minutes = int((eta % 3600) // 60)
 
-        # Update progress
-        processed_files += 1
-        elapsed_time = time.time() - start_time
-        average_time_per_file = elapsed_time / processed_files
-        files_left = total_files - processed_files
-        eta = average_time_per_file * files_left
+            percent_complete = (processed_files / total_files) * 100
 
-        # Calculate days, hours, and minutes
-        eta_days = int(eta // (24 * 3600))
-        eta_hours = int((eta % (24 * 3600)) // 3600)
-        eta_minutes = int((eta % 3600) // 60)
-
-        percent_complete = (processed_files / total_files) * 100
-
-        # Print completion message for the current file
-        print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
-              f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m", flush=True)
+            # Print completion message for the current file
+            print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
+                  f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m", flush=True)
+        finally:
+            # Remove the lock file
+            try:
+                os.remove(lock_path)
+            except OSError as e:
+                print(f"Error removing lock file {lock_path}: {e}", flush=True)
 
     print("Processing complete.")
 
@@ -145,6 +153,10 @@ if __name__ == "__main__":
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     debug_mode = os.getenv('DEBUG', '')
     score_threshold = float(os.getenv('THRESHOLD', 0.90))
+
+    # set CUDA_VISIBLE_DEVICES if not set
+    #if 'CUDA_VISIBLE_DEVICES' not in os.environ:
+    #    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
     if not input_dir or not output_dir:
         print("Error: INPUT_DIR or OUTPUT_DIR environment variables are not set.")

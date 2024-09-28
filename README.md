@@ -51,7 +51,10 @@ docker run --rm --gpus all -v ./app:/app -v ./input:/input:ro -v ./output:/outpu
 docker run --rm --gpus all v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py
 
 # faster but less accurate in DEBUG mode (drawing rectangles extra info around faces):
-docker run --rm --gpus all -v ./app:/app -e DEBUG=1 -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py 
+docker run --rm --gpus all -v ./app:/app -e DEBUG=1 -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py
+
+# Multi GPU, with single GPU #0 selected:
+docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=0 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow_with_lock.py 
 ```
 
 Environment variables:
@@ -143,5 +146,8 @@ rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video*
 
 # download files FROM remote server
 rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" user@$THOST:/home/user/face-blurer/output/ /tmp/output-$THOST/
+
+# watch locks
+watch -n 1 "ls output/*.lock"
 
 ```
