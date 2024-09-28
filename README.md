@@ -45,10 +45,10 @@ docker build -f Dockerfile.gpu --progress=plain . -t blurer
 ### Step 3: Process frames, detect and blur faces in each frame from the input directory:
 ```
 # slow but accurate:
-docker run --rm  --gpus all -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py
+docker run --rm --gpus all -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py
 
 # faster but less accurate:
-docker run --rm ---gpus all v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py
+docker run --rm --gpus all v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py
 
 # faster but less accurate in DEBUG mode (drawing rectangles extra info around faces):
 docker run --rm --gpus all -v ./app:/app -e DEBUG=1 -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py 
@@ -119,16 +119,18 @@ https://www.youtube.com/watch?v=Debjcl5z9Dw
 
 export TPORT=XXXX ; export THOST=XXX.XXX.XXX.XXX
 
+# provision host
 sudo apt-get install -y mc joe htop multitail docker-compose screen docker-buildx-plugin pydf iotop
+cd /home/user
 git clone https://github.com/ChieftainY2k/face-blurer.git
 
-# upload files to remote server
+# upload input files to remote server
 scp -P $TPORT ./input/video1.mp4 user@$THOST:/home/user/face-blurer/input
 
 # sync files TO remote server
-rsync -avz --delete -e "ssh -p $TPORT" ./input/ user@$THOST:/home/user/face-blurer/input/
+rsync -avz --info=progress2 --delete -e "ssh -p $TPORT" ./input/ user@$THOST:/home/user/face-blurer/input/
 
 # sync files FROM remote server
-rsync -avz --delete -e "ssh -p $TPORT" user@$THOST:/home/user/face-blurer/output/ /tmp/output-$THOST/
+rsync -avz --info=progress2 --delete -e "ssh -p $TPORT" user@$THOST:/home/user/face-blurer/output/ /tmp/output-$THOST/
 
 ```
