@@ -35,7 +35,7 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -
 
 ### Step 2: Process frames, detect and blur faces in each frame from the input directory:
 ```
-docker build . -t blurer 
+docker build --progress=plain . -t blurer 
 
 # slow but accurate:
 docker run --rm  --privileged --gpus all -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py
@@ -74,6 +74,11 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "
   * Because it's easier to delete the frames with a file manager if you want to reprocess just a part of the video.
   * Because it's easier to process frames with AI models and then compose video back. Also, it's easier to debug and improve the process.
   * Bacause it's easier to parallelize processing of frames.
+
+* How do I debug the container?
+```
+docker run --rm  -it --privileged --gpus all -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer bash
+```
 
 # Examples:
 
