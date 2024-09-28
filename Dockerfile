@@ -24,6 +24,7 @@ RUN git clone https://github.com/opencv/opencv_zoo /opencv_zoo \
 RUN pip install opencv-contrib-python numpy opencv-python retina-face tf-keras
 RUN pip install torch torchvision torchaudio
 RUN pip install batch-face
+RUN pip install tensorrt
 
 # Copy the face blurring script into the container
 #COPY blur_faces.py /app/

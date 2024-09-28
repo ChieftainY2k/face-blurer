@@ -38,7 +38,7 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -
 docker build . -t blurer 
 
 # slow but accurate:
-docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py
+docker run --rm  --privileged --gpus all -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py
 
 # faster but less accurate:
 docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py
