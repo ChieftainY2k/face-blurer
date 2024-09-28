@@ -8,13 +8,8 @@ from multiprocessing import Process
 from retinaface import RetinaFace
 
 def worker(image_files_chunk, gpu_id, input_dir, output_dir, debug_mode, score_threshold, total_files):
-    # Set the device for the current process
-    device = torch.device(f'cuda:{gpu_id}' if torch.cuda.is_available() else 'cpu')
-
-    # Initialize the RetinaFace model with the assigned device
-    model = RetinaFace.build_model()
-    model = model.to(device)
-    model.eval()
+    # Set the environment variable for the current process to specify the GPU
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
 
     # Start time for ETA calculation
     start_time = time.time()
@@ -45,7 +40,8 @@ def worker(image_files_chunk, gpu_id, input_dir, output_dir, debug_mode, score_t
 
         print(", detecting", end="", flush=True)
         detection_start_time = time.time()
-        faces = RetinaFace.detect_faces(image, model=model, device=device, threshold=score_threshold)
+        # Pass the gpu_id to the detect_faces function
+        faces = RetinaFace.detect_faces(image, threshold=score_threshold, gpu_id=gpu_id)
         detection_end_time = time.time()
         detection_time = detection_end_time - detection_start_time
         print(f" ({detection_time:.2f}s)", end="", flush=True)
@@ -120,7 +116,7 @@ def worker(image_files_chunk, gpu_id, input_dir, output_dir, debug_mode, score_t
         print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
               f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m", flush=True)
 
-    print("Processing complete for GPU:", gpu_id)
+    print(f"Processing complete for GPU: {gpu_id}")
 
 if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
@@ -154,8 +150,8 @@ if __name__ == "__main__":
 
     # Create and start processes
     processes = []
-    for gpu_id in range(num_gpus):
-        image_files_chunk = chunks[gpu_id]
+    for idx, gpu_id in enumerate(range(num_gpus)):
+        image_files_chunk = chunks[idx]
         p = Process(target=worker, args=(
             image_files_chunk, gpu_id, input_dir, output_dir, debug_mode, score_threshold, total_files))
         p.start()
