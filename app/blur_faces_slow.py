@@ -47,8 +47,7 @@ def blur_faces_in_directory(input_dir, output_dir):
         # Now check if lock file exists, attempt to create lock file atomically
         lock_path = output_path + '.lock'
         try:
-            fd = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-            os.close(fd)
+            fd_lock = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except FileExistsError:
             # The lock file exists, skip processing
             print(f", skipping as lock file {lock_path} exists", flush=True)
@@ -140,8 +139,9 @@ def blur_faces_in_directory(input_dir, output_dir):
             print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
                   f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m", flush=True)
         finally:
-            # Remove the lock file
+            # Release the lock file
             try:
+                os.close(fd_lock)
                 os.remove(lock_path)
             except OSError as e:
                 print(f"Error removing lock file {lock_path}: {e}", flush=True)
