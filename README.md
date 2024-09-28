@@ -118,6 +118,12 @@ https://www.youtube.com/watch?v=Debjcl5z9Dw
 ```
 
 export TPORT=XXXX ; export THOST=XXX.XXX.XXX.XXX
+
+# inject keys
+cat ~/.ssh/id_rsa.pub | ssh user@$THOST -p $TPORT "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys
+
+# log in
+ssh user@$THOST -p $TPORT"
  
 # provision host
 sudo apt-get install -y mc joe htop multitail docker-compose screen docker-buildx-plugin pydf iotop
@@ -132,13 +138,10 @@ sudo systemctl restart docker
 cd /home/user
 git clone https://github.com/ChieftainY2k/face-blurer.git
 
-# upload input files to remote server
-scp -P $TPORT ./input/video1.mp4 user@$THOST:/home/user/face-blurer/input
-
 # sync files TO remote server
-rsync -avz --info=progress2 --delete -e "ssh -p $TPORT" ./input/ user@$THOST:/home/user/face-blurer/input/
+rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video* user@$THOST:/home/user/face-blurer/input/
 
 # sync files FROM remote server
-rsync -avz --info=progress2 --delete -e "ssh -p $TPORT" user@$THOST:/home/user/face-blurer/output/ /tmp/output-$THOST/
+rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" user@$THOST:/home/user/face-blurer/output/ /tmp/output-$THOST/
 
 ```

@@ -144,7 +144,7 @@ if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     debug_mode = os.getenv('DEBUG', '')
-    score_threshold = float(os.getenv('THRESHOLD', 0.63))
+    score_threshold = float(os.getenv('THRESHOLD', 0.90))
 
     if not input_dir or not output_dir:
         print("Error: INPUT_DIR or OUTPUT_DIR environment variables are not set.")
