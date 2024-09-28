@@ -11,6 +11,12 @@ def worker(image_files_chunk, gpu_id, input_dir, output_dir, debug_mode, score_t
     # Set the environment variable for the current process to specify the GPU
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
 
+    # Set the default device to GPU 0 (since only one GPU is visible in this process)
+    torch.cuda.set_device(0)
+
+    # Build the model
+    model = RetinaFace.build_model()
+
     # Start time for ETA calculation
     start_time = time.time()
     processed_files = 0
@@ -40,8 +46,8 @@ def worker(image_files_chunk, gpu_id, input_dir, output_dir, debug_mode, score_t
 
         print(", detecting", end="", flush=True)
         detection_start_time = time.time()
-        # Pass the gpu_id to the detect_faces function
-        faces = RetinaFace.detect_faces(image, threshold=score_threshold, gpu_id=gpu_id)
+        # Remove 'gpu_id' parameter
+        faces = RetinaFace.detect_faces(image, model=model, threshold=score_threshold)
         detection_end_time = time.time()
         detection_time = detection_end_time - detection_start_time
         print(f" ({detection_time:.2f}s)", end="", flush=True)
@@ -102,7 +108,7 @@ def worker(image_files_chunk, gpu_id, input_dir, output_dir, debug_mode, score_t
         processed_files += 1
         elapsed_time = time.time() - start_time
         average_time_per_file = elapsed_time / processed_files
-        files_left = total_files - processed_files
+        files_left = len(image_files_chunk) - processed_files
         eta = average_time_per_file * files_left
 
         # Calculate days, hours, and minutes
@@ -110,10 +116,10 @@ def worker(image_files_chunk, gpu_id, input_dir, output_dir, debug_mode, score_t
         eta_hours = int((eta % (24 * 3600)) // 3600)
         eta_minutes = int((eta % 3600) // 60)
 
-        percent_complete = (processed_files / total_files) * 100
+        percent_complete = (processed_files / len(image_files_chunk)) * 100
 
         # Print completion message for the current file
-        print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
+        print(f", {processed_files}/{len(image_files_chunk)} files ({percent_complete:.2f}%). "
               f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m", flush=True)
 
     print(f"Processing complete for GPU: {gpu_id}")
