@@ -31,7 +31,7 @@ def worker(image_files_chunk, gpu_id, input_dir, output_dir, debug_mode, score_t
             output_path = os.path.join(output_dir, filename) + ".blurred.png"
 
         # Start line with file name
-        print(f"* processing: {input_path} to {output_path}", end="", flush=True)
+        print(f"[{gpu_id}] processing: {input_path} to {output_path}", end="", flush=True)
 
         # Skip if the output file already exists
         if os.path.exists(output_path):
