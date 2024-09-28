@@ -27,7 +27,7 @@ def blur_faces_in_directory(input_dir, output_dir):
 
     # Set up multi-GPU processing
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = RetinaFace().to(device)
+    model = RetinaFace.build_model().to(device)  # Correctly initialize the model
     model = torch.nn.DataParallel(model)
 
     # Loop through all image files in the input directory
