@@ -38,7 +38,7 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -
 docker build . -t blurer 
 
 # slow but accurate:
-docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache:/root/.deepface blurer python blur_faces_slow.py
+docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py
 
 # faster but less accurate:
 docker run --rm -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py
@@ -99,3 +99,11 @@ https://www.youtube.com/watch?v=Debjcl5z9Dw
 
 ![image](https://github.com/user-attachments/assets/355871dd-30da-48b8-b89d-58f6a950331a)
 
+
+
+### TensorDock deployments:
+
+```
+sudo apt-get install mc joe htop multitail docker-compose screen docker-buildx-plugin
+scp -P PORT /path/to/local/file user@SERVER_IP:/path/to/remote/file
+```
