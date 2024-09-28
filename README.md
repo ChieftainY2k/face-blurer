@@ -33,11 +33,17 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -vf "drawtext=text='T: %{pts\:hms}':x=w-tw-10:y=h-th-100:fontcolor=white:fontsize=24,drawtext=text='IF: %{frame_num}':x=w-tw-10:y=h-th-70:fontcolor=white:fontsize=24,drawtext=text='OF: %{n}':x=w-tw-10:y=h-th-40:fontcolor=white:fontsize=24" -q:v 0 -c:v png "/data/input/frame_%010d.png"
 ```
 
-### Step 2: Process frames, detect and blur faces in each frame from the input directory:
+### Step 2: build the docker image for the face blurer:
 ```
-docker build -f Dockerfile --progress=plain . -t blurer 
-docker build -f Dockerfile.gpu --progress=plain . -t blurer 
+# FOR CPU
+docker build -f Dockerfile --progress=plain . -t blurer
 
+# FOR GPU 
+docker build -f Dockerfile.gpu --progress=plain . -t blurer 
+```
+
+### Step 3: Process frames, detect and blur faces in each frame from the input directory:
+```
 # slow but accurate:
 docker run --rm  --gpus all -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py
 
