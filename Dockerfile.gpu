@@ -5,21 +5,21 @@ WORKDIR /app
 
 # Install necessary system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git git-lfs \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    libsm6 \
-    libxrender1 \
-    libxext6 \
-    curl \
+ #   git git-lfs \
+ #   libgl1-mesa-glx \
+ #   libglib2.0-0 \
+ #   libsm6 \
+ #   libxrender1 \
+ #   libxext6 \
+ #   curl \
     libgl1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-RUN git clone https://github.com/opencv/opencv_zoo /opencv_zoo \
-   && cd /opencv_zoo \
-   && git lfs install \
-   && git lfs pull
+#RUN git clone https://github.com/opencv/opencv_zoo /opencv_zoo \
+#   && cd /opencv_zoo \
+#   && git lfs install \
+#   && git lfs pull
 
 RUN pip install opencv-contrib-python numpy opencv-python retina-face tf-keras torch torchvision torchaudio batch-face
 
