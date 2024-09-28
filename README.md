@@ -122,10 +122,13 @@ export TPORT=XXXX ; export THOST=XXX.XXX.XXX.XXX
 sudo apt-get install -y mc joe htop multitail docker-compose screen docker-buildx-plugin pydf iotop
 git clone https://github.com/ChieftainY2k/face-blurer.git
 
-# upload files to server
+# upload files to remote server
 scp -P $TPORT ./input/video1.mp4 user@$THOST:/home/user/face-blurer/input
 
-# download files from server
-rsync -avz --delete -e "ssh -p $TPORT" user@$THOST:/home/user/face-blurer/output /tmp/output-$THOST
+# sync files TO remote server
+rsync -avz --delete -e "ssh -p $TPORT" ./input/ user@$THOST:/home/user/face-blurer/input/
+
+# sync files FROM remote server
+rsync -avz --delete -e "ssh -p $TPORT" user@$THOST:/home/user/face-blurer/output/ /tmp/output-$THOST/
 
 ```
