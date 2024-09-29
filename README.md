@@ -63,9 +63,14 @@ Environment variables:
 
 ### Step 3: Compose video back from frames:
 ```
-docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 -pix_fmt yuv420p "/data/output/video1-blurred.mp4"
+# 1080p 30fps
+docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 -pix_fmt yuv420p "/data/output/video.mp4"
 
-docker run -v $(pwd):/data linuxserver/ffmpeg -r 30  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.debug.png" -vcodec libx264 -crf 0 -pix_fmt yuv420p "/data/output/video8-debug.mp4"
+# 1080p 30fps, DEBUG MODE
+docker run -v $(pwd):/data linuxserver/ffmpeg -r 30  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.debug.png" -vcodec libx264 -crf 0 -pix_fmt yuv420p "/data/output/video.mp4"
+
+# 4K 60fps, DEBUG MODE
+docker run -v $(pwd):/data linuxserver/ffmpeg -r 59.94  -f image2 -s 3840x2160 -i "/data/output/frame_%10d.png.debug.png" -vcodec libx264 -crf 0 -pix_fmt yuv420p "/data/output/video.mp4"
 ```
 
 
@@ -150,6 +155,6 @@ rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video*
 rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/ /tmp/output-$THOST/
 
 # watch progress and GPU usage
-watch -n 1 "nvidia-smi; ls output/*.lock"
+watch -c -n 1 "uptime; pydf; nvidia-smi; ls output/*.lock; "
 
 ```
