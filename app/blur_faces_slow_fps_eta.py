@@ -1,10 +1,3 @@
-import cv2
-import os
-import sys
-import numpy as np
-import time
-from retinaface import RetinaFace
-
 def blur_faces_in_directory(input_dir, output_dir):
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
@@ -17,7 +10,7 @@ def blur_faces_in_directory(input_dir, output_dir):
     total_files = len(image_files)
     processed_files = 0
     files_checked = 0
-    file_check_times = []
+    file_check_times = []  # Stores times for the last 100 file checks
     percent_changes = []  # Store percent complete over time
     time_changes = []     # Store timestamps of these percent changes
 
@@ -34,7 +27,11 @@ def blur_faces_in_directory(input_dir, output_dir):
         start_loop_time = time.time()
         files_checked += 1
         check_time = time.time()
+
+        # Append current check time and ensure we only keep the last 100 entries
         file_check_times.append(check_time)
+        if len(file_check_times) > 100:
+            file_check_times.pop(0)
 
         # Record percent complete and time
         percent_complete = (files_checked / total_files) * 100
@@ -49,35 +46,28 @@ def blur_faces_in_directory(input_dir, output_dir):
         input_path = os.path.join(input_dir, filename)
 
         if debug_mode:
-            # Add .debug.png to the output path if debug mode is enabled
             output_path = os.path.join(output_dir, filename) + ".debug.png"
         else:
-            # Add .blurred.png to the output path if debug mode is disabled
             output_path = os.path.join(output_dir, filename) + ".blurred.png"
 
-        # Start line with file name
         print(f"* processing: {input_path} to {output_path}", end="", flush=True)
 
-        # Skip if the output file already exists
         if os.path.exists(output_path):
             print(f", skipping as {output_path} already exists", flush=True)
             continue
 
-        # Lock file management
         lock_path = output_path + '.lock'
         try:
             fd_lock = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
         except FileExistsError:
-            # The lock file exists, skip processing
             print(f", skipping as lock file {lock_path} exists", flush=True)
             continue
 
         try:
-            # Read the image
             image = cv2.imread(input_path)
             if image is None:
                 print(f", could not open or find the image: {filename}", flush=True)
-                continue  # Skip to the next file
+                continue
 
             print(", detecting", end="", flush=True)
             detection_start_time = time.time()
@@ -86,46 +76,34 @@ def blur_faces_in_directory(input_dir, output_dir):
             detection_time = detection_end_time - detection_start_time
             print(f" ({detection_time:.2f}s)", end="", flush=True)
 
-            face_count = 0  # Counter for faces in the current image
+            face_count = 0
 
             if faces:
                 print(f", ", end="", flush=True)
                 for face_id, face_info in faces.items():
-                    # Each face_info contains 'facial_area' and 'landmarks'
-
                     facial_area = face_info['facial_area']
                     x1, y1, x2, y2 = facial_area
-
                     score = face_info['score']
                     print(f"[{score:.2f}+]", end="", flush=True)
 
-                    # Ensure coordinates are within image bounds
                     x1 = max(0, x1)
                     y1 = max(0, y1)
                     x2 = min(image.shape[1], x2)
                     y2 = min(image.shape[0], y2)
 
-                    # Validate dimensions
                     if x1 >= x2 or y1 >= y2:
                         print(" , ERROR: invalid detection", end="", flush=True)
-                        continue  # Skip this face
+                        continue
 
-                    # Extract the face region
                     face_roi = image[y1:y2, x1:x2]
                     if face_roi.size == 0:
                         print(" , ERROR: face_roi is empty", end="", flush=True)
-                        continue  # Skip this face
+                        continue
 
-                    # Blur the face region
-                    face_roi_blurred = cv2.GaussianBlur(
-                        face_roi,      # Input image
-                        (99, 99),      # Kernel size
-                        30             # SigmaX
-                    )
+                    face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
                     image[y1:y2, x1:x2] = face_roi_blurred
 
                     if debug_mode:
-                        # Draw a rectangle around the face
                         color = (0, 255, 0) if score >= score_threshold else (0, 0, 255)
                         cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
                         text = f"{score:.2f}"
@@ -134,7 +112,6 @@ def blur_faces_in_directory(input_dir, output_dir):
                             text_y = y1 - 10
                         cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
-                    # Increment face count
                     face_count += 1
 
             print(f", {face_count} face(s)", end="", flush=True)
@@ -144,18 +121,16 @@ def blur_faces_in_directory(input_dir, output_dir):
             cv2.imwrite(tmp_output_path, image)
             os.rename(tmp_output_path, output_path)
 
-            # Update processed_files count
             processed_files += 1
         finally:
-            # Release the lock file
             try:
                 os.close(fd_lock)
                 os.remove(lock_path)
             except OSError as e:
                 print(f"Error removing lock file {lock_path}: {e}", flush=True)
 
-        # Calculate FPS if at least 100 files have been checked
-        if len(file_check_times) >= 100:
+        # Calculate FPS if at least 2 files have been checked
+        if len(file_check_times) >= 2:
             total_time_in_fps = file_check_times[-1] - file_check_times[0]
             if total_time_in_fps > 0:
                 fps = len(file_check_times) / total_time_in_fps
@@ -164,50 +139,22 @@ def blur_faces_in_directory(input_dir, output_dir):
         else:
             fps = 0
 
-        # Calculate dynamic ETA based on the percent change in the last 20 seconds
+        # Calculate dynamic ETA
         if len(percent_changes) >= 2:
             percent_change_rate = (percent_changes[-1] - percent_changes[0]) / (time_changes[-1] - time_changes[0])
             if percent_change_rate > 0:
                 time_left_seconds = (100 - percent_complete) / percent_change_rate
-                # Handle cases where time_left_seconds might be negative
                 time_left_seconds = max(time_left_seconds, 0)
             else:
-                time_left_seconds = float('inf')  # To handle the case of no progress
+                time_left_seconds = float('inf')
 
-            # Convert time_left_seconds to hours, minutes, and seconds
             eta_hours = int(time_left_seconds // 3600)
             eta_minutes = int((time_left_seconds % 3600) // 60)
             eta_seconds = int(time_left_seconds % 60)
 
-            # Print dynamic ETA
             print(f", ETA: {eta_hours}h {eta_minutes}m {eta_seconds}s", end="", flush=True)
 
         # Print completion message for the current file
-        if len(file_check_times) >= 100:
-            print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). FPS: {fps:.2f}.", flush=True)
-        else:
-            print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). ", flush=True)
+        print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). FPS: {fps:.2f}.", flush=True)
 
     print("Processing complete.")
-
-if __name__ == "__main__":
-    # Retrieve environment variables or set default paths
-    input_dir = os.getenv('INPUT_DIR', '/input')
-    output_dir = os.getenv('OUTPUT_DIR', '/output')
-    debug_mode_env = os.getenv('DEBUG', '')
-    score_threshold_env = os.getenv('THRESHOLD', '0.90')
-
-    # Validate and parse score_threshold
-    try:
-        score_threshold = float(score_threshold_env)
-    except ValueError:
-        print("Invalid THRESHOLD value. It should be a float. Using default 0.90.", flush=True)
-        score_threshold = 0.90
-
-    # Validate input and output directories
-    if not input_dir or not output_dir:
-        print("Error: INPUT_DIR or OUTPUT_DIR environment variables are not set.", flush=True)
-        sys.exit(1)
-
-    # Call the main processing function
-    blur_faces_in_directory(input_dir, output_dir)
