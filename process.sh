@@ -6,7 +6,6 @@ set -e
 
 # Detect number of GPUS from nvisia-smi
 GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
-#GPUS=(0 1)
 RUNS_PER_GPU=4
 
 #for gpu in "${GPUS[@]}"; do
