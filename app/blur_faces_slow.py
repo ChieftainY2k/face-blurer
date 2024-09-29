@@ -3,6 +3,7 @@ import os
 import sys
 import numpy as np
 import time
+import fcntl
 from retinaface import RetinaFace
 
 def blur_faces_in_directory(input_dir, output_dir):
