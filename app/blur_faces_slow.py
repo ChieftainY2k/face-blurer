@@ -213,19 +213,7 @@ if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     debug_mode_env = os.getenv('DEBUG', '')
-    score_threshold_env = os.getenv('THRESHOLD', '0.90')
-
-    # Validate and parse score_threshold
-    try:
-        score_threshold = float(score_threshold_env)
-    except ValueError:
-        print("Invalid THRESHOLD value. It should be a float. Using default 0.90.", flush=True)
-        score_threshold = 0.90
-
-    # Validate input and output directories
-    if not input_dir or not output_dir:
-        print("Error: INPUT_DIR or OUTPUT_DIR environment variables are not set.", flush=True)
-        sys.exit(1)
+    score_threshold_env = float(os.getenv('THRESHOLD', '0.90')
 
     # Call the main processing function
     blur_faces_in_directory(input_dir, output_dir)
