@@ -139,7 +139,9 @@ def blur_faces_in_directory(input_dir, output_dir):
 
             tmp_output_path = output_path + ".tmp.png"
 
+            save_start_time = time.time()
             if faces:
+              # Save the image
               print(f", saving frame", end="", flush=True)
               cv2.imwrite(tmp_output_path, image)
             else:
@@ -147,6 +149,10 @@ def blur_faces_in_directory(input_dir, output_dir):
               print(f", copying file", end="", flush=True)
               shutil.copyfile(input_path, tmp_output_path)
 
+            save_time = save_end_time - time.time()
+            print(f" ({save_time:.2f}s)", end="", flush = True)
+
+            # Rename the temporary output file to the final output file
             os.rename(tmp_output_path, output_path)
 
             processed_files += 1
