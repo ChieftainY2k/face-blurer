@@ -121,6 +121,13 @@ def blur_faces_in_directory(input_dir, output_dir):
                     x2 = min(image.shape[1], x2)
                     y2 = min(image.shape[0], y2)
 
+                    # extend the blur area by 10% but not exceed the image size
+                    extra_percentage = 0.3
+                    x1 = max(0, x1 - int((x2 - x1) * extra_percentage))
+                    y1 = max(0, y1 - int((y2 - y1) * extra_percentage))
+                    x2 = min(image.shape[1], x2 + int((x2 - x1) * extra_percentage))
+                    y2 = min(image.shape[0], y2 + int((y2 - y1) * extra_percentage))
+
                     if x1 >= x2 or y1 >= y2:
                         print(" , ERROR: invalid detection", end="", flush=True)
                         continue
@@ -129,13 +136,6 @@ def blur_faces_in_directory(input_dir, output_dir):
                     if face_roi.size == 0:
                         print(" , ERROR: face_roi is empty", end="", flush=True)
                         continue
-
-                    # extend the blur area by 10% but not exceed the image size
-                    extra_percentage = 0.3
-                    x1 = max(0, x1 - int((x2 - x1) * extra_percentage))
-                    y1 = max(0, y1 - int((y2 - y1) * extra_percentage))
-                    x2 = min(image.shape[1], x2 + int((x2 - x1) * extra_percentage))
-                    y2 = min(image.shape[0], y2 + int((y2 - y1) * extra_percentage))
 
                     face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
                     image[y1:y2, x1:x2] = face_roi_blurred
