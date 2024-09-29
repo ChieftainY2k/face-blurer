@@ -149,7 +149,7 @@ def blur_faces_in_directory(input_dir, output_dir):
               print(f", copying file", end="", flush=True)
               shutil.copyfile(input_path, tmp_output_path)
 
-            save_time = save_end_time - time.time()
+            save_time = time.time() - save_start_time
             print(f" ({save_time:.2f}s)", end="", flush = True)
 
             # Rename the temporary output file to the final output file
