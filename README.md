@@ -149,7 +149,7 @@ rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video*
 # download files FROM remote server
 rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/ /tmp/output-$THOST/
 
-# watch locks
-watch -n 1 "ls output/*.lock"
+# watch progress and GPU usage
+watch -n 1 "nvidia-smi; ls output/*.lock"
 
 ```
