@@ -1,4 +1,5 @@
-FROM tensorflow/tensorflow:latest-gpu
+#FROM tensorflow/tensorflow:latest-gpu
+FROM tensorflow/tensorflow:nightly-gpu
 
 # Set the working directory in the container
 WORKDIR /app
