@@ -72,6 +72,7 @@ def blur_faces_in_directory(input_dir, output_dir):
             continue
         except Exception as e:
             print(f"An error occurred: {e}", flush=True)
+            exit(1)
 
         try:
             image = cv2.imread(input_path)
