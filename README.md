@@ -120,13 +120,13 @@ https://www.youtube.com/watch?v=Debjcl5z9Dw
 
 ```
 
-export TPORT=XXXX ; export THOST=XXX.XXX.XXX.XXX
+export TPORT=XXXX ; export THOST=XXX.XXX.XXX.XXX ; export TUSER=user ;
 
 # inject keys
-cat ~/.ssh/id_rsa.pub | ssh user@$THOST -p $TPORT "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys
+cat ~/.ssh/id_rsa.pub | ssh $TUSER@$THOST -p $TPORT "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys
 
 # log in
-ssh user@$THOST -p $TPORT"
+ssh $TUSER@$THOST -p $TPORT"
  
 # provision host
 sudo apt-get install -y mc joe htop multitail docker-compose screen docker-buildx-plugin pydf iotop
@@ -138,14 +138,14 @@ sudo apt-get install -y nvidia-container-toolkit
 sudo nvidia-ctk runtime configure --runtime=docker
 sudo systemctl restart docker
 
-cd /home/user
+cd /home/$TUSER
 git clone https://github.com/ChieftainY2k/face-blurer.git
 
 # upload files TO remote server
-rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video* user@$THOST:/home/user/face-blurer/input/
+rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video* $TUSER@$THOST:/home/$TUSER/face-blurer/input/
 
 # download files FROM remote server
-rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" user@$THOST:/home/user/face-blurer/output/ /tmp/output-$THOST/
+rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/ /tmp/output-$THOST/
 
 # watch locks
 watch -n 1 "ls output/*.lock"
