@@ -170,8 +170,8 @@ def blur_faces_in_directory(input_dir, output_dir):
                 os.close(fd_lock)
                 os.remove(lock_path)
             except OSError as e:
-                print(f"Error removing lock file {lock_path}: {e}", flush=True)
-                exit(1)
+                print(f"Warning: cannot remove lock file {lock_path}: {e}", flush=True)
+                #exit(1)
 
         # Calculate FPS if at least 2 files have been checked
         if len(file_check_times) >= 2:
