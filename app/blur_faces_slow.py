@@ -138,7 +138,13 @@ def blur_faces_in_directory(input_dir, output_dir):
             print(f", saving", end="", flush=True)
 
             tmp_output_path = output_path + ".tmp.png"
-            cv2.imwrite(tmp_output_path, image)
+
+            if faces:
+              cv2.imwrite(tmp_output_path, image)
+            else:
+              # copy file from input to output
+              fcntl.copyfile(input_path, tmp_output_path)
+
             os.rename(tmp_output_path, output_path)
 
             processed_files += 1
