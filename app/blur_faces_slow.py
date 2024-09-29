@@ -4,6 +4,7 @@ import sys
 import numpy as np
 import time
 import fcntl
+import shutil
 from retinaface import RetinaFace
 
 def blur_faces_in_directory(input_dir, output_dir):
@@ -143,7 +144,7 @@ def blur_faces_in_directory(input_dir, output_dir):
               cv2.imwrite(tmp_output_path, image)
             else:
               # copy file from input to output
-              fcntl.copyfile(input_path, tmp_output_path)
+              shutil.copyfile(input_path, tmp_output_path)
 
             os.rename(tmp_output_path, output_path)
 
