@@ -16,6 +16,7 @@ def blur_faces_in_directory(input_dir, output_dir):
     image_files = [f for f in files if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
     total_files = len(image_files)
     processed_files = 0
+    checked_files = 0
 
     if total_files == 0:
         print("No image files found in the input directory.", flush=True)
@@ -28,6 +29,8 @@ def blur_faces_in_directory(input_dir, output_dir):
     for idx, filename in enumerate(image_files):
 
         input_path = os.path.join(input_dir, filename)
+
+        checked_files += 1
 
         if debug_mode:
             # add debug.png to the output path if debug mode is enabled

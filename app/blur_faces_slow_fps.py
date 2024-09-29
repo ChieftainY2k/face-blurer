@@ -24,7 +24,7 @@ def blur_faces_in_directory(input_dir, output_dir):
         return
 
     # Start time for ETA calculation
-    start_time = time.time()
+    #start_time = time.time()
 
     # Loop through all image files in the input directory
     for idx, filename in enumerate(image_files):
@@ -156,25 +156,23 @@ def blur_faces_in_directory(input_dir, output_dir):
             fps = 0
 
         # Update progress
-        elapsed_time = time.time() - start_time
-        average_time_per_file = elapsed_time / files_checked
+        #elapsed_time = time.time() - start_time
+        #average_time_per_file = elapsed_time / files_checked
         files_left = total_files - files_checked
-        eta = average_time_per_file * files_left
+        #eta = average_time_per_file * files_left
 
         # Calculate days, hours, and minutes
-        eta_days = int(eta // (24 * 3600))
-        eta_hours = int((eta % (24 * 3600)) // 3600)
-        eta_minutes = int((eta % 3600) // 60)
+        #eta_days = int(eta // (24 * 3600))
+        #eta_hours = int((eta % (24 * 3600)) // 3600)
+        #eta_minutes = int((eta % 3600) // 60)
 
         percent_complete = (files_checked / total_files) * 100
 
         # Print completion message for the current file
         if len(file_check_times) >= 100:
-            print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
-                  f"FPS: {fps:.2f}. ETA: {eta_days}d {eta_hours}h {eta_minutes}m", flush=True)
+            print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). FPS: {fps:.2f}.", flush=True)
         else:
-            print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
-                  f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m", flush=True)
+            print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). ", flush=True)
 
     print("Processing complete.")
 
