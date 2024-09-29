@@ -130,6 +130,12 @@ def blur_faces_in_directory(input_dir, output_dir):
                         print(" , ERROR: face_roi is empty", end="", flush=True)
                         continue
 
+                    # extend the blur area by 10% but not exceed the image size
+                    x1 = max(0, x1 - int((x2 - x1) * 0.1))
+                    y1 = max(0, y1 - int((y2 - y1) * 0.1))
+                    x2 = min(image.shape[1], x2 + int((x2 - x1) * 0.1))
+                    y2 = min(image.shape[0], y2 + int((y2 - y1) * 0.1))
+                    
                     face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
                     image[y1:y2, x1:x2] = face_roi_blurred
 
