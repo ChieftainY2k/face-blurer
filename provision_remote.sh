@@ -48,10 +48,9 @@ exec_remote "curl https://gist.githubusercontent.com/ChieftainY2k/0a6fa487ac1065
 exec_remote "[ -d ~/face-blurer ] || git clone https://github.com/ChieftainY2k/face-blurer.git"
 exec_remote "cd face-blurer && git pull"
 
-exec_remote cd face-blurer \&\& \
-  docker build -f Dockerfile.gpu --progress=plain . -t blurer
+exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
 
-rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video1.mp4 $TUSER@$THOST:/home/$TUSER/face-blurer/input/
+#rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video1.mp4 $TUSER@$THOST:/home/$TUSER/face-blurer/input/
 
 #exec_remote cd face-blurer \&\& \
 #  docker run -v \$\(pwd\):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -fps_mode passthrough -q:v 0 -c:v png "/data/input/frame_%10d.png"
