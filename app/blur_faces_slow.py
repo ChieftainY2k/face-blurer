@@ -71,9 +71,6 @@ def blur_faces_in_directory(input_dir, output_dir):
         except BlockingIOError:
             print(f"Skipping as lock file {lock_path} is locked by another process", flush=True)
             continue
-        except Exception as e:
-            print(f"An error occurred: {e}", flush=True)
-            exit(1)
 
         try:
             image = cv2.imread(input_path)
