@@ -33,7 +33,9 @@ function exec_remote() {
 #cat ~/.ssh/id_rsa.pub | ssh $TUSER@$THOST -p $TPORT "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
 
 # inject keys if authorized_keys does not exist, in one line
+echo "Injecting keys..."
 cat ~/.ssh/id_rsa.pub | ssh $TUSER@$THOST -p $TPORT "mkdir -p ~/.ssh && [ -f ~/.ssh/authorized_keys ] || cat >> ~/.ssh/authorized_keys"
+echo "Keys injected."
 
 exec_remote nvidia-smi
 
