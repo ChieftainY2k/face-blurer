@@ -136,14 +136,15 @@ def blur_faces_in_directory(input_dir, output_dir):
                     face_count += 1
 
             print(f", {face_count} face(s)", end="", flush=True)
-            print(f", saving", end="", flush=True)
 
             tmp_output_path = output_path + ".tmp.png"
 
             if faces:
+              print(f", saving frame", end="", flush=True)
               cv2.imwrite(tmp_output_path, image)
             else:
               # copy file from input to output
+              print(f", copying file", end="", flush=True)
               shutil.copyfile(input_path, tmp_output_path)
 
             os.rename(tmp_output_path, output_path)
