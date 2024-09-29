@@ -85,7 +85,7 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -r 30  -f image2 -s 1920x1080 -i "
   * Because it's easier to preview the frames with a file manager if you want to check the quality of the processing.
   * Because it's easier to delete the frames with a file manager if you want to reprocess just a part of the video.
   * Because it's easier to process frames with AI models and then compose video back. Also, it's easier to debug and improve the process.
-  * Bacause it's easier to parallelize processing of frames.
+  * Bacause it's easier to parallelize processing of frames by running multiple instances of the application in parallel.
 
 * How do I debug the container?
 ```
