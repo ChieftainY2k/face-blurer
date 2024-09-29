@@ -85,7 +85,7 @@ def blur_faces_in_directory(input_dir, output_dir):
             continue
         except FileExistsError:
             try:
-                print(f", lockfile exists", flush=True)
+                print(f", lockfile exists", end="", flush=True)
                 fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
                 fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError:
