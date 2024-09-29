@@ -3,8 +3,8 @@
 set -e
 
 # Define the number of GPUs and how many times to run the command per GPU
-GPUS=(0 1 2 3)
-RUNS_PER_GPU=4
+GPUS=(0 1)
+RUNS_PER_GPU=3
 
 for gpu in "${GPUS[@]}"; do
   for ((i = 1; i <= RUNS_PER_GPU; i++)); do
