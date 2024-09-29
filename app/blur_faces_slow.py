@@ -121,7 +121,7 @@ def blur_faces_in_directory(input_dir, output_dir):
 
             tmp_output_path = output_path + ".tmp"
             #cv2.imwrite(output_path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-            cv2.imwrite(tmp_output_path, image)
+            cv2.imwrite(tmp_output_path, image, overwrite=True)
             os.rename(tmp_output_path, output_path)
 
             # Update progress
