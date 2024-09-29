@@ -162,15 +162,21 @@ watch -c -n 1 "uptime; pydf; nvidia-smi; ls output/*.lock; "
 ### Troubleshooting:
 
 ```
-sudo apt remove --purge '^nvidia-.*'
+
+sudo dpkg --get-selections | grep hold
+sudo apt-mark unhold libnvidia-cfg1-535
+sudo apt-mark unhold libnvidia-compute-535
+
+sudo apt remove -y --purge '^nvidia-.*'
 sudo add-apt-repository --remove ppa:graphics-drivers/ppa
 sudo add-apt-repository ppa:graphics-drivers/ppa
+
 sudo apt update
 sudo apt install nvidia-driver-545
 sudo apt-get install -y nvidia-container-toolkit
 sudo nvidia-ctk runtime configure --runtime=docker
 sudo systemctl restart docker
-reboot
+sudo reboot
 ```
 
 ### Cookbook:
