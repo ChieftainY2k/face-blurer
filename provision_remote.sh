@@ -50,7 +50,7 @@ exec_remote cd face-blurer \&\& \
 #exec_remote cd face-blurer \&\& \
 #  docker run -v \$\(pwd\):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -fps_mode passthrough -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
-exec_remote curl https://gist.githubusercontent.com/ChieftainY2k/0a6fa487ac10658d667a0861f6c289ff/raw/e4573c108ebc32f5b06fc852506dce0d68b7a711/.screenrc > /home/$TUSER/.screenrc
+exec_remote "curl https://gist.githubusercontent.com/ChieftainY2k/0a6fa487ac10658d667a0861f6c289ff/raw/e4573c108ebc32f5b06fc852506dce0d68b7a711/.screenrc > /home/$TUSER/.screenrc"
 
 # run detection test
 exec_remote cd face-blurer \&\& \
