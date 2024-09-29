@@ -1,3 +1,10 @@
+import cv2
+import os
+import sys
+import numpy as np
+import time
+from retinaface import RetinaFace
+
 def blur_faces_in_directory(input_dir, output_dir):
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
@@ -158,3 +165,25 @@ def blur_faces_in_directory(input_dir, output_dir):
         print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). FPS: {fps:.2f}.", flush=True)
 
     print("Processing complete.")
+
+if __name__ == "__main__":
+    # Retrieve environment variables or set default paths
+    input_dir = os.getenv('INPUT_DIR', '/input')
+    output_dir = os.getenv('OUTPUT_DIR', '/output')
+    debug_mode_env = os.getenv('DEBUG', '')
+    score_threshold_env = os.getenv('THRESHOLD', '0.90')
+
+    # Validate and parse score_threshold
+    try:
+        score_threshold = float(score_threshold_env)
+    except ValueError:
+        print("Invalid THRESHOLD value. It should be a float. Using default 0.90.", flush=True)
+        score_threshold = 0.90
+
+    # Validate input and output directories
+    if not input_dir or not output_dir:
+        print("Error: INPUT_DIR or OUTPUT_DIR environment variables are not set.", flush=True)
+        sys.exit(1)
+
+    # Call the main processing function
+    blur_faces_in_directory(input_dir, output_dir)
