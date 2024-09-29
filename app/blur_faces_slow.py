@@ -66,9 +66,12 @@ def blur_faces_in_directory(input_dir, output_dir):
         lock_path = output_path + '.lock'
         try:
             fd_lock = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
-        except FileExistsError:
-            print(f", skipping as lock file {lock_path} exists", flush=True)
+            fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            print(f"Skipping as lock file {lock_path} is locked by another process", flush=True)
             continue
+        except Exception as e:
+            print(f"An error occurred: {e}", flush=True)
 
         try:
             image = cv2.imread(input_path)
@@ -135,6 +138,7 @@ def blur_faces_in_directory(input_dir, output_dir):
                 os.remove(lock_path)
             except OSError as e:
                 print(f"Error removing lock file {lock_path}: {e}", flush=True)
+                exit(1)
 
         # Calculate FPS if at least 2 files have been checked
         if len(file_check_times) >= 2:

@@ -64,6 +64,8 @@ Environment variables:
 ### Step 3: Compose video back from frames:
 ```
 docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 -pix_fmt yuv420p "/data/output/video1-blurred.mp4"
+
+docker run -v $(pwd):/data linuxserver/ffmpeg -r 30  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.debug.png" -vcodec libx264 -crf 0 -pix_fmt yuv420p "/data/output/video8-debug.mp4"
 ```
 
 
