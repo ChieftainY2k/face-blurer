@@ -15,6 +15,12 @@ def blur_faces_in_directory(input_dir, output_dir):
 
     # Filter image files
     image_files = [f for f in files if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+
+    fps = 0
+    eta_hours = 0
+    eta_minutes = 0
+    eta_seconds = 0
+
     total_files = len(image_files)
     processed_files = 0
     files_checked = 0
@@ -58,7 +64,8 @@ def blur_faces_in_directory(input_dir, output_dir):
         else:
             output_path = os.path.join(output_dir, filename) + ".blurred.png"
 
-        print(f"* processing: {input_path} to {output_path}", end="", flush=True)
+        print(f"* [FPS: {fps:.2f}][ETA: {eta_hours}h {eta_minutes}m {eta_seconds}s]", end="", flush=True)
+        print(f" processing: {input_path} to {output_path}", end="", flush=True)
 
         if os.path.exists(output_path):
             print(f", skipping as {output_path} already exists", flush=True)
@@ -162,10 +169,8 @@ def blur_faces_in_directory(input_dir, output_dir):
             eta_minutes = int((time_left_seconds % 3600) // 60)
             eta_seconds = int(time_left_seconds % 60)
 
-            print(f", ETA: {eta_hours}h {eta_minutes}m {eta_seconds}s", end="", flush=True)
-
         # Print completion message for the current file
-        print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). FPS: {fps:.2f}.", flush=True)
+        print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%)", flush=True)
 
     print("Processing complete.")
 
