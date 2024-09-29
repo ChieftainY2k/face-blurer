@@ -213,7 +213,7 @@ if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     debug_mode_env = os.getenv('DEBUG', '')
-    score_threshold_env = float(os.getenv('THRESHOLD', '0.90')
+    score_threshold_env = float(os.getenv('THRESHOLD', '0.90'))
 
     # Call the main processing function
     blur_faces_in_directory(input_dir, output_dir)
