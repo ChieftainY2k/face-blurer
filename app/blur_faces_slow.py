@@ -65,7 +65,7 @@ def blur_faces_in_directory(input_dir, output_dir):
             output_path = os.path.join(output_dir, filename) + ".blurred.png"
 
         print(f"* [FPS: {fps:05.2f}][ETA: {eta_hours:02}h {eta_minutes:02}m {eta_seconds:02}s]", end="", flush=True)
-        print(f" processing: {input_path} to {output_path}", end="", flush=True)
+        print(f" {input_path} -> {output_path}", end="", flush=True)
 
         if os.path.exists(output_path):
             print(f", skipping as {output_path} already exists", flush=True)
