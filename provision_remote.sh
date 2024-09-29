@@ -60,5 +60,5 @@ exec_remote "cd face-blurer && git pull"
 
 exec_remote "cd face-blurer && rm -f output/sample*"
 
-exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py"
+exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py"
 
