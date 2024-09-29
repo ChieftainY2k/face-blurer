@@ -16,7 +16,8 @@ def blur_faces_in_directory(input_dir, output_dir):
     image_files = [f for f in files if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
     total_files = len(image_files)
     processed_files = 0
-    total_processing_time = 0  # Initialize total processing time for FPS calculation
+    files_checked = 0
+    file_check_times = []
 
     if total_files == 0:
         print("No image files found in the input directory.", flush=True)
@@ -27,6 +28,15 @@ def blur_faces_in_directory(input_dir, output_dir):
 
     # Loop through all image files in the input directory
     for idx, filename in enumerate(image_files):
+
+        # Increment files_checked
+        files_checked += 1
+
+        # Record the time when the file is checked
+        check_time = time.time()
+        file_check_times.append(check_time)
+        if len(file_check_times) > 100:
+            file_check_times.pop(0)
 
         input_path = os.path.join(input_dir, filename)
 
@@ -53,9 +63,6 @@ def blur_faces_in_directory(input_dir, output_dir):
             # The lock file exists, skip processing
             print(f", skipping as lock file {lock_path} exists", flush=True)
             continue
-
-        # Start timing for the current image
-        image_start_time = time.time()
 
         try:
             # Read the image
@@ -102,9 +109,9 @@ def blur_faces_in_directory(input_dir, output_dir):
 
                     # Blur the face region
                     face_roi_blurred = cv2.GaussianBlur(
-                        face_roi,  # Input image
-                        (99, 99),  # Kernel size
-                        30)  # SigmaX
+                      face_roi, # Input image
+                      (99, 99),  # Kernel size
+                      30) # SigmaX
                     image[y1:y2, x1:x2] = face_roi_blurred
 
                     if debug_mode:
@@ -124,36 +131,12 @@ def blur_faces_in_directory(input_dir, output_dir):
             print(f", saving", end="", flush=True)
 
             tmp_output_path = output_path + ".tmp.png"
-            # cv2.imwrite(output_path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+            #cv2.imwrite(output_path, image, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
             cv2.imwrite(tmp_output_path, image)
             os.rename(tmp_output_path, output_path)
 
-            # End timing for the current image
-            image_end_time = time.time()
-            time_taken_for_this_image = image_end_time - image_start_time
-            total_processing_time += time_taken_for_this_image
-            per_image_fps = 1.0 / time_taken_for_this_image if time_taken_for_this_image > 0 else 0
-
-            # Update progress
+            # Update processed_files
             processed_files += 1
-            overall_fps = processed_files / total_processing_time if total_processing_time > 0 else 0
-
-            elapsed_time = time.time() - start_time
-            average_time_per_file = total_processing_time / processed_files
-            files_left = total_files - processed_files
-            eta = average_time_per_file * files_left
-
-            # Calculate days, hours, and minutes
-            eta_days = int(eta // (24 * 3600))
-            eta_hours = int((eta % (24 * 3600)) // 3600)
-            eta_minutes = int((eta % 3600) // 60)
-
-            percent_complete = (processed_files / total_files) * 100
-
-            # Print completion message for the current file with FPS info
-            print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
-                  f"Per-image FPS: {per_image_fps:.2f}, Overall FPS: {overall_fps:.2f}. "
-                  f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m", flush=True)
         finally:
             # Release the lock file
             try:
@@ -162,6 +145,37 @@ def blur_faces_in_directory(input_dir, output_dir):
             except OSError as e:
                 print(f"Error removing lock file {lock_path}: {e}", flush=True)
 
+        # Calculate FPS if at least 100 files have been checked
+        if len(file_check_times) >= 100:
+            total_time_in_fps = file_check_times[-1] - file_check_times[0]
+            if total_time_in_fps > 0:
+                fps = len(file_check_times) / total_time_in_fps
+            else:
+                fps = float('inf')
+        else:
+            fps = 0
+
+        # Update progress
+        elapsed_time = time.time() - start_time
+        average_time_per_file = elapsed_time / files_checked
+        files_left = total_files - files_checked
+        eta = average_time_per_file * files_left
+
+        # Calculate days, hours, and minutes
+        eta_days = int(eta // (24 * 3600))
+        eta_hours = int((eta % (24 * 3600)) // 3600)
+        eta_minutes = int((eta % 3600) // 60)
+
+        percent_complete = (files_checked / total_files) * 100
+
+        # Print completion message for the current file
+        if len(file_check_times) >= 100:
+            print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
+                  f"FPS: {fps:.2f}. ETA: {eta_days}d {eta_hours}h {eta_minutes}m", flush=True)
+        else:
+            print(f", {processed_files}/{total_files} files ({percent_complete:.2f}%). "
+                  f"ETA: {eta_days}d {eta_hours}h {eta_minutes}m", flush=True)
+
     print("Processing complete.")
 
 if __name__ == "__main__":
@@ -169,6 +183,10 @@ if __name__ == "__main__":
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     debug_mode = os.getenv('DEBUG', '')
     score_threshold = float(os.getenv('THRESHOLD', 0.90))
+
+    # set CUDA_VISIBLE_DEVICES if not set
+    #if 'CUDA_VISIBLE_DEVICES' not in os.environ:
+    #    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
     if not input_dir or not output_dir:
         print("Error: INPUT_DIR or OUTPUT_DIR environment variables are not set.")
