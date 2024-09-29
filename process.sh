@@ -13,6 +13,7 @@ echo "Will run $RUNS_PER_GPU times per GPU"
 #for gpu in "${GPUS[@]}"; do
 for ((gpu = 0; gpu < GPUS; gpu++)); do
   for ((i = 1; i <= RUNS_PER_GPU; i++)); do
+    echo "Running on GPU $gpu, run $i"
     screen docker run --rm --gpus all \
       -e CUDA_VISIBLE_DEVICES=$gpu \
       -e DEBUG=1 \
