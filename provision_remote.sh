@@ -30,12 +30,34 @@ function exec_remote() {
 }
 
 # inject keys
-cat ~/.ssh/id_rsa.pub | ssh $TUSER@$THOST -p $TPORT "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+#cat ~/.ssh/id_rsa.pub | ssh $TUSER@$THOST -p $TPORT "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+
+# inject keys if authorized_keys does not exist, in one line
+cat ~/.ssh/id_rsa.pub | ssh $TUSER@$THOST -p $TPORT "mkdir -p ~/.ssh && [ -f ~/.ssh/authorized_keys ] || cat >> ~/.ssh/authorized_keys"
 
 exec_remote nvidia-smi
 
+exec_remote sudo apt-get -y remove unattended-upgrades
 exec_remote sudo apt-get install -y mc joe htop multitail docker-compose screen docker-buildx-plugin pydf iotop
 
-exec_remote git clone https://github.com/ChieftainY2k/face-blurer.git
+exec_remote "[ -d ~/face-blurer ] || git clone https://github.com/ChieftainY2k/face-blurer.git"
 
-rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video* $TUSER@$THOST:/home/$TUSER/face-blurer/input/
+rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video1.mp4 $TUSER@$THOST:/home/$TUSER/face-blurer/input/
+
+exec_remote cd face-blurer \&\& \
+  docker build -f Dockerfile.gpu --progress=plain . -t blurer
+
+#exec_remote cd face-blurer \&\& \
+#  docker run -v \$\(pwd\):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -fps_mode passthrough -q:v 0 -c:v png "/data/input/frame_%10d.png"
+
+exec_remote curl https://gist.githubusercontent.com/ChieftainY2k/0a6fa487ac10658d667a0861f6c289ff/raw/e4573c108ebc32f5b06fc852506dce0d68b7a711/.screenrc > /home/$TUSER/.screenrc
+
+# run detection test
+exec_remote cd face-blurer \&\& \
+  docker run --rm --gpus all -v ./app:/app -v ./samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py
+
+exec_remote cd face-blurer \&\& \
+  exec_remote ls -la output/sample*
+
+#exec_remote cd face-blurer \&\& \
+#  screen
