@@ -15,4 +15,7 @@ docker run --rm --gpus all \
   -v /tmp/blurer-cache/deepface:/root/.deepface \
   -v /tmp/blurer-cache/root:/root/.cache \
   blurer python blur_faces_slow.py
-pause 'Press [Enter] key to continue...'
+
+echo 'Press [Enter] key to continue...'
+read
+
