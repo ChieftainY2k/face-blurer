@@ -14,7 +14,7 @@ echo "Will run $RUNS_PER_GPU times per GPU"
 for ((gpu = 0; gpu < GPUS; gpu++)); do
   for ((i = 1; i <= RUNS_PER_GPU; i++)); do
     echo "Running on GPU $gpu , worker $i ..."
-    screen ./process_single.sh $gpu
+    screen ./process_single.sh $gpu $i
     sleep 20
 done
 done

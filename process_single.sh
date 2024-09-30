@@ -4,8 +4,11 @@
 
 # get GPU from arg
 GPU=$1
+INSTANCE=$1
 
-echo "Running on GPU $GPU ..."
+screen -X title "GPU $GPU/$INSTANCE"
+
+echo "Running on GPU $GPU , instance $INSTANCE ..."
 docker run --rm --gpus all \
   -e CUDA_VISIBLE_DEVICES=$GPU \
   -e DEBUG=1 \
