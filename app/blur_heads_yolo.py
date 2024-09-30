@@ -7,7 +7,7 @@ import fcntl
 import shutil
 from ultralytics import YOLO  # Import YOLOv8
 
-def blur_heads_in_directory(input_dir, output_dir):
+def blur_people_in_directory(input_dir, output_dir):
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -34,12 +34,8 @@ def blur_heads_in_directory(input_dir, output_dir):
         print("No image files found in the input directory.", flush=True)
         return
 
-    # Initialize variables from environment variables or defaults
-    debug_mode = os.getenv('DEBUG', '').lower() in ['1', 'true', 'yes']
-    score_threshold = float(os.getenv('THRESHOLD', 0.90))
-
     # Load YOLOv8 model
-    model = YOLO('yolov8n.pt')  # You can replace this with a different YOLOv8 model (e.g., yolov8s.pt)
+    model = YOLO('yolov8x.pt')  # Using the small YOLOv8 model
 
     # Loop through all image files in the input directory
     for idx, filename in enumerate(image_files):
@@ -96,21 +92,25 @@ def blur_heads_in_directory(input_dir, output_dir):
             print(", detecting", end="", flush=True)
             detection_start_time = time.time()
 
-            # Perform head detection using YOLOv8
+            # Perform person detection using YOLOv8
             results = model(image)
             detection_end_time = time.time()
             detection_time = detection_end_time - detection_start_time
             print(f" ({detection_time:.2f}s)", end="", flush=True)
 
-            head_count = 0
+            person_count = 0
 
             if results:
                 print(f", ", end="", flush=True)
                 for result in results:
                     for box in result.boxes:
+                        class_id = int(box.cls[0])  # Get the class ID
+                        if class_id != 0:  # 0 corresponds to 'person' in COCO dataset
+                            continue
+
                         # Get bounding box coordinates and confidence score
                         x1, y1, x2, y2 = map(int, box.xyxy[0])  # YOLOv8 returns boxes in [x1, y1, x2, y2] format
-                        score = box.conf
+                        score = box.conf.item()
                         if score < score_threshold:
                             continue
                         print(f"[{score:.2f}+]", end="", flush=True)
@@ -120,24 +120,18 @@ def blur_heads_in_directory(input_dir, output_dir):
                         x2 = min(image.shape[1], x2)
                         y2 = min(image.shape[0], y2)
 
-                        # extend the blur area by 10% but not exceed the image size
-                        extra_percentage = 0.3
-                        x1 = max(0, x1 - int((x2 - x1) * extra_percentage))
-                        y1 = max(0, y1 - int((y2 - y1) * extra_percentage))
-                        x2 = min(image.shape[1], x2 + int((x2 - x1) * extra_percentage))
-                        y2 = min(image.shape[0], y2 + int((y2 - y1) * extra_percentage))
-
                         if x1 >= x2 or y1 >= y2:
                             print(" , ERROR: invalid detection", end="", flush=True)
                             continue
 
-                        head_roi = image[y1:y2, x1:x2]
-                        if head_roi.size == 0:
-                            print(" , ERROR: head_roi is empty", end="", flush=True)
+                        person_roi = image[y1:y2, x1:x2]
+                        if person_roi.size == 0:
+                            print(" , ERROR: person_roi is empty", end="", flush=True)
                             continue
 
-                        head_roi_blurred = cv2.GaussianBlur(head_roi, (99, 99), 30)
-                        image[y1:y2, x1:x2] = head_roi_blurred
+                        # Blur the detected person region
+                        person_roi_blurred = cv2.GaussianBlur(person_roi, (99, 99), 30)
+                        image[y1:y2, x1:x2] = person_roi_blurred
 
                         if debug_mode:
                             color = (0, 255, 0) if score >= score_threshold else (0, 0, 255)
@@ -148,9 +142,9 @@ def blur_heads_in_directory(input_dir, output_dir):
                                 text_y = y1 - 10
                             cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
-                        head_count += 1
+                        person_count += 1
 
-            print(f", {head_count} head(s)", end="", flush=True)
+            print(f", {person_count} person(s)", end="", flush=True)
 
             tmp_output_path = output_path + ".tmp.png"
 
@@ -209,4 +203,8 @@ if __name__ == "__main__":
     # Retrieve environment variables or set default paths
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
-    blur_heads_in_directory(input_dir, output_dir)
+    # Initialize variables from environment variables or defaults
+    debug_mode = os.getenv('DEBUG', '').lower() in ['1', 'true', 'yes']
+    score_threshold = float(os.getenv('THRESHOLD', 0.90))
+
+    blur_people_in_directory(input_dir, output_dir)
