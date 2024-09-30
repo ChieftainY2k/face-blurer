@@ -16,7 +16,7 @@ screen -t "info" -- watch -c -n 1 "uptime; free; pydf; nvidia-smi; ls output/*.l
 for ((gpu = 0; gpu < GPUS; gpu++)); do
   for ((i = 0; i < RUNS_PER_GPU; i++)); do
     echo "Running on GPU $gpu , worker $i ..."
-    screen -t "GPU $gpu/$i" ./process_single.sh $gpu $i
+    screen -t "GPU$gpu/$i" ./process_single.sh $gpu $i
     sleep 20
 done
 done
