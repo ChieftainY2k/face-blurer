@@ -19,5 +19,5 @@ if [ -z "$TUSER" ]; then
   exit 1
 fi
 
-INPUT={$1:-"./input/vi*"}
-rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" $INPUT $TUSER@$THOST:/home/$TUSER/face-blurer/input/
+LOCAL_SOURCE={$1:-"./input/vi*"}
+rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" $LOCAL_SOURCE $TUSER@$THOST:/home/$TUSER/face-blurer/input/
