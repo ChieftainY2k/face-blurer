@@ -20,4 +20,4 @@ if [ -z "$TUSER" ]; then
 fi
 
 LOCAL_SOURCE=${1:-"./input/video1.mp4"}
-rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" $LOCAL_SOURCE $TUSER@$THOST:/home/$TUSER/face-blurer/input/video.mp4
+rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" $LOCAL_SOURCE $TUSER@$THOST:/home/$TUSER/face-blurer/input/video1.mp4
