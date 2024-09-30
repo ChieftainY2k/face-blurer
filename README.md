@@ -182,13 +182,6 @@ sudo reboot
 ### Cookbook:
 
 ```
-screen watch -c -n 1 "uptime; pydf; nvidia-smi; ls output/*.lock; "
+watch -c -n 1 "uptime; free; pydf; nvidia-smi; ls output/*.lock; "
 screen docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=0 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py 
-screen docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=0 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py 
-screen docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=0 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py 
-screen docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=0 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py 
-screen docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=1 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py 
-screen docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=1 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py 
-screen docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=1 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py 
-screen docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=1 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py 
 ```
