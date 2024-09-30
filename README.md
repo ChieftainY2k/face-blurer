@@ -127,7 +127,7 @@ https://www.youtube.com/watch?v=Debjcl5z9Dw
 
 ```
 
-export TPORT=XXXX ; export THOST=XXX.XXX.XXX.XXX ; export TUSER=user ;
+export TPORT=XXXX ; export THOST=XXX.XXX.XXX.XXX ; export TUSER=user
 
 # inject keys
 cat ~/.ssh/id_rsa.pub | ssh $TUSER@$THOST -p $TPORT "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys
@@ -182,6 +182,15 @@ sudo reboot
 ### Cookbook:
 
 ```
+# Trim video
+docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -ss 00:00:00 -t 00:05:00 -c copy "/data/input/video1-5min.mp4" 
+
+# Trim video, convert to 30fps
+docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -ss 00:00:00 -t 00:01:00 -r 30 "/data/input/video1-1min.mp4" 
+
+# Show system stats
 watch -c -n 1 "uptime; free; pydf; nvidia-smi; ls output/*.lock; "
+
+# Run in a screen window
 screen docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=0 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py 
 ```
