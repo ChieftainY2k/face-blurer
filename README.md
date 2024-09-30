@@ -149,7 +149,7 @@ rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video*
 rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/ /tmp/output-$THOST/
 
 # watch progress and GPU usage
-watch -c -n 1 "uptime; pydf; nvidia-smi; ls output/*.lock; "
+watch -c -n 1 "uptime; free; pydf; nvidia-smi; ls output/*.lock"
 
 ```
 
