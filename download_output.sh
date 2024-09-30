@@ -20,7 +20,7 @@ if [ -z "$TUSER" ]; then
 fi
 
 #REMOTE_SOURCE={$1:-"vi*"}
-REMOTE_SOURCE={$1:-"*"}
+REMOTE_SOURCE=${1:-"*"}
 
 # Download videos
 rsync -avz --partial --info=progress2 -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/$REMOTE_SOURCE /tmp/output-$THOST/
