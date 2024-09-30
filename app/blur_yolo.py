@@ -34,8 +34,7 @@ def blur_people_in_directory(input_dir, output_dir):
         print("No image files found in the input directory.", flush=True)
         return
 
-    # Load YOLOv8 model
-    model = YOLO('yolov8x.pt')  # Using the small YOLOv8 model
+    model = YOLO('yolov8x.pt')
 
     # Loop through all image files in the input directory
     for idx, filename in enumerate(image_files):
