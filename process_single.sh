@@ -6,8 +6,6 @@
 GPU=$1
 INSTANCE=$1
 
-screen -X title "GPU $GPU/$INSTANCE"
-
 echo "Running on GPU $GPU , instance $INSTANCE ..."
 docker run --rm --gpus all \
   -e CUDA_VISIBLE_DEVICES=$GPU \
