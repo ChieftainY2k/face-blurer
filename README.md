@@ -163,10 +163,10 @@ sudo apt-mark unhold libnvidia-cfg1-535
 sudo apt-mark unhold libnvidia-compute-535
 
 sudo apt remove -y --purge '^nvidia-.*'
-sudo add-apt-repository --remove ppa:graphics-drivers/ppa
+sudo add-apt-repository -y --remove ppa:graphics-drivers/ppa
 sudo add-apt-repository ppa:graphics-drivers/ppa
 sudo apt update
-sudo apt install nvidia-driver-545
+sudo apt install -y nvidia-driver-545
 
 # Docker with GPU support
 sudo curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg   && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list |     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |     sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
