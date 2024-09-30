@@ -2,8 +2,6 @@
 # shellcheck disable=SC2086
 set -e
 
-# Define the number of GPUs and how many times to run the command per GPU
-
 # Detect number of GPUS from nvisia-smi
 GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 echo "Detected $GPUS GPUs"

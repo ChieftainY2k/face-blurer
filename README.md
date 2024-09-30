@@ -133,7 +133,7 @@ export TPORT=XXXX ; export THOST=XXX.XXX.XXX.XXX ; export TUSER=user
 cat ~/.ssh/id_rsa.pub | ssh $TUSER@$THOST -p $TPORT "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys
 
 # log in
-ssh $TUSER@$THOST -p $TPORT"
+ssh $TUSER@$THOST -p $TPORT
  
 # provision host
 sudo apt-get install -y mc joe htop multitail docker-compose screen docker-buildx-plugin pydf iotop
@@ -157,11 +157,6 @@ watch -c -n 1 "uptime; free; pydf; nvidia-smi; ls output/*.lock"
 
 ```
 
-sudo curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg   && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list |     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |     sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-sudo apt-get update
-sudo apt-get install -y nvidia-container-toolkit
-sudo nvidia-ctk runtime configure --runtime=docker
-sudo systemctl restart docker
 
 sudo dpkg --get-selections | grep hold
 sudo apt-mark unhold libnvidia-cfg1-535
@@ -170,13 +165,18 @@ sudo apt-mark unhold libnvidia-compute-535
 sudo apt remove -y --purge '^nvidia-.*'
 sudo add-apt-repository --remove ppa:graphics-drivers/ppa
 sudo add-apt-repository ppa:graphics-drivers/ppa
-
 sudo apt update
 sudo apt install nvidia-driver-545
+
+# Docker with GPU support
+sudo curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg   && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list |     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |     sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt-get update
 sudo apt-get install -y nvidia-container-toolkit
 sudo nvidia-ctk runtime configure --runtime=docker
 sudo systemctl restart docker
+
 sudo reboot
+
 ```
 
 ### Cookbook:
