@@ -13,7 +13,7 @@ echo -ne "\033kGPU${GPU}[${INSTANCE}][RUN]\033\\"
 
 docker run --rm --gpus all \
   -e CUDA_VISIBLE_DEVICES=$GPU \
-  -e DEBUG=1 \
+  -e DEBUG=${${DEBUG:-""} \
   -v ./app:/app \
   -v ./input:/input:ro \
   -v ./output:/output \
