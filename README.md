@@ -64,13 +64,17 @@ Environment variables:
 ### Step 3: Compose video back from frames:
 ```
 # 1080p 30fps
-docker run -v $(pwd):/data linuxserver/ffmpeg -r 50  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 -pix_fmt yuv420p "/data/output/video.mp4"
+docker run -v $(pwd):/data linuxserver/ffmpeg -r 30  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 "/data/output/video-blurred-1080p-30fps.mp4"
 
 # 1080p 30fps, DEBUG MODE
-docker run -v $(pwd):/data linuxserver/ffmpeg -r 30  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.debug.png" -vcodec libx264 -crf 0 -pix_fmt yuv420p "/data/output/video.mp4"
+docker run -v $(pwd):/data linuxserver/ffmpeg -r 30  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.debug.png" -vcodec libx264 -crf 20 "/data/output/video-debug-1080p-30fps.mp4"
 
-# 4K 60fps, DEBUG MODE
-docker run -v $(pwd):/data linuxserver/ffmpeg -r 59.94  -f image2 -s 3840x2160 -i "/data/output/frame_%10d.png.debug.png" -vcodec libx264 -crf 0 -pix_fmt yuv420p "/data/output/video.mp4"
+# 4k 30fps
+docker run -v $(pwd):/data linuxserver/ffmpeg -r 30  -f image2 -s 3840x2160 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 "/data/output/video-blurred-4k-30fps.mp4"
+
+# 4K 30fps, DEBUG MODE
+docker run -v $(pwd):/data linuxserver/ffmpeg -r 30  -f image2 -s 3840x2160 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 "/data/output/video-debug-4k-30fps.mp4"
+
 ```
 
 
