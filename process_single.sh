@@ -1,6 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC2086
-set -e
+#set -e
 
 # get GPU from arg
 GPU=$1
