@@ -8,7 +8,7 @@ echo "Detected $GPUS GPUs"
 RUNS_PER_GPU=4
 echo "Will run $RUNS_PER_GPU times per GPU"
 
-screen -t "info" -- watch -c -n 3 "uptime; free; pydf; nvidia-smi; ls output/*.lock"
+screen -t "INFO" -- watch -c -n 3 "uptime; free; pydf; nvidia-smi; ls output/*.lock"
 
 #for gpu in "${GPUS[@]}"; do
 for ((gpu = 0; gpu < GPUS; gpu++)); do
