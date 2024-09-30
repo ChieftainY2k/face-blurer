@@ -4,7 +4,7 @@
 
 # get GPU from arg
 GPU=$1
-INSTANCE=$1
+INSTANCE=$2
 
 echo "Running on GPU $GPU , instance $INSTANCE ..."
 
