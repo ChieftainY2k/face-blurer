@@ -16,5 +16,5 @@ for ((gpu = 0; gpu < GPUS; gpu++)); do
     echo "Running on GPU $gpu , worker $i ..."
     screen -t "GPU $gpu/$i" -- ./worker.sh $gpu $i
     sleep 20
-done
+  done
 done
