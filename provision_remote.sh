@@ -48,6 +48,13 @@ exec_remote "curl https://gist.githubusercontent.com/ChieftainY2k/0a6fa487ac1065
 exec_remote "[ -d ~/face-blurer ] || git clone https://github.com/ChieftainY2k/face-blurer.git"
 exec_remote "cd face-blurer && git pull"
 
+#exec_remote "sudo curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg   && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list |     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list"
+#exec_remote sudo apt-get update
+#exec_remote sudo apt-get install -y nvidia-container-toolkit
+#exec_remote sudo nvidia-ctk runtime configure --runtime=docker
+#exec_remote sudo systemctl restart docker
+
+
 exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
 
 #rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video1.mp4 $TUSER@$THOST:/home/$TUSER/face-blurer/input/

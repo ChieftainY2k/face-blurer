@@ -17,20 +17,20 @@ This is a simple PoC (proof of concept) how to blur faces in a video using AI an
 ### Step 1: Decompose video into frames, each frame in a file with the index number:
 ```
 # Preserve original
-docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -fps_mode passthrough -q:v 0 -c:v png "/data/input/frame_%10d.png"
+docker run --gpus all -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -fps_mode passthrough -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
 # Scale to 640px width
-docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -vf "scale=640:-1" -q:v 0 -c:v png "/data/input/frame_%10d.png"
+docker run --gpus all -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -vf "scale=640:-1" -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
 # Scale to 640px width and custom FPS
-docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 10 -vf "scale=640:-1" -q:v 0 -c:v png "/data/input/frame_%10d.png"
+docker run --gpus all -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 10 -vf "scale=640:-1" -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
 # Custom FPS
-docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -q:v 0 -c:v png "/data/input/frame_%10d.png"
+docker run --gpus all -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video-input-1080p50fps-15min.mp4" -r 30 -q:v 0 -c:v png "/data/input/frame_%10d.png"
 
 # With extra info overlay
-docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -vf "drawtext=text='%{pts\:hms}':x=w-tw-10:y=h-th-10:fontcolor=white:fontsize=24" -q:v 0 -c:v png "/data/input/frame_%010d.png"
-docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -vf "drawtext=text='T: %{pts\:hms}':x=w-tw-10:y=h-th-100:fontcolor=white:fontsize=24,drawtext=text='IF: %{frame_num}':x=w-tw-10:y=h-th-70:fontcolor=white:fontsize=24,drawtext=text='OF: %{n}':x=w-tw-10:y=h-th-40:fontcolor=white:fontsize=24" -q:v 0 -c:v png "/data/input/frame_%010d.png"
+docker run --gpus all -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -vf "drawtext=text='%{pts\:hms}':x=w-tw-10:y=h-th-10:fontcolor=white:fontsize=24" -q:v 0 -c:v png "/data/input/frame_%010d.png"
+docker run --gpus all -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -r 5 -vf "drawtext=text='T: %{pts\:hms}':x=w-tw-10:y=h-th-100:fontcolor=white:fontsize=24,drawtext=text='IF: %{frame_num}':x=w-tw-10:y=h-th-70:fontcolor=white:fontsize=24,drawtext=text='OF: %{n}':x=w-tw-10:y=h-th-40:fontcolor=white:fontsize=24" -q:v 0 -c:v png "/data/input/frame_%010d.png"
 ```
 
 ### Step 2: build the docker image for the face blurer:
@@ -139,12 +139,6 @@ ssh $TUSER@$THOST -p $TPORT"
 sudo apt-get install -y mc joe htop multitail docker-compose screen docker-buildx-plugin pydf iotop
 nvidia-smi
 
-sudo curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg   && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list |     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |     sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-sudo apt-get update
-sudo apt-get install -y nvidia-container-toolkit
-sudo nvidia-ctk runtime configure --runtime=docker
-sudo systemctl restart docker
-
 cd /home/$TUSER
 git clone https://github.com/ChieftainY2k/face-blurer.git
 
@@ -162,6 +156,12 @@ watch -c -n 1 "uptime; pydf; nvidia-smi; ls output/*.lock; "
 ### Troubleshooting:
 
 ```
+
+sudo curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg   && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list |     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' |     sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt-get update
+sudo apt-get install -y nvidia-container-toolkit
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
 
 sudo dpkg --get-selections | grep hold
 sudo apt-mark unhold libnvidia-cfg1-535
