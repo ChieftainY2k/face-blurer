@@ -15,6 +15,6 @@ for ((gpu = 0; gpu < GPUS; gpu++)); do
   for ((i = 1; i <= RUNS_PER_GPU; i++)); do
     echo "Running on GPU $gpu ..."
     screen -S GPU-$gpu-$i ./process_single.sh $gpu
-    #sleep 20
+    sleep 20
 done
 done
