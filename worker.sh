@@ -8,7 +8,8 @@ INSTANCE=$1
 
 echo "Running on GPU $GPU , instance $INSTANCE ..."
 
-#screen -X "title" "GPU $gpu/$i [RUNNING]"
+# change window title
+echo -ne "\033kGPU $gpu/$i [WORKING]\033\\"
 
 docker run --rm --gpus all \
   -e CUDA_VISIBLE_DEVICES=$GPU \
@@ -20,8 +21,8 @@ docker run --rm --gpus all \
   -v /tmp/blurer-cache/root:/root/.cache \
   blurer python blur_faces_slow.py
 
-#screen -X "title" "GPU $gpu/$i [DONE]"
+# change window title
+echo -ne "\033kGPU $gpu/$i [DONE]\033\\"
 
 echo 'Press [Enter] key to continue...'
 read
-
