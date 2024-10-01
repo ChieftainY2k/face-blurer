@@ -2,23 +2,29 @@
 
 # Ensure script is run as root
 if [[ "$EUID" -ne 0 ]]; then
-    echo "Please run as root"
-    exit 1
+  echo "Please run as root"
+  exit 1
 fi
+
+# Log start time
+log_message() {
+  local message="$1"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"
+}
 
 # Get the current NVIDIA driver version
 nvidia_version=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader)
-echo "Current NVIDIA driver version: $nvidia_version"
+log_message "Current NVIDIA driver version: $nvidia_version"
 
 # Check if the driver version is 535.xxxx
 if [[ $nvidia_version == 535.* ]]; then
-    echo "Driver version is 535.xxxx. Proceeding with drivers update."
+  log_message "Driver version is 535.xxxx. Proceeding with drivers update."
 elif [[ $nvidia_version == 545.* ]]; then
-    echo "Driver version is 545. That's OK."
-    exit 0
+  log_message "Driver version is 545. That's OK."
+  exit 0
 else
-    echo "ERROR: Driver version is unknown. don't know what do do."
-    exit 1
+  log_message "ERROR: Driver version is unknown. don't know what do do."
+  exit 1
 fi
 
 # Unhold NVIDIA packages if held
@@ -48,10 +54,9 @@ nvidia-ctk runtime configure --runtime=docker
 systemctl restart docker
 
 # Prompt user to reboot
-echo "----------------------------------------------------------"
-echo "System changes applied. Please reboot your system to complete the process."
-echo "----------------------------------------------------------"
-
+log_message "----------------------------------------------------------"
+log_message "System changes applied. Please reboot your system to complete the process."
+log_message "----------------------------------------------------------"
 
 ##!/bin/bash
 #

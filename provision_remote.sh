@@ -28,7 +28,7 @@ exec_remote() {
 # Log start time
 log_message() {
   local message="$1"
-  echo [$(date '+%Y-%m-%d %H:%M:%S')] $message
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"
   exec_remote "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] $message\" >> /home/user/provision-log.txt"
 }
 
