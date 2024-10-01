@@ -15,6 +15,7 @@ if [[ $nvidia_version == 535.* ]]; then
     echo "Driver version is 535.xxxx. Proceeding with drivers update."
 elif [[ $nvidia_version == 545.* ]]; then
     echo "Driver version is 545. That's OK."
+    exit 0
 else
     echo "ERROR: Driver version is unknown. don't know what do do."
     exit 1
