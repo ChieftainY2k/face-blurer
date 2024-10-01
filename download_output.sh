@@ -21,7 +21,7 @@ fi
 
 #REMOTE_SOURCE={$1:-"vi*"}
 REMOTE_SOURCE=${1:-"vi*"}
-echo "Downloading $REMOTE_SOURCE from $THOST"
+echo "Downloading '$REMOTE_SOURCE' files from $THOST"
 
 # Download videos
 rsync -avz --partial --info=progress2 -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/$REMOTE_SOURCE /tmp/output-$THOST/
