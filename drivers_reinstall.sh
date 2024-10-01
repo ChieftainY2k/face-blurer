@@ -26,7 +26,7 @@ elif [[ $nvidia_version == 545.* ]]; then
   log_message "Driver version is 545. That's OK."
   exit 0
 else
-  log_message "ERROR: Driver version is unknown. don't know what do do."
+  log_message "ERROR: Driver version is unknown."
   exit 1
 fi
 
