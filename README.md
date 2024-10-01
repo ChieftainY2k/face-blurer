@@ -192,6 +192,9 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -ss 00
 # Trim video, convert to 30fps
 docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -ss 00:00:00 -t 00:01:00 -r 30 "/data/input/video1-1min.mp4" 
 
+# Trim video, transcode
+  docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -ss 00:00:00 -t 00:01:00 -r 30 -vcodec libx264 -crf 20 "/data/input/video1-1min.mp4" 
+
 # Show system stats
 watch -c -n 1 "uptime; free; pydf; nvidia-smi; ls output/*.lock; "
 
