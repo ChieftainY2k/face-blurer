@@ -62,7 +62,7 @@ log_message "repo clone finished"
 
 # Run driver check script
 log_message "drivers check started"
-exec_remote "cd face-blurer && ./drivers_reinstall.sh"
+exec_remote "cd face-blurer && sudo ./drivers_reinstall.sh"
 log_message "drivers check finished"
 
 # Build Docker image
