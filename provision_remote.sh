@@ -38,7 +38,7 @@ cat ~/.ssh/id_rsa.pub | ssh $TUSER@$THOST -p $TPORT 'mkdir -p ~/.ssh && touch ~/
 echo "Keys injected."
 
 # show date t YYYY-mm-dd HH:MM:SS
-exec_remote "echo \"Started at $(date "+%Y-%m-%d %H:%M:%S")\" >> /home/user/provisioned_at.txt"
+exec_remote "echo \"[$(date "+%Y-%m-%d %H:%M:%S")] started\" >> /home/user/provision-log.txt"
 
 exec_remote nvidia-smi
 exec_remote free
@@ -69,4 +69,4 @@ exec_remote "cd face-blurer && rm -f output/sample*"
 
 exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py"
 
-exec_remote "echo \"Finished at $(date "+%Y-%m-%d %H:%M:%S")\" >> /home/user/provisioned_at.txt"
+exec_remote "echo \"[$(date "+%Y-%m-%d %H:%M:%S")] finished\" >> /home/user/provision-log.txt"
