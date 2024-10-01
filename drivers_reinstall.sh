@@ -15,6 +15,7 @@ log_message() {
 }
 
 # Get the current NVIDIA driver version
+nvidia-smi
 nvidia_version=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader)
 log_message "Current NVIDIA driver version: $nvidia_version"
 

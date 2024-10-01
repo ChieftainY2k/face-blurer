@@ -1,12 +1,12 @@
 #!/bin/bash
-set -xe
+set -e
 
 SOURCE=${1:-"input/video1.mp4"}
 
 
 # get number of frames
 FRAMES_COUNT=$(ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=nb_read_packets -of csv=p=0 "$SOURCE")
-echo "FRAMES_COUNT=$FRAMES_COUNT"
+echo "VIDEO FRAMES_COUNT=$FRAMES_COUNT"
 
 # decompose video to frames
 ffmpeg -i "$SOURCE" -q:v 0 -c:v png "input/frame_%10d.png"

@@ -64,7 +64,7 @@ Environment variables:
 ### Step 3: Compose video back from frames:
 ```
 # 1080p 30fps
-ffmpeg -r 30  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 "/data/output/video-blurred-1080p-30fps.mp4"
+s
 
 # 1080p 30fps, DEBUG MODE
 ffmpeg -r 30  -f image2 -s 1920x1080 -i "/data/output/frame_%10d.png.debug.png" -vcodec libx264 -crf 20 "/data/output/video-debug-1080p-30fps.mp4"

@@ -28,8 +28,14 @@ exec_remote() {
 # Log start time
 log_message() {
   local message="$1"
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"
+  log_message_local "$message"
   exec_remote "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] $message\" >> /home/user/provision-log.txt"
+}
+
+# Log start time
+log_message_local() {
+  local message="$1"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"
 }
 
 # Inject SSH keys
@@ -65,6 +71,18 @@ log_message "drivers check started"
 exec_remote "cd face-blurer && sudo ./drivers_reinstall.sh"
 log_message "drivers check finished"
 
+log_message_local "rebooting server..."
+#exec_remote "sudo reboot"
+exec_remote "sudo bash -c \"sleep 3 && sudo reboot\" &"
+log_message_local "waiting..."
+sleep 10
+# wait until server is reabooted, check every 1 second
+while ! exec_remote "uptime"; do
+#  echo -n "."
+  sleep 1
+done
+log_message_local "OK, server is up"
+
 # Build Docker image
 log_message "docker image build starting"
 exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
@@ -77,10 +95,6 @@ log_message "docker image build finished"
 # exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py"
 
 log_message "finished"
-
-
-
-
 
 ##!/bin/bash
 ## shellcheck disable=SC2086
