@@ -33,7 +33,6 @@ log_message "Downloading '$REMOTE_SOURCE' files from $THOST to $LOCAL_DEST"
 while true; do
   rsync -avz --partial --info=progress2 -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/$REMOTE_SOURCE $LOCAL_DEST
   if [ $? -eq 0 ]; then
-    log_message "Transfer complete"
     break
   else
     log_message "Transfer failed, retrying in 10 seconds..."

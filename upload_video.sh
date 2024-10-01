@@ -32,7 +32,7 @@ log_message "Uploading '$LOCAL_SOURCE' to $THOST:$REMOTE_DEST"
 while true; do
   rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" $LOCAL_SOURCE $REMOTE_DEST
   if [ $? -eq 0 ]; then
-    log_message "Transfer complete"
+    #log_message "Transfer complete"
     break
   else
     log_message "Transfer failed, retrying in 10 seconds..."
