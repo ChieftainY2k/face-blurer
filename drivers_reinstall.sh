@@ -19,3 +19,7 @@ apt-get update
 apt-get install -y nvidia-container-toolkit
 nvidia-ctk runtime configure --runtime=docker
 systemctl restart docker
+
+echo "----------------------------------------------------------"
+echo "You need to reboot the system to apply the changes"
+echo "----------------------------------------------------------"
