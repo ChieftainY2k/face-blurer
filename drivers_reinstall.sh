@@ -14,13 +14,11 @@ echo "Current NVIDIA driver version: $nvidia_version"
 if [[ $nvidia_version == 535.* ]]; then
     echo "Driver version is 535.xxxx. Proceeding with drivers update."
 elif [[ $nvidia_version == 545.* ]]; then
-    echo "Driver version is not 545. That's OK."
+    echo "Driver version is 545. That's OK."
 else
     echo "ERROR: Driver version is unknown. don't know what do do."
     exit 1
 fi
-
-exit 1
 
 # Unhold NVIDIA packages if held
 apt-mark unhold $(dpkg --get-selections | grep hold | awk '{print $1}')
