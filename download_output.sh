@@ -19,12 +19,32 @@ if [ -z "$TUSER" ]; then
   exit 1
 fi
 
+log_message() {
+  echo "[$(date +'%Y-%m-%d %H:%M:%S')]: $@"
+}
+
 #REMOTE_SOURCE={$1:-"vi*"}
 REMOTE_SOURCE=${1:-"vi*"}
-echo "Downloading '$REMOTE_SOURCE' files from $THOST"
+LOCAL_DEST="/tmp/output-$THOST"
+#echo "Downloading '$REMOTE_SOURCE' files from $THOST"
+log_message "Downloading '$REMOTE_SOURCE' files from $THOST to $LOCAL_DEST"
+
+# Loop until transfer is complete
+while true; do
+  rsync -avz --partial --info=progress2 -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/$REMOTE_SOURCE $LOCAL_DEST
+  if [ $? -eq 0 ]; then
+    log_message "Transfer complete"
+    break
+  else
+    log_message "Transfer failed, retrying in 10 seconds..."
+    sleep 10
+  fi
+done
+
+log_message "Download complete"
 
 # Download videos
-rsync -avz --partial --info=progress2 -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/$REMOTE_SOURCE /tmp/output-$THOST/
+
 
 # Download all
 #rsync -avz --partial --info=progress2 -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/ /tmp/output-$THOST/

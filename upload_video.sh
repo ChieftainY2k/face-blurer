@@ -3,7 +3,7 @@
 
 set -e
 
-# check variablews
+# check variables
 if [ -z "$THOST" ]; then
   echo "THOST is not set"
   exit 1
@@ -19,5 +19,25 @@ if [ -z "$TUSER" ]; then
   exit 1
 fi
 
+log_message() {
+  echo "[$(date +'%Y-%m-%d %H:%M:%S')]: $@"
+}
+
 LOCAL_SOURCE=${1:-"./input/video1.mp4"}
-rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" $LOCAL_SOURCE $TUSER@$THOST:/home/$TUSER/face-blurer/input/video1.mp4
+REMOTE_DEST="$TUSER@$THOST:/home/$TUSER/face-blurer/input/video1.mp4"
+
+log_message "Uploading '$LOCAL_SOURCE' to $THOST:$REMOTE_DEST"
+
+# Loop until transfer is complete
+while true; do
+  rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" $LOCAL_SOURCE $REMOTE_DEST
+  if [ $? -eq 0 ]; then
+    log_message "Transfer complete"
+    break
+  else
+    log_message "Transfer failed, retrying in 10 seconds..."
+    sleep 10
+  fi
+done
+
+log_message "Upload complete"
