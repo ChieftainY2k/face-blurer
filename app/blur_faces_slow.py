@@ -100,7 +100,12 @@ def blur_faces_in_directory(input_dir, output_dir):
 
             print(", detecting", end="", flush=True)
             detection_start_time = time.time()
-            faces = RetinaFace.detect_faces(image, threshold = score_threshold)
+            if debug_mode:
+                # Use a lower threshold for debug mode
+                faces = RetinaFace.detect_faces(image, threshold = 0.2)
+            else:
+                # Use the threshold from the environment variable
+                faces = RetinaFace.detect_faces(image, threshold = score_threshold)
             detection_end_time = time.time()
             detection_time = detection_end_time - detection_start_time
             print(f" ({detection_time:.2f}s)", end="", flush=True)
@@ -136,15 +141,17 @@ def blur_faces_in_directory(input_dir, output_dir):
                         print(" , ERROR: face_roi is empty", end="", flush=True)
                         continue
 
-                    # blur only if above threshold
                     if score >= score_threshold:
+                        # blur only if above threshold
                         face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
                         image[y1:y2, x1:x2] = face_roi_blurred
 
                     if debug_mode:
-                        color = (0, 255, 0) if score >= score_threshold else (255, 0, 0)
+                        # Draw a rectangle around the face
+                        color = (0, 255, 0) if score >= score_threshold else (0, 0, 255)
                         cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
-                        text = f"{score:.2f}"
+                        score_percent = score * 100
+                        text = f"{score_percent:.2f}%"
                         text_y = y2 + 20
                         if text_y > image.shape[0]:
                             text_y = y1 - 10
