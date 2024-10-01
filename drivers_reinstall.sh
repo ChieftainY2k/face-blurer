@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 # Ensure script is run as root
 if [[ "$EUID" -ne 0 ]]; then
   echo "Please run as root"

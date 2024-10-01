@@ -60,15 +60,15 @@ exec_remote "[ -d ~/face-blurer ] || git clone https://github.com/ChieftainY2k/f
 exec_remote "cd face-blurer && git pull"
 log_message "repo clone finished"
 
-# Build Docker image
-log_message "docker image build starting"
-exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
-log_message "docker image build finished"
-
 # Run driver check script
 log_message "drivers check started"
 exec_remote "cd face-blurer && ./drivers_reinstall.sh"
 log_message "drivers check finished"
+
+# Build Docker image
+log_message "docker image build starting"
+exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
+log_message "docker image build finished"
 
 # Uncomment if needed for rsync and Docker execution
 # rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video1.mp4 $TUSER@$THOST:/home/$TUSER/face-blurer/input/
