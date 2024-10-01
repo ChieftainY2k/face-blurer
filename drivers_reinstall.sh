@@ -18,6 +18,8 @@ else
     exit 1
 fi
 
+exit 1
+
 # Unhold NVIDIA packages if held
 apt-mark unhold $(dpkg --get-selections | grep hold | awk '{print $1}')
 
