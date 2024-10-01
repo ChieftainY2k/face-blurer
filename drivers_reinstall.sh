@@ -30,7 +30,12 @@ else
 fi
 
 # Unhold NVIDIA packages if held
-apt-mark unhold $(dpkg --get-selections | grep hold | awk '{print $1}')
+#apt-mark unhold $(dpkg --get-selections | grep hold | awk '{print $1}')
+held_packages=$(dpkg --get-selections | grep hold | awk '{print $1}')
+if [ -n "$held_packages" ]; then
+  apt-mark unhold $held_packages
+fi
+
 
 # Remove old NVIDIA drivers and purge related packages
 apt remove -y --purge '^nvidia-.*'
