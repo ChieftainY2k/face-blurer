@@ -45,7 +45,7 @@ docker build -f Dockerfile.gpu --progress=plain . -t blurer
 ### Step 3: Process frames, detect and blur faces in each frame from the input directory:
 ```
 # slow but accurate:
-docker run --rm --gpus all -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py
+docker run --rm --gpus all -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface.py
 
 # faster but less accurate:
 docker run --rm --gpus all v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py
@@ -54,7 +54,7 @@ docker run --rm --gpus all v ./app:/app -v ./input:/input:ro -v ./output:/output
 docker run --rm --gpus all -v ./app:/app -e DEBUG=1 -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/depface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_fast.py
 
 # Multi GPU, with single GPU #0 selected:
-docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=0 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py 
+docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=0 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface.py 
 ```
 
 Environment variables:
@@ -196,5 +196,5 @@ docker run -v $(pwd):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -ss 00
 watch -c -n 1 "uptime; free; pydf; nvidia-smi; ls output/*.lock; "
 
 # Run in a screen window
-screen docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=0 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py 
+screen docker run --rm --gpus all -e CUDA_VISIBLE_DEVICES=0 -e DEBUG=1 -v ./app:/app -v ./input:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface.py 
 ```

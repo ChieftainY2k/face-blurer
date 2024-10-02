@@ -92,7 +92,7 @@ log_message "docker image build finished"
 # rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video1.mp4 $TUSER@$THOST:/home/$TUSER/face-blurer/input/
 # exec_remote "cd face-blurer && docker run -v \$(pwd):/data linuxserver/ffmpeg -i \"/data/input/video1.mp4\" -fps_mode passthrough -q:v 0 -c:v png \"/data/input/frame_%10d.png\""
 # exec_remote "cd face-blurer && rm -f output/sample*"
-# exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py"
+# exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface.py"
 
 log_message "finished"
 
@@ -166,7 +166,7 @@ log_message "finished"
 ##  docker run -v \$\(pwd\):/data linuxserver/ffmpeg -i "/data/input/video1.mp4" -fps_mode passthrough -q:v 0 -c:v png "/data/input/frame_%10d.png"
 #
 ##exec_remote "cd face-blurer && rm -f output/sample*"
-##exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_slow.py"
+##exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface.py"
 #
 #
 #exec_remote "echo \"[$(date "+%Y-%m-%d %H:%M:%S")] finished\" >> /home/user/provision-log.txt"
