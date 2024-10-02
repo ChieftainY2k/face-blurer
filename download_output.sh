@@ -38,7 +38,7 @@ while true; do
       sleep 10
     fi
   done
-  log_message "transfer complete, checking if there are more files to download..."
+  log_message "transfer complete, checking if there are more files to download... , press [Ctrl+C] to stop"
   sleep 10
 done
 
