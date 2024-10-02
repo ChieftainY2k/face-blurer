@@ -47,6 +47,7 @@ INFO_FILE_RUN="./output/metadata-run"
 RESOLUTION=$(grep 'RESOLUTION' $INFO_FILE | cut -d '=' -f 2)
 FPS=$(grep 'FPS' $INFO_FILE | cut -d '=' -f 2)
 DEBUG=$(grep 'DEBUG' $INFO_FILE_RUN | cut -d '=' -f 2)
+THRESHOLD=$(grep 'THRESHOLD' $INFO_FILE_RUN | cut -d '=' -f 2)
 
 log_message "Input video metadata:"
 # show both files
@@ -60,13 +61,13 @@ if [ -z "$RESOLUTION" ] || [ -z "$FPS" ] || [ -z "$DEBUG" ]; then
   exit 1
 fi
 
-PREFIX="blurred"
+PREFIX_MODE="blurred"
 if [ "$DEBUG" -eq 1 ]; then
-  PREFIX="debug"
+  PREFIX_MODE="debug"
 fi
 
 # Use variables in the ffmpeg command
-COMMAND="ffmpeg -r \"$FPS\" -hwaccel \"cuda\" -c:v h264_nvenc -preset slow -cq 20 -f image2 -s \"$RESOLUTION\" -i \"output/frame_%10d.png.debug.png\" \"output/video-${PREFIX}-${RESOLUTION}-${FPS}fps.mp4\" "
+COMMAND="ffmpeg -r \"$FPS\" -hwaccel \"cuda\" -c:v h264_nvenc -preset slow -cq 20 -f image2 -s \"$RESOLUTION\" -i \"output/frame_%10d.png.debug.png\" \"output/video-${RESOLUTION}-${FPS}-${PREFIX_MODE}-{$THRESHOLD}fps.mp4\" "
 
 # show command , wait for ENTER
 log_message "About to exec the command: $COMMAND"
