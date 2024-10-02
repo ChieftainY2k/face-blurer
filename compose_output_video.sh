@@ -67,7 +67,7 @@ if [ "$DEBUG" -eq 1 ]; then
 fi
 
 # Use variables in the ffmpeg command
-COMMAND="ffmpeg -r \"$FPS\" -hwaccel \"cuda\" -c:v h264_nvenc -preset slow -cq 20 -f image2 -s \"$RESOLUTION\" -i \"output/frame_%10d.png.debug.png\" \"output/video-${RESOLUTION}-${FPS}-${PREFIX_MODE}-${THRESHOLD}fps.mp4\" "
+COMMAND="ffmpeg -r \"$FPS\" -hwaccel \"cuda\" -c:v h264_nvenc -preset slow -cq 20 -f image2 -s \"$RESOLUTION\" -i \"output/frame_%10d.png.debug.png\" \"output/video-${RESOLUTION}-${FPS}fps-${PREFIX_MODE}-th${THRESHOLD}.mp4\" "
 
 # show command , wait for ENTER
 log_message "About to exec the command: $COMMAND"
