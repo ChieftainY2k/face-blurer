@@ -136,14 +136,111 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                 # Use a lower threshold for debug mode
                 retina_threshold = 0.1
 
-            print(f", detecting[{retina_threshold}][{score_threshold}]", end="", flush=True)
-            detection_start_time = time.time()
-            faces = RetinaFace.detect_faces(image, threshold=retina_threshold)
-            detection_end_time = time.time()
-            detection_time = detection_end_time - detection_start_time
-            print(f" ({detection_time:.2f}s)", end="", flush=True)
 
             prev_blurs_applied = False
+
+            # Check if there's a cached metadata file
+            metadata_data = None
+            metadata_filename = image_files[idx]
+            metadata_path = os.path.join(output_dir, metadata_filename) + ".metadata.json"
+            if os.path.exists(metadata_path):
+                with open(metadata_path, 'r') as json_file:
+                    metadata_data = json.load(json_file)
+
+            if metadata_data:
+                print(f", using cached metadata", end="", flush = True)
+                detected_faces = None
+            else:
+                print(f", detecting[{retina_threshold}][{score_threshold}]", end="", flush=True)
+                detection_start_time = time.time()
+                detected_faces = RetinaFace.detect_faces(image, threshold=retina_threshold)
+                detection_end_time = time.time()
+                detection_time = detection_end_time - detection_start_time
+                print(f" ({detection_time:.2f}s)", end="", flush=True)
+
+            # Check if there's a previous metadata file
+            if idx > 5:
+                prev_idx = idx - 5
+                prev_filename = image_files[prev_idx]
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + ".metadata.json"
+                if os.path.exists(prev_metadata_path):
+                    with open(prev_metadata_path, 'r') as json_file:
+                        prev_face_data = json.load(json_file)
+                    # Apply blurs from previous frame areas
+                    if prev_face_data:
+                        print(f", found blurs from {prev_idx}", end="", flush=True)
+                        for face in prev_face_data:
+                            position = face['position']
+                            x1 = position['x1']
+                            y1 = position['y1']
+                            x2 = position['x2']
+                            y2 = position['y2']
+                            blur_face(image, x1, y1, x2, y2)
+                            draw_prev_frame_2(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                            prev_blurs_applied = True
+
+            # Check if there's a previous metadata file
+            if idx > 4:
+                prev_idx = idx - 4
+                prev_filename = image_files[prev_idx]
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + ".metadata.json"
+                if os.path.exists(prev_metadata_path):
+                    with open(prev_metadata_path, 'r') as json_file:
+                        prev_face_data = json.load(json_file)
+                    # Apply blurs from previous frame areas
+                    if prev_face_data:
+                        print(f", found blurs from {prev_idx}", end="", flush=True)
+                        for face in prev_face_data:
+                            position = face['position']
+                            x1 = position['x1']
+                            y1 = position['y1']
+                            x2 = position['x2']
+                            y2 = position['y2']
+                            blur_face(image, x1, y1, x2, y2)
+                            draw_prev_frame_2(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                            prev_blurs_applied = True
+
+            # Check if there's a previous metadata file
+            if idx > 3:
+                prev_idx = idx - 3
+                prev_filename = image_files[prev_idx]
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + ".metadata.json"
+                if os.path.exists(prev_metadata_path):
+                    with open(prev_metadata_path, 'r') as json_file:
+                        prev_face_data = json.load(json_file)
+                    # Apply blurs from previous frame areas
+                    if prev_face_data:
+                        print(f", found blurs from {prev_idx}", end="", flush=True)
+                        for face in prev_face_data:
+                            position = face['position']
+                            x1 = position['x1']
+                            y1 = position['y1']
+                            x2 = position['x2']
+                            y2 = position['y2']
+                            blur_face(image, x1, y1, x2, y2)
+                            draw_prev_frame_2(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                            prev_blurs_applied = True
+
+            # Check if there's a previous metadata file
+            if idx > 2:
+                prev_idx = idx - 2
+                prev_filename = image_files[prev_idx]
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + ".metadata.json"
+                if os.path.exists(prev_metadata_path):
+                    with open(prev_metadata_path, 'r') as json_file:
+                        prev_face_data = json.load(json_file)
+                    # Apply blurs from previous frame areas
+                    if prev_face_data:
+                        print(f", found blurs from {prev_idx}", end="", flush=True)
+                        for face in prev_face_data:
+                            position = face['position']
+                            x1 = position['x1']
+                            y1 = position['y1']
+                            x2 = position['x2']
+                            y2 = position['y2']
+                            blur_face(image, x1, y1, x2, y2)
+                            draw_prev_frame_2(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                            prev_blurs_applied = True
 
             # Check if there's a previous metadata file
             if idx > 1:
@@ -191,9 +288,9 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             face_count = 0
             face_data = []
 
-            if faces:
+            if detected_faces:
                 print(f", ", end="", flush=True)
-                for face_id, face_info in faces.items():
+                for face_id, face_info in detected_faces.items():
                     facial_area = face_info['facial_area']
                     x1, y1, x2, y2 = facial_area
                     score = face_info['score']
@@ -235,16 +332,29 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             else:
                 print(f", no faces detected", end="", flush=True)
 
-            # Save face data to a JSON file
-            json_output_path = os.path.join(output_dir, filename) + ".metadata.json"
-            json_output_path_tmp = json_output_path + ".tmp"
-            with open(json_output_path_tmp, 'w') as json_file:
-                json.dump(face_data, json_file, indent=4)
-            os.rename(json_output_path_tmp, json_output_path)
+            if not metadata_data:
+                print(f", saving metadata", end="", flush=True)
+                json_output_path = os.path.join(output_dir, filename) + ".metadata.json"
+                json_output_path_tmp = json_output_path + ".tmp"
+                with open(json_output_path_tmp, 'w') as json_file:
+                    json.dump(face_data, json_file, indent=4)
+                os.rename(json_output_path_tmp, json_output_path)
+            else:
+                print(f", using cached metadata", end="", flush=True)
+                for face in metadata_data:
+                    position = face['position']
+                    x1 = position['x1']
+                    y1 = position['y1']
+                    x2 = position['x2']
+                    y2 = position['y2']
+                    blur_face(image, x1, y1, x2, y2)
+                    draw_frame(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                    prev_blurs_applied = True
+
 
             tmp_output_path = output_path + ".tmp.png"
             save_start_time = time.time()
-            if faces or prev_blurs_applied:
+            if detected_faces or prev_blurs_applied:
                 # Save the image
                 print(f", saving frame", end="", flush=True)
                 cv2.imwrite(tmp_output_path, image)
