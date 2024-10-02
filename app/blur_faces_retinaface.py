@@ -107,7 +107,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             retina_threshold = score_threshold
             if debug_mode:
                 # Use a lower threshold for debug mode
-                retina_threshold = 0.2
+                retina_threshold = 0.1
 
             print(f", detecting[{retina_threshold}][{score_threshold}]", end="", flush=True)
             detection_start_time = time.time()
@@ -217,7 +217,7 @@ if __name__ == "__main__":
     if score_threshold:
         score_threshold = float(score_threshold)
     else:
-        score_threshold = 0.40
+        score_threshold = 0.20
 
     # Call the main processing function
     blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold)
