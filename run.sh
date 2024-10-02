@@ -5,9 +5,10 @@ set -e
 # Detect number of GPUS from nvisia-smi
 GPU_COUNT=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 #GPU_COUNT=1
-echo "Detected $GPU_COUNT GPUs"
 WORKER_COUNT=4
-echo "Will run $WORKER_COUNT times per GPU"
+echo "GPU_COUNT  = $GPU_COUNT , WORKER_COUNT = $WORKER_COUNT , DEBUG = $DEBUG , THRESHOLD = $THRESHOLD"
+echo "Press [Enter] key to continue..."
+read
 
 #screen -t "INFO" -- watch -c -n 3 "uptime; free; pydf; nvidia-smi; ls output/*.lock"
 
