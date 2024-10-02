@@ -124,7 +124,10 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                     facial_area = face_info['facial_area']
                     x1, y1, x2, y2 = facial_area
                     score = face_info['score']
-                    print(f"[{score:.2f}+]", end="", flush=True)
+                    if score >= score_threshold:
+                        print(f"[{score:.2f}+]", end="", flush=True)
+                    else:
+                        print(f"[{score:.2f}-]", end="", flush=True)
 
                     x1 = max(0, x1)
                     y1 = max(0, y1)
