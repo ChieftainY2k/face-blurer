@@ -109,7 +109,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                 # Use a lower threshold for debug mode
                 retina_threshold = 0.2
 
-            print(f", detecting[{retina_threshold}]", end="", flush=True)
+            print(f", detecting[{retina_threshold}][{score_threshold}]", end="", flush=True)
             detection_start_time = time.time()
             faces = RetinaFace.detect_faces(image, threshold=retina_threshold)
             detection_end_time = time.time()

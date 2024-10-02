@@ -1,8 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC2086
 
-set -e
-
 # check variablews
 if [ -z "$THOST" ]; then
   echo "THOST is not set"
