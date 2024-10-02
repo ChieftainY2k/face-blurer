@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC2086
+# shellcheck disable=SC2086,SC2129
 #set -e
 
 # get GPU from arg
@@ -11,7 +11,14 @@ THRESHOLD=$4
 echo "Running on GPU $GPU , instance $INSTANCE , DEBUG=$DEBUG, THRESHOLD=$THRESHOLD ..."
 
 # change window title
-echo -ne "\033kGPU${GPU}/${INSTANCE}\033\\"
+echo -ne "\033kGPU${GPU}/${INSTANCE}(WORK)\033\\"
+
+INFO_FILE="./output/metadata-worker-$GPU-$INSTANCE.txt"
+# save vars to local file
+echo "GPU=$GPU" > $INFO_FILE
+echo "INSTANCE=$INSTANCE" >> $INFO_FILE
+echo "DEBUG=$DEBUG" >> $INFO_FILE
+echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
 
 docker run --rm --gpus all \
   -e CUDA_VISIBLE_DEVICES=$GPU \
@@ -25,7 +32,7 @@ docker run --rm --gpus all \
   blurer python blur_faces_retinaface.py
 
 # change window title
-echo -ne "\033kGPU${GPU}[${INSTANCE}][DONE]\033\\"
+echo -ne "\033kGPU${GPU}/${INSTANCE}(DONE)\033\\"
 
 echo 'Press [Enter] key to continue...'
 read

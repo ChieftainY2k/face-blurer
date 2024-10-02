@@ -18,7 +18,7 @@ if [ -z "$TUSER" ]; then
 fi
 
 log_message() {
-  echo "[$(date +'%Y-%m-%d %H:%M:%S')]: $@"
+  echo "[$(date +'%Y-%m-%d %H:%M:%S')] $@"
 }
 
 #REMOTE_SOURCE={$1:-"vi*"}
