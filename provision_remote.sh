@@ -46,6 +46,9 @@ echo "Keys injected."
 
 log_message "started"
 
+# set timezone to warsaw
+exec_remote "sudo timedatectl set-timezone Europe/Warsaw"
+
 # Remote system checks
 exec_remote nvidia-smi
 exec_remote free

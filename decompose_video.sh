@@ -27,6 +27,7 @@ echo "RESOLUTION=$RESOLUTION" >> $INFO_FILE
 echo "FRAMES_COUNT=$FRAMES_COUNT" >> $INFO_FILE
 echo "FPS=$FPS" >> $INFO_FILE
 echo "FPS_FFPROBE=$FPS_FFPROBE" >> $INFO_FILE
+echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
 # decompose video to frames
 log_message "Decomposing video $SOURCE ..."
@@ -36,5 +37,6 @@ ffmpeg -hwaccel cuda  -i "$SOURCE" -q:v 0 -c:v png -n "input/frame_%10d.png"
 # set starting and ending frame
 #FRAME_FIRST=1000 FRAME_LAST=1100 ffmpeg -i input/video.mp4 -start_number $FRAME_FIRST -vf trim=start_frame=$FRAME_FIRST:end_frame=$FRAME_LAST -q:v 0 -vsync vfr -c:v png "input/frame_%10d.png"
 
+echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FPS_FFPROBE = $FPS_FFPROBE , FRAMES_COUNT = $FRAMES_COUNT"
 log_message "Finished decomposing video $SOURCE"
