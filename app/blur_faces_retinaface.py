@@ -212,9 +212,9 @@ if __name__ == "__main__":
     debug_mode = os.getenv('DEBUG', '')
     score_threshold = os.getenv('THRESHOLD')
     if score_threshold is None:
-        score_threshold = 0.40
-    else:
         score_threshold = float(score_threshold)
+    else:
+        score_threshold = 0.40
 
     # Call the main processing function
     blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold)
