@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC2086
+# shellcheck disable=SC2086,SC2129
 set -e
 
 log_message() {
@@ -13,6 +13,11 @@ WORKER_COUNT=4
 log_message "GPU_COUNT  = $GPU_COUNT , WORKER_COUNT = $WORKER_COUNT , DEBUG = $DEBUG , THRESHOLD = $THRESHOLD"
 log_message "Press [Enter] key to continue..."
 read
+
+INFO_FILE="./output/metadata-run-$GPU-$INSTANCE.txt"
+# save vars to local file
+echo "DEBUG=$DEBUG" >> $INFO_FILE
+echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
 
 #screen -t "INFO" -- watch -c -n 3 "uptime; free; pydf; nvidia-smi; ls output/*.lock"
 
