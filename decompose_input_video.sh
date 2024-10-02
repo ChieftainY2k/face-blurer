@@ -20,7 +20,7 @@ log_message "Press [Enter] key to continue..."
 read
 
 
-INFO_FILE="./input/metadata"
+INFO_FILE="./input/metadata-video"
 # save vars to local file
 echo "SOURCE=$SOURCE" > $INFO_FILE
 echo "RESOLUTION=$RESOLUTION" >> $INFO_FILE

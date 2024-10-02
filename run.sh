@@ -20,7 +20,7 @@ log_message "GPU_COUNT  = $GPU_COUNT , WORKER_COUNT = $WORKER_COUNT , DEBUG = $D
 log_message "Press [Enter] key to continue..."
 read
 
-INFO_FILE="./output/metadata-run.txt"
+INFO_FILE="./output/metadata-run"
 # save vars to local file
 echo "DEBUG=$DEBUG" > $INFO_FILE
 echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE

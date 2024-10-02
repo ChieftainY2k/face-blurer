@@ -17,7 +17,7 @@ log_message "Running on GPU $GPU , instance $INSTANCE , DEBUG=$DEBUG, THRESHOLD=
 # change window title
 echo -ne "\033kGPU${GPU}/${INSTANCE}(WORK)\033\\"
 
-INFO_FILE="./output/metadata-worker-$GPU-$INSTANCE.txt"
+INFO_FILE="./output/metadata-worker-$GPU-$INSTANCE"
 # save vars to local file
 echo "GPU=$GPU" > $INFO_FILE
 echo "INSTANCE=$INSTANCE" >> $INFO_FILE
