@@ -14,9 +14,9 @@ log_message "GPU_COUNT  = $GPU_COUNT , WORKER_COUNT = $WORKER_COUNT , DEBUG = $D
 log_message "Press [Enter] key to continue..."
 read
 
-INFO_FILE="./output/metadata-run-$GPU-$INSTANCE.txt"
+INFO_FILE="./output/metadata-run.txt"
 # save vars to local file
-echo "DEBUG=$DEBUG" >> $INFO_FILE
+echo "DEBUG=$DEBUG" > $INFO_FILE
 echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
 
 #screen -t "INFO" -- watch -c -n 3 "uptime; free; pydf; nvidia-smi; ls output/*.lock"
