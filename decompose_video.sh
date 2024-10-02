@@ -27,7 +27,8 @@ sleep 3
 
 # decompose video to frames
 log_message "Decomposing video $SOURCE ..."
-ffmpeg -i "$SOURCE" -q:v 0 -c:v png -n "input/frame_%10d.png"
+#ffmpeg -i "$SOURCE" -q:v 0 -c:v png -n "input/frame_%10d.png"
+docker run --gpus all -v $(pwd):/data linuxserver/ffmpeg -i "/data/$SOURCE" -q:v 0 -c:v png -n "/data/input/frame_%10d.png"
 
 # set starting and ending frame
 #FRAME_FIRST=1000 FRAME_LAST=1100 ffmpeg -i input/video.mp4 -start_number $FRAME_FIRST -vf trim=start_frame=$FRAME_FIRST:end_frame=$FRAME_LAST -q:v 0 -vsync vfr -c:v png "input/frame_%10d.png"
