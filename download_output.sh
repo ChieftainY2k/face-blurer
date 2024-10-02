@@ -25,20 +25,24 @@ log_message() {
 REMOTE_SOURCE=${1:-"vi*"}
 LOCAL_DEST="/tmp/output-$THOST"
 #echo "Downloading '$REMOTE_SOURCE' files from $THOST"
-log_message "Downloading '$REMOTE_SOURCE' files from $THOST to $LOCAL_DEST"
+log_message "downloading '$REMOTE_SOURCE' files from $THOST to $LOCAL_DEST"
 
 # Loop until transfer is complete
 while true; do
-  rsync -avz --partial --info=progress2 -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/$REMOTE_SOURCE $LOCAL_DEST
-  if [ $? -eq 0 ]; then
-    break
-  else
-    log_message "Transfer failed, retrying in 10 seconds..."
-    sleep 10
-  fi
+  while true; do
+    rsync -avz --partial --info=progress2 -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/$REMOTE_SOURCE $LOCAL_DEST
+    if [ $? -eq 0 ]; then
+      break
+    else
+      log_message "transfer failed, retrying in 10 seconds..."
+      sleep 10
+    fi
+  done
+  log_message "transfer complete, checking if there are more files to download..."
+  sleep 10
 done
 
-log_message "Download complete"
+log_message "download complete"
 
 # Download videos
 
