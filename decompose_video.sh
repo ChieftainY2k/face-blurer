@@ -11,6 +11,11 @@ SOURCE=${1:-"input/video1.mp4"}
 log_message "Getting info on $SOURCE ..."
 FRAMES_COUNT=$(ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=nb_read_packets -of csv=p=0 "$SOURCE")
 RESOLUTION=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$SOURCE")
+
+# save vars to local file
+echo "SOURCE=$SOURCE" > ./video_info.txt
+echo "RESOLUTION=$RESOLUTION" >> ./video_info.txt
+
 log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , VIDEO FRAMES COUNT = $FRAMES_COUNT"
 log_message "Press [Enter] key to continue..."
 read
