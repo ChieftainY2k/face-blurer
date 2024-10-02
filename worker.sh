@@ -35,9 +35,15 @@ docker run --rm --gpus all \
   -v /tmp/blurer-cache/root:/root/.cache \
   blurer python blur_faces_retinaface.py
 
-# change window title
-echo -ne "\033kGPU${GPU}/${INSTANCE}(DONE)\033\\"
-echo "FINISHED=1" >> $INFO_FILE
+# change window title to DONE on success, ERROR on error
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+  echo -ne "\033kGPU${GPU}/${INSTANCE}(ERROR)\033\\"
+  echo "ERROR=$EXIT_CODE" >> $INFO_FILE
+else
+  echo -ne "\033kGPU${GPU}/${INSTANCE}(DONE)\033\\"
+  echo "FINISHED=1" >> $INFO_FILE
+fi
 
 log_message 'Press [Enter] key to continue...'
 read
