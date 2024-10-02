@@ -144,6 +144,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             print(f" ({detection_time:.2f}s)", end="", flush=True)
 
             # Check if there's a previous metadata file
+            prev_blurs_applied = False
             if idx > 1:
                 prev_idx = idx - 2
                 prev_filename = image_files[prev_idx]
@@ -162,6 +163,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                             y2 = position['y2']
                             blur_face(image, x1, y1, x2, y2)
                             draw_prev_frame_2(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                            prev_blurs_applied = True
 
             # Check if there's a previous metadata file
             if idx > 0:
@@ -182,6 +184,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                             y2 = position['y2']
                             blur_face(image, x1, y1, x2, y2)
                             draw_prev_frame(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                            prev_blurs_applied = True
 
 
             face_count = 0
@@ -240,7 +243,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
 
             tmp_output_path = output_path + ".tmp.png"
             save_start_time = time.time()
-            if faces:
+            if faces or prev_blurs_applied:
                 # Save the image
                 print(f", saving frame", end="", flush=True)
                 cv2.imwrite(tmp_output_path, image)
