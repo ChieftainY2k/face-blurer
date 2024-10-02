@@ -7,7 +7,7 @@ import fcntl
 import shutil
 from retinaface import RetinaFace
 
-def blur_faces_in_directory(input_dir, output_dir):
+def blur_faces_in_directory(input_dir, output_dir, debug_mode, env_score_threshold):
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -217,11 +217,16 @@ def blur_faces_in_directory(input_dir, output_dir):
     print("Processing complete.")
 
 if __name__ == "__main__":
-    # Retrieve environment variables or set default paths
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
-    debug_mode_env = os.getenv('DEBUG', '')
-    env_score_threshold = float(os.getenv('THRESHOLD', 0.50))
+    debug_mode = os.getenv('DEBUG', '')
+    #env_score_threshold = float(os.getenv('THRESHOLD', 0.50))
+
+    env_score_threshold = os.getenv('THRESHOLD')
+    if env_score_threshold == None:
+        env_score_threshold = 0.50
+    else:
+        env_score_threshold = float(env_score_threshold)
 
     # Call the main processing function
-    blur_faces_in_directory(input_dir, output_dir)
+    blur_faces_in_directory(input_dir, output_dir, debug_mode, env_score_threshold)
