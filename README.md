@@ -79,6 +79,7 @@ docker run --gpus all -v $(pwd):/data linuxserver/ffmpeg -r 30 -f image2 -s 3840
 docker run --gpus all -v $(pwd):/data linuxserver/ffmpeg -r 59.94005994005994005994 -f image2 -s 3840x2160 -i "/data/output/frame_%10d.png.blurred.png" -vcodec libx264 -crf 20 "/data/output/video-blured-4k-60fps.mp4"
 
 # 4K 60fps, DEBUG MODE
+ffmpeg -r 59.94005994005994005994 -hwaccel "cuda" -c:v h264_nvenc -preset slow -cq 20 -f image2 -s 3840x2160 -i "output/frame_%10d.png.debug.png" "output/video-debug-4k-60fps.mp4" 
 docker run --gpus all -v $(pwd):/data linuxserver/ffmpeg -r 59.94005994005994005994 -f image2 -s 3840x2160 -i "/data/output/frame_%10d.png.debug.png" -vcodec libx264 -crf 20 "/data/output/video-debug-4k-60fps.mp4"
 ```
 

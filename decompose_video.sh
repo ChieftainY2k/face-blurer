@@ -30,7 +30,7 @@ echo "FPS_FFPROBE=$FPS_FFPROBE" >> $INFO_FILE
 
 # decompose video to frames
 log_message "Decomposing video $SOURCE ..."
-ffmpeg -i "$SOURCE" -q:v 0 -c:v png -n "input/frame_%10d.png"
+ffmpeg -hwaccel cuda  -i "$SOURCE" -q:v 0 -c:v png -n "input/frame_%10d.png"
 #docker run --gpus all -v $(pwd):/data linuxserver/ffmpeg -i "/data/$SOURCE" -q:v 0 -c:v png -n "/data/input/frame_%10d.png"
 
 # set starting and ending frame
