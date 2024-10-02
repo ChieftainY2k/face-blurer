@@ -24,6 +24,7 @@ INFO_FILE="./output/metadata-run.txt"
 # save vars to local file
 echo "DEBUG=$DEBUG" > $INFO_FILE
 echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
+echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
 #screen -t "INFO" -- watch -c -n 3 "uptime; free; pydf; nvidia-smi; ls output/*.lock"
 
