@@ -19,7 +19,7 @@ log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FPS_FFPR
 log_message "Press [Enter] key to continue..."
 read
 
-
+log_message "Collecting metadata..."
 INFO_FILE="./input/metadata-video"
 # save vars to local file
 echo "SOURCE=$SOURCE" > $INFO_FILE
@@ -28,6 +28,9 @@ echo "FRAMES_COUNT=$FRAMES_COUNT" >> $INFO_FILE
 echo "FPS=$FPS" >> $INFO_FILE
 echo "FPS_FFPROBE=$FPS_FFPROBE" >> $INFO_FILE
 echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
+echo "MD5_HASH=$(md5sum "$SOURCE" | awk '{ print $1 }')" >> $INFO_FILE
+log_message "Metadata saved to $INFO_FILE"
+cat $INFO_FILE
 
 # decompose video to frames
 log_message "Decomposing video $SOURCE ..."
