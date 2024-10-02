@@ -25,11 +25,11 @@ log_message() {
 REMOTE_SOURCE=${1:-"vi*"}
 LOCAL_DEST="/tmp/output-$THOST"
 #echo "Downloading '$REMOTE_SOURCE' files from $THOST"
-log_message "downloading '$REMOTE_SOURCE' files from $THOST to $LOCAL_DEST"
 
 # Loop until transfer is complete
 while true; do
   while true; do
+    log_message "downloading '$REMOTE_SOURCE' files from $THOST to $LOCAL_DEST"
     rsync -avz --partial --info=progress2 -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/$REMOTE_SOURCE $LOCAL_DEST
     if [ $? -eq 0 ]; then
       break
