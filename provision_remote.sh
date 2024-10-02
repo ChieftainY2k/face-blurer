@@ -71,7 +71,7 @@ log_message "drivers check started"
 exec_remote "cd face-blurer && sudo ./drivers_reinstall.sh"
 log_message "drivers check finished"
 
-log_message_local "rebooting server..."
+log_message "rebooting server..."
 #exec_remote "sudo reboot"
 exec_remote "sudo bash -c \"sleep 3 && sudo reboot\" &"
 log_message_local "waiting..."
@@ -81,7 +81,8 @@ while ! exec_remote "uptime"; do
 #  echo -n "."
   sleep 1
 done
-log_message_local "OK, server is up"
+sleep 20
+log_message "OK, server is up"
 
 # Build Docker image
 log_message "docker image build starting"

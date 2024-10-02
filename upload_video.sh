@@ -1,7 +1,7 @@
 #!/bin/bash
 # shellcheck disable=SC2086
 
-set -e
+#set -e
 
 # check variables
 if [ -z "$THOST" ]; then
@@ -20,13 +20,13 @@ if [ -z "$TUSER" ]; then
 fi
 
 log_message() {
-  echo "[$(date +'%Y-%m-%d %H:%M:%S')]: $@"
+  echo "[$(date +'%Y-%m-%d %H:%M:%S')] $@"
 }
 
 LOCAL_SOURCE=${1:-"./input/video1.mp4"}
 REMOTE_DEST="$TUSER@$THOST:/home/$TUSER/face-blurer/input/video1.mp4"
 
-log_message "Uploading '$LOCAL_SOURCE' to $THOST:$REMOTE_DEST"
+log_message "uploading '$LOCAL_SOURCE' to $THOST:$REMOTE_DEST"
 
 # Loop until transfer is complete
 while true; do
@@ -35,9 +35,9 @@ while true; do
     #log_message "Transfer complete"
     break
   else
-    log_message "Transfer failed, retrying in 10 seconds..."
+    log_message "transfer failed, retrying in 10 seconds..."
     sleep 10
   fi
 done
 
-log_message "Upload complete"
+log_message "upload complete"
