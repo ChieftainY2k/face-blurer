@@ -60,7 +60,6 @@ if [ -z "$RESOLUTION" ] || [ -z "$FPS" ] || [ -z "$DEBUG" ]; then
   exit 1
 fi
 
-
 PREFIX="blurred"
 if [ "$DEBUG" -eq 1 ]; then
   PREFIX="debug"
@@ -70,7 +69,7 @@ fi
 COMMAND="ffmpeg -r \"$FPS\" -hwaccel \"cuda\" -c:v h264_nvenc -preset slow -cq 20 -f image2 -s \"$RESOLUTION\" -i \"output/frame_%10d.png.debug.png\" \"output/video-${PREFIX}-${RESOLUTION}-${FPS}fps.mp4\" "
 
 # show command , wait for ENTER
-log_message "Command: $COMMAND"
+log_message "About to exec the command: $COMMAND"
 log_message "Press [Enter] key to continue..."
 read
 
