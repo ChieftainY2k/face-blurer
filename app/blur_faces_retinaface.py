@@ -153,7 +153,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                         prev_face_data = json.load(json_file)
                     # Apply blurs from previous frame areas
                     if prev_face_data:
-                        print(f", found blurs from {idx}", end="", flush=True)
+                        print(f", found blurs from {prev_idx}", end="", flush=True)
                         for face in prev_face_data:
                             position = face['position']
                             x1 = position['x1']
@@ -173,7 +173,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                         prev_face_data = json.load(json_file)
                     # Apply blurs from previous frame areas
                     if prev_face_data:
-                        print(f", found blurs from {idx}", end="", flush=True)
+                        print(f", found blurs from {prev_idx}", end="", flush=True)
                         for face in prev_face_data:
                             position = face['position']
                             x1 = position['x1']
