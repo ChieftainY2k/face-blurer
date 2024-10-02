@@ -214,7 +214,7 @@ if __name__ == "__main__":
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     debug_mode = os.getenv('DEBUG', '')
     score_threshold = os.getenv('THRESHOLD')
-    if score_threshold is None:
+    if score_threshold:
         score_threshold = float(score_threshold)
     else:
         score_threshold = 0.40
