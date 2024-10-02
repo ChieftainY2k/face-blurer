@@ -14,16 +14,17 @@ FRAMES_COUNT=$(ffprobe -v error -select_streams v:0 -count_packets -show_entries
 RESOLUTION=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$SOURCE")
 FPS=$(ffprobe -v 0 -select_streams v:0 -show_entries stream=r_frame_rate -of csv=p=0 "$SOURCE"| bc -l)
 
-# save vars to local file
-echo "SOURCE=$SOURCE" > ./video_info.txt
-echo "RESOLUTION=$RESOLUTION" >> ./video_info.txt
-echo "FRAMES_COUNT=$FRAMES_COUNT" >> ./video_info.txt
-echo "FPS=$FPS" >> ./video_info.txt
-
 log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FRAMES_COUNT = $FRAMES_COUNT"
 log_message "Press [Enter] key to continue..."
 read
-sleep 3
+
+
+INFO_FILE="./input/metadata"
+# save vars to local file
+echo "SOURCE=$SOURCE" > $INFO_FILE
+echo "RESOLUTION=$RESOLUTION" >> $INFO_FILE
+echo "FRAMES_COUNT=$FRAMES_COUNT" >> $INFO_FILE
+echo "FPS=$FPS" >> $INFO_FILE
 
 # decompose video to frames
 log_message "Decomposing video $SOURCE ..."
