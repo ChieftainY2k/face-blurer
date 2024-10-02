@@ -11,7 +11,7 @@ THRESHOLD=$4
 echo "Running on GPU $GPU , instance $INSTANCE , DEBUG=$DEBUG, THRESHOLD=$THRESHOLD ..."
 
 # change window title
-echo -ne "\033kGPU${GPU}[${INSTANCE}][RUN]\033\\"
+echo -ne "\033kGPU${GPU}/${INSTANCE}\033\\"
 
 docker run --rm --gpus all \
   -e CUDA_VISIBLE_DEVICES=$GPU \
