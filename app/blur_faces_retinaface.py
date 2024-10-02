@@ -7,6 +7,21 @@ import fcntl
 import shutil
 from retinaface import RetinaFace
 
+def blur_face(image, x1, y1, x2, y2):
+    face_roi = image[y1:y2, x1:x2]
+    face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
+    image[y1:y2, x1:x2] = face_roi_blurred
+
+def draw_frame(image, x1, y1, x2, y2, score, score_threshold):
+    color = (0, 255, 0) if score >= score_threshold else (0, 0, 255)
+    cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
+    score_percent = score * 100
+    text = f"{score_percent:.2f}%"
+    text_y = y2 + 20
+    if text_y > image.shape[0]:
+        text_y = y1 - 10
+    cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+
 def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
@@ -82,15 +97,6 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
         except BlockingIOError:
             print(f", skipping as file {lock_path} is locked", flush=True)
             continue
-#         except FileExistsError:
-#             try:
-#                 print(f", lockfile exists", end="", flush=True)
-#                 fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
-#                 fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-#             except BlockingIOError:
-#                 print(f", skipping(2) as lock file {lock_path} is locked by another process", flush=True)
-#                 continue
-
 
         try:
             image = cv2.imread(input_path)
@@ -105,7 +111,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
 
             print(f", detecting[{retina_threshold}]", end="", flush=True)
             detection_start_time = time.time()
-            faces = RetinaFace.detect_faces(image, threshold = retina_threshold)
+            faces = RetinaFace.detect_faces(image, threshold=retina_threshold)
             detection_end_time = time.time()
             detection_time = detection_end_time - detection_start_time
             print(f" ({detection_time:.2f}s)", end="", flush=True)
@@ -136,26 +142,11 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                         print(" , ERROR: invalid detection", end="", flush=True)
                         continue
 
-                    face_roi = image[y1:y2, x1:x2]
-                    if face_roi.size == 0:
-                        print(" , ERROR: face_roi is empty", end="", flush=True)
-                        continue
-
                     if score >= score_threshold:
-                        # blur only if above threshold
-                        face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
-                        image[y1:y2, x1:x2] = face_roi_blurred
+                        blur_face(image, x1, y1, x2, y2)
 
                     if debug_mode:
-                        # Draw a rectangle around the face
-                        color = (0, 255, 0) if score >= score_threshold else (0, 0, 255)
-                        cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
-                        score_percent = score * 100
-                        text = f"{score_percent:.2f}%"
-                        text_y = y2 + 20
-                        if text_y > image.shape[0]:
-                            text_y = y1 - 10
-                        cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+                        draw_frame(image, x1, y1, x2, y2, score, score_threshold)
 
                     face_count += 1
 
@@ -165,16 +156,16 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
 
             save_start_time = time.time()
             if faces:
-              # Save the image
-              print(f", saving frame", end="", flush=True)
-              cv2.imwrite(tmp_output_path, image)
+                # Save the image
+                print(f", saving frame", end="", flush=True)
+                cv2.imwrite(tmp_output_path, image)
             else:
-              # copy file from input to output
-              print(f", copying file", end="", flush=True)
-              shutil.copyfile(input_path, tmp_output_path)
+                # copy file from input to output
+                print(f", copying file", end="", flush=True)
+                shutil.copyfile(input_path, tmp_output_path)
 
             save_time = time.time() - save_start_time
-            print(f" ({save_time:.2f}s)", end="", flush = True)
+            print(f" ({save_time:.2f}s)", end="", flush=True)
 
             # Rename the temporary output file to the final output file
             os.rename(tmp_output_path, output_path)
@@ -186,7 +177,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                 os.remove(lock_path)
             except OSError as e:
                 print(f", warning: cannot remove lock file {lock_path}: {e}", flush=True)
-                #exit(1)
+                # exit(1)
 
         # Calculate FPS if at least 2 files have been checked
         if len(file_check_times) >= 2:
@@ -213,7 +204,6 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
 
         print(f", completed.", flush=True)
 
-
     print("Processing complete.")
 
 if __name__ == "__main__":
@@ -221,7 +211,7 @@ if __name__ == "__main__":
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     debug_mode = os.getenv('DEBUG', '')
     score_threshold = os.getenv('THRESHOLD')
-    if score_threshold == None:
+    if score_threshold is None:
         score_threshold = 0.50
     else:
         score_threshold = float(score_threshold)
