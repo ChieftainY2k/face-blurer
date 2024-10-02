@@ -6,6 +6,12 @@ log_message() {
   echo "[$(date +'%Y-%m-%d %H:%M:%S')] $@"
 }
 
+# check if you are inside screen session
+if [ -z "$STY" ]; then
+  log_message "Please run this script inside a screen session"
+  exit 1
+fi
+
 # Detect number of GPUS from nvisia-smi
 GPU_COUNT=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 #GPU_COUNT=1
