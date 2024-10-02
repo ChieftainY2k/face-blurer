@@ -44,10 +44,10 @@ log_message() {
 # Define variables from the metadata file
 INFO_FILE="./input/metadata-video"
 INFO_FILE_RUN="./output/metadata-run"
-RESOLUTION=$(grep 'RESOLUTION' $INFO_FILE | cut -d '=' -f 2)
-FPS=$(grep 'FPS' $INFO_FILE | cut -d '=' -f 2)
-DEBUG=$(grep 'DEBUG' $INFO_FILE_RUN | cut -d '=' -f 2)
-THRESHOLD=$(grep 'THRESHOLD' $INFO_FILE_RUN | cut -d '=' -f 2)
+RESOLUTION=$(grep 'RESOLUTION=' $INFO_FILE | cut -d '=' -f 2)
+FPS=$(grep 'FPS=' $INFO_FILE | cut -d '=' -f 2)
+DEBUG=$(grep 'DEBUG=' $INFO_FILE_RUN | cut -d '=' -f 2)
+THRESHOLD=$(grep 'THRESHOLD=' $INFO_FILE_RUN | cut -d '=' -f 2)
 
 log_message "Input video metadata:"
 # show both files
