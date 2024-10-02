@@ -2,23 +2,27 @@
 # shellcheck disable=SC2086,SC2129
 #set -e
 
+log_message() {
+  echo "[$(date +'%Y-%m-%d %H:%M:%S')] $@"
+}
+
 # get GPU from arg
 GPU=$1
 INSTANCE=$2
 DEBUG=$3
 THRESHOLD=$4
 
-echo "Running on GPU $GPU , instance $INSTANCE , DEBUG=$DEBUG, THRESHOLD=$THRESHOLD ..."
+log_message "Running on GPU $GPU , instance $INSTANCE , DEBUG=$DEBUG, THRESHOLD=$THRESHOLD ..."
 
 # change window title
 echo -ne "\033kGPU${GPU}/${INSTANCE}(WORK)\033\\"
 
 INFO_FILE="./output/metadata-worker-$GPU-$INSTANCE.txt"
 # save vars to local file
-echo "GPU=$GPU" > $INFO_FILE
-echo "INSTANCE=$INSTANCE" >> $INFO_FILE
-echo "DEBUG=$DEBUG" >> $INFO_FILE
-echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
+log_message "GPU=$GPU" > $INFO_FILE
+log_message "INSTANCE=$INSTANCE" >> $INFO_FILE
+log_message "DEBUG=$DEBUG" >> $INFO_FILE
+log_message "THRESHOLD=$THRESHOLD" >> $INFO_FILE
 
 docker run --rm --gpus all \
   -e CUDA_VISIBLE_DEVICES=$GPU \
@@ -34,5 +38,5 @@ docker run --rm --gpus all \
 # change window title
 echo -ne "\033kGPU${GPU}/${INSTANCE}(DONE)\033\\"
 
-echo 'Press [Enter] key to continue...'
+log_message 'Press [Enter] key to continue...'
 read
