@@ -7,7 +7,7 @@ import fcntl
 import shutil
 from retinaface import RetinaFace
 
-def blur_faces_in_directory(input_dir, output_dir, debug_mode, env_score_threshold):
+def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -98,7 +98,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, env_score_thresho
                 print(f", could not open or find the image: {filename}", flush=True)
                 continue
 
-            retina_threshold = env_score_threshold
+            retina_threshold = score_threshold
             if debug_mode:
                 # Use a lower threshold for debug mode
                 retina_threshold = 0.2
@@ -141,14 +141,14 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, env_score_thresho
                         print(" , ERROR: face_roi is empty", end="", flush=True)
                         continue
 
-                    if score >= env_score_threshold:
+                    if score >= score_threshold:
                         # blur only if above threshold
                         face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
                         image[y1:y2, x1:x2] = face_roi_blurred
 
                     if debug_mode:
                         # Draw a rectangle around the face
-                        color = (0, 255, 0) if score >= env_score_threshold else (0, 0, 255)
+                        color = (0, 255, 0) if score >= score_threshold else (0, 0, 255)
                         cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
                         score_percent = score * 100
                         text = f"{score_percent:.2f}%"
@@ -220,13 +220,11 @@ if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     debug_mode = os.getenv('DEBUG', '')
-    #env_score_threshold = float(os.getenv('THRESHOLD', 0.50))
-
-    env_score_threshold = os.getenv('THRESHOLD')
-    if env_score_threshold == None:
-        env_score_threshold = 0.50
+    score_threshold = os.getenv('THRESHOLD')
+    if score_threshold == None:
+        score_threshold = 0.50
     else:
-        env_score_threshold = float(env_score_threshold)
+        score_threshold = float(score_threshold)
 
     # Call the main processing function
-    blur_faces_in_directory(input_dir, output_dir, debug_mode, env_score_threshold)
+    blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold)

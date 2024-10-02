@@ -8,7 +8,6 @@ if [[ "$EUID" -ne 0 ]]; then
   exit 1
 fi
 
-# Log start time
 log_message() {
   local message="$1"
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"

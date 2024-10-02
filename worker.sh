@@ -5,8 +5,10 @@
 # get GPU from arg
 GPU=$1
 INSTANCE=$2
+DEBUG=$3
+THRESHOLD=$4
 
-echo "Running on GPU $GPU , instance $INSTANCE ..."
+echo "Running on GPU $GPU , instance $INSTANCE , DEBUG=$DEBUG, THRESHOLD=$THRESHOLD ..."
 
 # change window title
 echo -ne "\033kGPU${GPU}[${INSTANCE}][RUN]\033\\"
