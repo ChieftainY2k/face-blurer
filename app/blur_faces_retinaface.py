@@ -25,7 +25,7 @@ def draw_frame(image, x1, y1, x2, y2, score, score_threshold):
         text_y = y1 - 10
     cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
-def draw_prev_frame(image, x1, y1, x2, y2, score, score_threshold):
+def draw_frame_prev(image, x1, y1, x2, y2, score, score_threshold):
 #     print()
 #     print(f"draw_prev_frame:(x1={x1}, y1={y1}, x2={x2}, y2={y2}, score={score}, score_threshold={score_threshold})")
     color = (0, 128, 0) if score >= score_threshold else (0, 0, 128)
@@ -37,17 +37,17 @@ def draw_prev_frame(image, x1, y1, x2, y2, score, score_threshold):
         text_y = y1 - 10
     cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
-def draw_prev_frame_2(image, x1, y1, x2, y2, score, score_threshold):
-#     print()
-#     print(f"draw_prev_frame:(x1={x1}, y1={y1}, x2={x2}, y2={y2}, score={score}, score_threshold={score_threshold})")
-    color = (0, 64, 0) if score >= score_threshold else (0, 0, 64)
-    cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
-    score_percent = score * 100
-    text = f"{score_percent:.2f}%"
-    text_y = y2 + 20
-    if text_y > image.shape[0]:
-        text_y = y1 - 10
-    cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+# def draw_prev_frame_2(image, x1, y1, x2, y2, score, score_threshold):
+# #     print()
+# #     print(f"draw_prev_frame:(x1={x1}, y1={y1}, x2={x2}, y2={y2}, score={score}, score_threshold={score_threshold})")
+#     color = (0, 64, 0) if score >= score_threshold else (0, 0, 64)
+#     cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
+#     score_percent = score * 100
+#     text = f"{score_percent:.2f}%"
+#     text_y = y2 + 20
+#     if text_y > image.shape[0]:
+#         text_y = y1 - 10
+#     cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
 def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
     # Ensure the output directory exists
@@ -142,7 +142,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             # Check if there's a cached metadata file
             metadata_data = None
             metadata_filename = image_files[idx]
-            metadata_path = os.path.join(output_dir, metadata_filename) + f".{score_threshold_percent}.metadata.json"
+            metadata_path = os.path.join(output_dir, metadata_filename) + f".{score_threshold_decimal}.metadata.json"
             if os.path.exists(metadata_path):
                 with open(metadata_path, 'r') as json_file:
                     metadata_data = json.load(json_file)
@@ -162,7 +162,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             if idx > 5:
                 prev_idx = idx - 5
                 prev_filename = image_files[prev_idx]
-                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_percent}.metadata.json"
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
                 if os.path.exists(prev_metadata_path):
                     with open(prev_metadata_path, 'r') as json_file:
                         prev_face_data = json.load(json_file)
@@ -171,19 +171,21 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                         print(f", found blurs from {prev_idx}", end="", flush=True)
                         for face in prev_face_data:
                             position = face['position']
+                            score = face['score']
                             x1 = position['x1']
                             y1 = position['y1']
                             x2 = position['x2']
                             y2 = position['y2']
-                            blur_face(image, x1, y1, x2, y2)
-                            draw_prev_frame_2(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                            if score >= score_threshold:
+                                blur_face(image, x1, y1, x2, y2)
+                            if debug_mode:
+                                draw_frame_prev(image, x1, y1, x2,   y2, face['score'], score_threshold)
                             prev_blurs_applied = True
 
             # Check if there's a previous metadata file
             if idx > 4:
-                prev_idx = idx - 4
                 prev_filename = image_files[prev_idx]
-                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_percent}.metadata.json"
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
                 if os.path.exists(prev_metadata_path):
                     with open(prev_metadata_path, 'r') as json_file:
                         prev_face_data = json.load(json_file)
@@ -192,19 +194,22 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                         print(f", found blurs from {prev_idx}", end="", flush=True)
                         for face in prev_face_data:
                             position = face['position']
+                            score = face['score']
                             x1 = position['x1']
                             y1 = position['y1']
                             x2 = position['x2']
                             y2 = position['y2']
-                            blur_face(image, x1, y1, x2, y2)
-                            draw_prev_frame_2(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                            if score >= score_threshold:
+                                blur_face(image, x1, y1, x2, y2)
+                            if debug_mode:
+                                draw_frame_prev(image, x1, y1, x2,   y2, face['score'], score_threshold)
                             prev_blurs_applied = True
 
             # Check if there's a previous metadata file
             if idx > 3:
                 prev_idx = idx - 3
                 prev_filename = image_files[prev_idx]
-                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_percent}.metadata.json"
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
                 if os.path.exists(prev_metadata_path):
                     with open(prev_metadata_path, 'r') as json_file:
                         prev_face_data = json.load(json_file)
@@ -213,19 +218,22 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                         print(f", found blurs from {prev_idx}", end="", flush=True)
                         for face in prev_face_data:
                             position = face['position']
+                            score = face['score']
                             x1 = position['x1']
                             y1 = position['y1']
                             x2 = position['x2']
                             y2 = position['y2']
-                            blur_face(image, x1, y1, x2, y2)
-                            draw_prev_frame_2(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                            if score >= score_threshold:
+                                blur_face(image, x1, y1, x2, y2)
+                            if debug_mode:
+                                draw_frame_prev(image, x1, y1, x2,   y2, face['score'], score_threshold)
                             prev_blurs_applied = True
 
             # Check if there's a previous metadata file
             if idx > 2:
                 prev_idx = idx - 2
                 prev_filename = image_files[prev_idx]
-                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_percent}.metadata.json"
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
                 if os.path.exists(prev_metadata_path):
                     with open(prev_metadata_path, 'r') as json_file:
                         prev_face_data = json.load(json_file)
@@ -234,19 +242,22 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                         print(f", found blurs from {prev_idx}", end="", flush=True)
                         for face in prev_face_data:
                             position = face['position']
+                            score = face['score']
                             x1 = position['x1']
                             y1 = position['y1']
                             x2 = position['x2']
                             y2 = position['y2']
-                            blur_face(image, x1, y1, x2, y2)
-                            draw_prev_frame_2(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                            if score >= score_threshold:
+                                blur_face(image, x1, y1, x2, y2)
+                            if debug_mode:
+                                draw_frame_prev(image, x1, y1, x2,   y2, face['score'], score_threshold)
                             prev_blurs_applied = True
 
             # Check if there's a previous metadata file
             if idx > 1:
                 prev_idx = idx - 2
                 prev_filename = image_files[prev_idx]
-                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_percent}.metadata.json"
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
                 if os.path.exists(prev_metadata_path):
                     with open(prev_metadata_path, 'r') as json_file:
                         prev_face_data = json.load(json_file)
@@ -255,19 +266,22 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                         print(f", found blurs from {prev_idx}", end="", flush=True)
                         for face in prev_face_data:
                             position = face['position']
+                            score = face['score']
                             x1 = position['x1']
                             y1 = position['y1']
                             x2 = position['x2']
                             y2 = position['y2']
-                            blur_face(image, x1, y1, x2, y2)
-                            draw_prev_frame_2(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                            if score >= score_threshold:
+                                blur_face(image, x1, y1, x2, y2)
+                            if debug_mode:
+                                draw_frame_prev(image, x1, y1, x2,   y2, face['score'], score_threshold)
                             prev_blurs_applied = True
 
             # Check if there's a previous metadata file
             if idx > 0:
                 prev_idx = idx - 1
                 prev_filename = image_files[prev_idx]
-                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_percent}.metadata.json"
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
                 if os.path.exists(prev_metadata_path):
                     with open(prev_metadata_path, 'r') as json_file:
                         prev_face_data = json.load(json_file)
@@ -276,12 +290,15 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                         print(f", found blurs from {prev_idx}", end="", flush=True)
                         for face in prev_face_data:
                             position = face['position']
+                            score = face['score']
                             x1 = position['x1']
                             y1 = position['y1']
                             x2 = position['x2']
                             y2 = position['y2']
-                            blur_face(image, x1, y1, x2, y2)
-                            draw_prev_frame(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                            if score >= score_threshold:
+                                blur_face(image, x1, y1, x2, y2)
+                            if debug_mode:
+                                draw_frame_prev(image, x1, y1, x2,   y2, face['score'], score_threshold)
                             prev_blurs_applied = True
 
 
@@ -323,6 +340,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                     # Save score and position in a dictionary
                     face_data.append({
                         'score': float(score),
+                        'score_threshold': float(score_threshold),
                         'position': {'x1': int(x1), 'y1': int(y1), 'x2': int(x2), 'y2': int(y2)}
                     })
 
@@ -334,7 +352,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
 
             if not metadata_data:
                 print(f", saving metadata", end="", flush=True)
-                json_output_path = os.path.join(output_dir, filename) + f".{score_threshold_percent}.metadata.json"
+                json_output_path = os.path.join(output_dir, filename) + f".{score_threshold_decimal}.metadata.json"
                 json_output_path_tmp = json_output_path + ".tmp"
                 with open(json_output_path_tmp, 'w') as json_file:
                     json.dump(face_data, json_file, indent=4)
@@ -343,14 +361,16 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
                 print(f", using cached metadata", end="", flush=True)
                 for face in metadata_data:
                     position = face['position']
+                    score = face['score']
                     x1 = position['x1']
                     y1 = position['y1']
                     x2 = position['x2']
                     y2 = position['y2']
-                    blur_face(image, x1, y1, x2, y2)
-                    draw_frame(image, x1, y1, x2,   y2, face['score'], score_threshold)
+                    if score >= score_threshold:
+                        blur_face(image, x1, y1, x2, y2)
+                    if debug_mode:
+                        draw_frame(image, x1, y1, x2,   y2, face['score'], score_threshold)
                     prev_blurs_applied = True
-
 
             tmp_output_path = output_path + ".tmp.png"
             save_start_time = time.time()
@@ -414,7 +434,7 @@ if __name__ == "__main__":
     else:
         score_threshold = 0.20
 
-    score_threshold_percent = score_threshold * 100
+    score_threshold_decimal = int(score_threshold * 1000)
 
     # Call the main processing function
     blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold)
