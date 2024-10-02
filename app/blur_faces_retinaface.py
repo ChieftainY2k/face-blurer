@@ -142,7 +142,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             # Check if there's a cached metadata file
             metadata_data = None
             metadata_filename = image_files[idx]
-            metadata_path = os.path.join(output_dir, metadata_filename) + f"{score_threshold}.metadata.json"
+            metadata_path = os.path.join(output_dir, metadata_filename) + f".{score_threshold_percent}.metadata.json"
             if os.path.exists(metadata_path):
                 with open(metadata_path, 'r') as json_file:
                     metadata_data = json.load(json_file)
@@ -162,7 +162,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             if idx > 5:
                 prev_idx = idx - 5
                 prev_filename = image_files[prev_idx]
-                prev_metadata_path = os.path.join(output_dir, prev_filename) + f"{score_threshold}.metadata.json"
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_percent}.metadata.json"
                 if os.path.exists(prev_metadata_path):
                     with open(prev_metadata_path, 'r') as json_file:
                         prev_face_data = json.load(json_file)
@@ -183,7 +183,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             if idx > 4:
                 prev_idx = idx - 4
                 prev_filename = image_files[prev_idx]
-                prev_metadata_path = os.path.join(output_dir, prev_filename) + f"{score_threshold}.metadata.json"
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_percent}.metadata.json"
                 if os.path.exists(prev_metadata_path):
                     with open(prev_metadata_path, 'r') as json_file:
                         prev_face_data = json.load(json_file)
@@ -204,7 +204,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             if idx > 3:
                 prev_idx = idx - 3
                 prev_filename = image_files[prev_idx]
-                prev_metadata_path = os.path.join(output_dir, prev_filename) + f"{score_threshold}.metadata.json"
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_percent}.metadata.json"
                 if os.path.exists(prev_metadata_path):
                     with open(prev_metadata_path, 'r') as json_file:
                         prev_face_data = json.load(json_file)
@@ -225,7 +225,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             if idx > 2:
                 prev_idx = idx - 2
                 prev_filename = image_files[prev_idx]
-                prev_metadata_path = os.path.join(output_dir, prev_filename) + f"{score_threshold}.metadata.json"
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_percent}.metadata.json"
                 if os.path.exists(prev_metadata_path):
                     with open(prev_metadata_path, 'r') as json_file:
                         prev_face_data = json.load(json_file)
@@ -246,7 +246,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             if idx > 1:
                 prev_idx = idx - 2
                 prev_filename = image_files[prev_idx]
-                prev_metadata_path = os.path.join(output_dir, prev_filename) + f"{score_threshold}.metadata.json"
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_percent}.metadata.json"
                 if os.path.exists(prev_metadata_path):
                     with open(prev_metadata_path, 'r') as json_file:
                         prev_face_data = json.load(json_file)
@@ -267,7 +267,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
             if idx > 0:
                 prev_idx = idx - 1
                 prev_filename = image_files[prev_idx]
-                prev_metadata_path = os.path.join(output_dir, prev_filename) + f"{score_threshold}.metadata.json"
+                prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_percent}.metadata.json"
                 if os.path.exists(prev_metadata_path):
                     with open(prev_metadata_path, 'r') as json_file:
                         prev_face_data = json.load(json_file)
@@ -334,7 +334,7 @@ def blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold):
 
             if not metadata_data:
                 print(f", saving metadata", end="", flush=True)
-                json_output_path = os.path.join(output_dir, filename) + f"{score_threshold}.metadata.json"
+                json_output_path = os.path.join(output_dir, filename) + f".{score_threshold_percent}.metadata.json"
                 json_output_path_tmp = json_output_path + ".tmp"
                 with open(json_output_path_tmp, 'w') as json_file:
                     json.dump(face_data, json_file, indent=4)
@@ -413,6 +413,8 @@ if __name__ == "__main__":
         score_threshold = float(score_threshold)
     else:
         score_threshold = 0.20
+
+    score_threshold_percent = score_threshold * 100
 
     # Call the main processing function
     blur_faces_in_directory(input_dir, output_dir, debug_mode, score_threshold)
