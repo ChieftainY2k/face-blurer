@@ -6,6 +6,7 @@ import time
 import fcntl
 import shutil
 import json
+import gc
 from retinaface import RetinaFace
 
 def blur_face(image, x1, y1, x2, y2):
@@ -296,6 +297,8 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
             eta_minutes = int((time_left_seconds % 3600) // 60)
             eta_seconds = int(time_left_seconds % 60)
 
+        del image
+        gc.collect()
         print(f", completed.", end="", flush=True)
 
     print("Processing complete.")
