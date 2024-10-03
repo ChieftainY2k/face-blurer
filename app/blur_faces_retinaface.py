@@ -215,26 +215,26 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
         fd_lock = None
         try:
 
-#             if is_pass2:
-#                 while True:
-#                     try:
-#                         fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
-#                         fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-#                         break
-#                     except BlockingIOError:
-#                         os.close(fd_lock)
-#                         fd_lock = None
-#                         print(f", waiting for lock", end="", flush=True)
-#                         time.sleep(1)
-#             else:
-            try:
-                fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
-                fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError:
-                os.close(fd_lock)
-                fd_lock = None
-                print(f", frame is locked, skipping", end="", flush=True)
-                continue
+            if is_pass2:
+                while True:
+                    try:
+                        fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
+                        fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                        break
+                    except BlockingIOError:
+                        os.close(fd_lock)
+                        fd_lock = None
+                        print(f", waiting for lock", end="", flush=True)
+                        time.sleep(1)
+            else:
+                try:
+                    fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
+                    fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    os.close(fd_lock)
+                    fd_lock = None
+                    print(f", frame is locked, skipping", end="", flush=True)
+                    continue
 
             if is_pass1:
                 if os.path.exists(metadata_path):
