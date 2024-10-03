@@ -226,7 +226,7 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                         'position': {'x1': int(x1), 'y1': int(y1), 'x2': int(x2), 'y2': int(y2)}
                     })
 
-                    extra_percentage = 0.3
+                    extra_percentage = 0.5
                     x1 = max(0, x1 - int((x2 - x1) * extra_percentage))
                     y1 = max(0, y1 - int((y2 - y1) * extra_percentage))
                     x2 = min(image.shape[1], x2 + int((x2 - x1) * extra_percentage))
