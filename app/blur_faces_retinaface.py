@@ -10,12 +10,17 @@ import gc
 from retinaface import RetinaFace
 
 
-# def blur_face(image, x1, y1, x2, y2):
-#     face_roi = image[y1:y2, x1:x2]
-#     face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
-#     image[y1:y2, x1:x2] = face_roi_blurred
-
 def blur_face(image, x1, y1, x2, y2, blocks=5):
+
+    if x1 >= x2 or y1 >= y2:
+        raise Exception(f"Invalid blur area, {x1}, {y1}, {x2}, {y2}")
+
+    # apply margin
+    x1 = max(0, x1 - int((x2 - x1) * blur_extra_margin_percent))
+    y1 = max(0, y1 - int((y2 - y1) * blur_extra_margin_percent))
+    x2 = min(image.shape[1], x2 + int((x2 - x1) * blur_extra_margin_percent))
+    y2 = min(image.shape[0], y2 + int((y2 - y1) * blur_extra_margin_percent))
+
     face_roi = image[y1:y2, x1:x2]
     # Resize to a smaller size
     temp = cv2.resize(face_roi, (blocks, blocks), interpolation=cv2.INTER_LINEAR)
@@ -227,15 +232,6 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                         'position': {'x1': int(x1), 'y1': int(y1), 'x2': int(x2), 'y2': int(y2)}
                     })
 
-                    # blur_margin_percent = 1
-                    x1 = max(0, x1 - int((x2 - x1) * blur_extra_margin_percent))
-                    y1 = max(0, y1 - int((y2 - y1) * blur_extra_margin_percent))
-                    x2 = min(image.shape[1], x2 + int((x2 - x1) * blur_extra_margin_percent))
-                    y2 = min(image.shape[0], y2 + int((y2 - y1) * blur_extra_margin_percent))
-
-                    if x1 >= x2 or y1 >= y2:
-                        raise Exception(f"Invalid face area, {x1}, {y1}, {x2}, {y2}")
-
                     if is_pass2:
                         if score >= score_threshold:
                             blur_face(image, x1, y1, x2, y2)
@@ -338,7 +334,7 @@ if __name__ == "__main__":
     if blur_extra_margin_percent:
         blur_extra_margin_percent = float(blur_extra_margin_percent)
     else:
-        blur_extra_margin_percent = 0.5
+        blur_extra_margin_percent = 0.3
 
     look_ahead = os.getenv('BLUR_AHEAD')
     if look_ahead:
