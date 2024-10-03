@@ -33,7 +33,8 @@ echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 for ((gpu_idx = 0; gpu_idx < GPU_COUNT; gpu_idx++)); do
   for ((worker_idx = 0; worker_idx < WORKER_COUNT; worker_idx++)); do
     log_message "Running on GPU ${gpu_idx}/${GPU_COUNT} , worker ${worker_idx}/${WORKER_COUNT} , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE ..."
-    screen -t "GPU${gpu_idx}/${worker_idx}" -- ./worker.sh "$gpu_idx" "$worker_idx" "$DEBUG" "$THRESHOLD" "$MODE"
+    #screen -t "GPU${gpu_idx}/${worker_idx}" -- ./worker.sh "$gpu_idx" "$worker_idx" "$DEBUG" "$THRESHOLD" "$MODE"
+    screen -t "GPU${gpu_idx}/${worker_idx}" -- bash -c "GPU=${gpu_idx} INSTANCE=${worker_idx} DEBUG=${DEBUG} THRESHOLD=${THRESHOLD} MODE=${MODE} ./worker.sh"
     sleep 20
   done
 done

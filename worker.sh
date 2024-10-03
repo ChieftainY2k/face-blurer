@@ -7,11 +7,11 @@ log_message() {
 }
 
 # get GPU from arg
-GPU=$1
-INSTANCE=$2
-DEBUG=$3
-THRESHOLD=$4
-MODE=$5
+#GPU=$1
+#INSTANCE=$2
+#DEBUG=$3
+#THRESHOLD=$4
+#MODE=$5
 
 log_message "Running on GPU $GPU , instance $INSTANCE , DEBUG=$DEBUG, THRESHOLD=$THRESHOLD , MODE=$MODE ..."
 
