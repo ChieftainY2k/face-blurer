@@ -28,64 +28,62 @@ def process_previous_frames(idx, image_files, output_dir, image, score_threshold
     image_is_modified = False
     max_prev_frames = 10
     for i in range(1, max_prev_frames + 1):
-        if idx >= i:
-            prev_idx = idx - i
-            prev_filename = image_files[prev_idx]
-            prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
-            if os.path.exists(prev_metadata_path):
-                with open(prev_metadata_path, 'r') as json_file:
-                    prev_face_data = json.load(json_file)
-                if prev_face_data:
-                    print(f", found blurs from {prev_idx}", end="", flush=True)
-                    for face in prev_face_data:
-                        position = face['position']
-                        score = face['score']
-                        x1 = position['x1']
-                        y1 = position['y1']
-                        x2 = position['x2']
-                        y2 = position['y2']
-                        if score >= score_threshold:
-                            blur_face(image, x1, y1, x2, y2)
-                        if is_debug_mode:
-                            # Define colors based on how many frames back
-                            intensity = 128 - (i - 1) * 16
-                            intensity = max(intensity, 0)
-                            color_above = (0, intensity, 0)
-                            color_below = (0, 0, intensity)
-                            draw_frame(image, x1, y1, x2, y2, score, score_threshold, color_above, color_below)
-                        image_is_modified = True
+        prev_idx = idx - i
+        prev_filename = image_files[prev_idx]
+        prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
+        if os.path.exists(prev_metadata_path):
+            with open(prev_metadata_path, 'r') as json_file:
+                prev_face_data = json.load(json_file)
+            if prev_face_data:
+                print(f", found blurs from prev {prev_idx}", end="", flush=True)
+                for face in prev_face_data:
+                    position = face['position']
+                    score = face['score']
+                    x1 = position['x1']
+                    y1 = position['y1']
+                    x2 = position['x2']
+                    y2 = position['y2']
+                    if score >= score_threshold:
+                        blur_face(image, x1, y1, x2, y2)
+                    if is_debug_mode:
+                        # Define colors based on how many frames back
+                        intensity = 128 - (i - 1) * 16
+                        intensity = max(intensity, 0)
+                        color_above = (0, intensity, 0)
+                        color_below = (0, 0, intensity)
+                        draw_frame(image, x1, y1, x2, y2, score, score_threshold, color_above, color_below)
+                    image_is_modified = True
     return image_is_modified
 
 def process_next_frames(idx, image_files, output_dir, image, score_threshold_decimal, score_threshold, is_debug_mode):
     image_is_modified = False
     max_prev_frames = 5
     for i in range(1, max_prev_frames + 1):
-        if idx >= i:
-            prev_idx = idx + i
-            prev_filename = image_files[prev_idx]
-            prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
-            if os.path.exists(prev_metadata_path):
-                with open(prev_metadata_path, 'r') as json_file:
-                    prev_face_data = json.load(json_file)
-                if prev_face_data:
-                    print(f", found blurs from {prev_idx}", end="", flush=True)
-                    for face in prev_face_data:
-                        position = face['position']
-                        score = face['score']
-                        x1 = position['x1']
-                        y1 = position['y1']
-                        x2 = position['x2']
-                        y2 = position['y2']
-                        if score >= score_threshold:
-                            blur_face(image, x1, y1, x2, y2)
-                        if is_debug_mode:
-                            # Define colors based on how many frames back
-                            intensity = 128 - (i - 1) * 16
-                            intensity = max(intensity, 0)
-                            color_above = (0, intensity, 0)
-                            color_below = (0, 0, intensity)
-                            draw_frame(image, x1, y1, x2, y2, score, score_threshold, color_above, color_below)
-                        image_is_modified = True
+        prev_idx = idx + i
+        prev_filename = image_files[prev_idx]
+        prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
+        if os.path.exists(prev_metadata_path):
+            with open(prev_metadata_path, 'r') as json_file:
+                prev_face_data = json.load(json_file)
+            if prev_face_data:
+                print(f", found blurs from next {prev_idx}", end="", flush=True)
+                for face in prev_face_data:
+                    position = face['position']
+                    score = face['score']
+                    x1 = position['x1']
+                    y1 = position['y1']
+                    x2 = position['x2']
+                    y2 = position['y2']
+                    if score >= score_threshold:
+                        blur_face(image, x1, y1, x2, y2)
+                    if is_debug_mode:
+                        # Define colors based on how many frames back
+                        intensity = 128 - (i - 1) * 16
+                        intensity = max(intensity, 0)
+                        color_above = (0, intensity, 0)
+                        color_below = (0, 0, intensity)
+                        draw_frame(image, x1, y1, x2, y2, score, score_threshold, color_above, color_below)
+                    image_is_modified = True
     return image_is_modified
 
 def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshold):
