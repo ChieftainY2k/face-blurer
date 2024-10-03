@@ -16,7 +16,7 @@ log_message() {
 log_message "Running , GPU=$GPU , INSTANCE=$INSTANCE , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE , BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 
 # change window title
-echo -ne "\033kGPU${GPU}/${INSTANCE}(WORK)\033\\"
+echo -ne "\033kGPU${GPU}/${INSTANCE}(${MODE}/WORK)\033\\"
 
 INFO_FILE="./output/metadata-worker-$GPU-$INSTANCE"
 # save vars to local file
@@ -48,10 +48,10 @@ docker run --rm --gpus all \
 # change window title to DONE on success, ERROR on error
 EXIT_CODE=$?
 if [ $EXIT_CODE -ne 0 ]; then
-  echo -ne "\033kGPU${GPU}/${INSTANCE}(ERROR)\033\\"
+  echo -ne "\033kGPU${GPU}/${INSTANCE}(${MODE}/ERROR)\033\\"
   echo "ERROR=$EXIT_CODE" >> $INFO_FILE
 else
-  echo -ne "\033kGPU${GPU}/${INSTANCE}(DONE)\033\\"
+  echo -ne "\033kGPU${GPU}/${INSTANCE}(${MODE}/DONE)\033\\"
 fi
 echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
