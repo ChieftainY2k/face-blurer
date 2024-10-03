@@ -168,8 +168,8 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
             if is_pass2:
                 blurs_applied_prev = False
                 blurs_applied_next = False
-                look_back = 10
-                look_ahead = 5
+                #look_back = 10
+                #look_ahead = 5
                 if idx > 0:
                     blurs_applied_prev = process_other_frames(
                         max(0, idx - look_back), max(0, idx),
@@ -226,11 +226,11 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                         'position': {'x1': int(x1), 'y1': int(y1), 'x2': int(x2), 'y2': int(y2)}
                     })
 
-                    extra_percentage = 1
-                    x1 = max(0, x1 - int((x2 - x1) * extra_percentage))
-                    y1 = max(0, y1 - int((y2 - y1) * extra_percentage))
-                    x2 = min(image.shape[1], x2 + int((x2 - x1) * extra_percentage))
-                    y2 = min(image.shape[0], y2 + int((y2 - y1) * extra_percentage))
+#                     blur_margin_percent = 1
+                    x1 = max(0, x1 - int((x2 - x1) * blur_margin_percent))
+                    y1 = max(0, y1 - int((y2 - y1) * blur_margin_percent))
+                    x2 = min(image.shape[1], x2 + int((x2 - x1) * blur_margin_percent))
+                    y2 = min(image.shape[0], y2 + int((y2 - y1) * blur_margin_percent))
 
                     if x1 >= x2 or y1 >= y2:
                         raise Exception(f"Invalid face area, {x1}, {y1}, {x2}, {y2}")
@@ -332,6 +332,9 @@ if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     is_debug_mode = os.getenv('DEBUG', '').lower() in ['1', 'true', 'yes']
+    blur_margin_percent = float(os.getenv('BLUR_MARGIN', 1.0))
+    look_ahead = int(os.getenv('BLUR_AHEAD', 3))
+    look_back = int(os.getenv('BLUR_BACK', 5))
 
     process_mode = os.getenv('MODE', 'pass2')  # pass1, pass2
     if process_mode not in ['pass1', 'pass2']:
