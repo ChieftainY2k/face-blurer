@@ -84,7 +84,7 @@ def process_other_frames(origin_idx, idx_from, idx_to, image_files, my_output_di
                          my_score_threshold,
                          my_is_debug_mode):
     image_is_modified = False
-    print(f", checking metadata from [{idx_from}-{idx_to}]", end="", flush=True)
+    print(f", checking metadata #{idx_from}-#{idx_to}", end="", flush=True)
     #print(f"[{idx_from}, {idx_to}]", end="", flush=True)
     for idx in range(idx_from, idx_to):
         prev_filename = image_files[idx]
@@ -92,7 +92,7 @@ def process_other_frames(origin_idx, idx_from, idx_to, image_files, my_output_di
 
         #wait for the file to be available
         if not os.path.exists(prev_metadata_path):
-            print(f", waiting for metadata from frame {idx}...", end="", flush=True)
+            print(f", waiting for metadata from #{idx}...", end="", flush=True)
             while not os.path.exists(prev_metadata_path):
                 print(f".", end="", flush=True)
                 time.sleep(5)
@@ -105,7 +105,8 @@ def process_other_frames(origin_idx, idx_from, idx_to, image_files, my_output_di
             raise Exception(f", metadata file {prev_metadata_path} is empty")
 
         if prev_face_data:
-            print(f", [F{idx + 1}]", end="", flush=True)
+            data_length = len(prev_face_data)
+            print(f", #F{idx + 1}({data_length})", end="", flush=True)
             for face in prev_face_data:
                 position = face['position']
                 score = face['score']
