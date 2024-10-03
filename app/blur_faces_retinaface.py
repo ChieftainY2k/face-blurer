@@ -9,6 +9,7 @@ import cv2
 import torch
 from retinaface import RetinaFace
 from torchvision import transforms
+import fcntl
 
 # Set device to CUDA if available
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -54,31 +55,39 @@ def blur_face(image_tensor, x1, y1, x2, y2, blocks=5):
     image_tensor[:, y1:y2, x1:x2] = face_roi
 
 def draw_frame(image_tensor, x1, y1, x2, y2, score, my_score_threshold, color_above=(0, 255, 0), color_below=(0, 0, 255)):
-    color = torch.tensor(color_above if score >= my_score_threshold else color_below, device=device, dtype=torch.uint8)
+    color = torch.tensor(color_above if score >= my_score_threshold else color_below, device=device, dtype=torch.float32) / 255.0
     # Draw rectangle (approximate using tensor operations)
-    image_tensor[:, y1:y1+4, x1:x2] = color.view(3, 1, 1)
-    image_tensor[:, y2-4:y2, x1:x2] = color.view(3, 1, 1)
-    image_tensor[:, y1:y2, x1:x1+4] = color.view(3, 1, 1)
-    image_tensor[:, y1:y2, x2-4:x2] = color.view(3, 1, 1)
+    thickness = 4
+    image_tensor[:, y1:y1+thickness, x1:x2] = color.view(3, 1, 1)
+    image_tensor[:, y2-thickness:y2, x1:x2] = color.view(3, 1, 1)
+    image_tensor[:, y1:y2, x1:x1+thickness] = color.view(3, 1, 1)
+    image_tensor[:, y1:y2, x2-thickness:x2] = color.view(3, 1, 1)
+    # Optionally, add score text (requires more complex operations)
 
 def process_other_frames(origin_idx, idx_from, idx_to, image_files, my_output_dir, image_tensor, my_score_threshold_decimal,
                          my_score_threshold, my_is_debug_mode):
     image_is_modified = False
+    print(f", checking metadata #{idx_from}-#{idx_to}", end="", flush=True)
     for idx in range(idx_from, idx_to):
         prev_filename = image_files[idx]
         prev_metadata_path = os.path.join(my_output_dir, "metadata", f"{prev_filename}.{my_score_threshold_decimal}.metadata.json")
 
         # Wait for the file to be available
-        while not os.path.exists(prev_metadata_path):
-            time.sleep(1)
+        if not os.path.exists(prev_metadata_path):
+            print(f", waiting for metadata from #{idx}...", end="", flush=True)
+            while not os.path.exists(prev_metadata_path):
+                print(f".", end="", flush=True)
+                time.sleep(5)
 
         with open(prev_metadata_path, 'r') as json_file:
             prev_face_data = json.load(json_file)
 
         if prev_face_data is None:
-            raise Exception(f"Metadata file {prev_metadata_path} is empty")
+            raise Exception(f", metadata file {prev_metadata_path} is empty")
 
         if prev_face_data:
+            data_length = len(prev_face_data)
+            print(f", #F{idx + 1}({data_length})", end="", flush=True)
             for face in prev_face_data:
                 position = face['position']
                 score = face['score']
@@ -89,7 +98,7 @@ def process_other_frames(origin_idx, idx_from, idx_to, image_files, my_output_di
                 if score >= my_score_threshold:
                     blur_face(image_tensor, x1, y1, x2, y2)
                 if my_is_debug_mode:
-                    # Define colors based on frame index difference
+                    # Define colors based on how many frames back
                     intensity = 255 - (abs(origin_idx - idx)) * 16
                     intensity = max(intensity, 0)
                     color_above_threshold = (0, intensity, 0)
@@ -119,91 +128,248 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
 
     image_files_list = find_image_files(input_dir)
     total_files_count = len(image_files_list)
+    processed_files = 0
+    files_checked = 0
+    file_check_times = []
+    percent_changes = []
+    time_changes = []
+
     if total_files_count == 0:
         raise Exception("No image files found in the input directory.")
 
+    fps = 0
+    eta_hours = 0
+    eta_minutes = 0
+    eta_seconds = 0
+    percent_complete = 0
+
     for idx, filename in enumerate(image_files_list):
+        start_loop_time = time.time()
+        files_checked += 1
+        check_time = time.time()
+
+        # Append current check time and ensure we only keep the last 100 entries
+        file_check_times.append(check_time)
+        if len(file_check_times) > 100:
+            file_check_times.pop(0)
+
+        # Record percent complete and time
+        percent_complete = (files_checked / total_files_count) * 100
+        percent_changes.append(percent_complete)
+        time_changes.append(check_time)
+
+        # Keep only data from the last 20 seconds
+        while time_changes and (check_time - time_changes[0]) > 20:
+            time_changes.pop(0)
+            percent_changes.pop(0)
+
         input_path = os.path.join(input_dir, filename)
         metadata_path = os.path.join(output_dir, "metadata", f"{filename}.{score_threshold_decimal}.metadata.json")
-        output_path = os.path.join(output_dir, f"{filename}.blurred.png") if not is_debug_mode else os.path.join(output_dir, f"{filename}.debug.png")
-
-        # Check if output already exists
-        if is_pass2 and os.path.exists(output_path):
-            continue
-
-        # Read the image and convert to tensor
-        image = cv2.imread(input_path)
-        if image is None:
-            raise Exception(f"Could not open or find the image: {filename}")
-        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image_tensor = torch.from_numpy(image_rgb).permute(2, 0, 1).to(device, dtype=torch.float32) / 255.0
-
-        # Detection threshold
-        retina_threshold = 0.01 if is_debug_mode else score_threshold
-
-        # Load or compute metadata
-        if os.path.exists(metadata_path):
-            with open(metadata_path, 'r') as json_file:
-                metadata_data = json.load(json_file)
-            detected_faces = None
+        output_path = os.path.join(output_dir, filename)
+        if is_debug_mode:
+            output_path += ".debug.png"
         else:
-            detected_faces = RetinaFace.detect_faces(image_rgb, threshold=retina_threshold)
-            metadata_data = []
+            output_path += ".blurred.png"
 
-        # Process detected faces
-        if detected_faces:
-            for face_id, face_info in detected_faces.items():
-                facial_area = face_info['facial_area']
-                x1, y1, x2, y2 = facial_area
-                score = face_info['score']
+        lock_path = os.path.join(output_dir, filename) + ".lock"
 
-                x1 = max(0, x1)
-                y1 = max(0, y1)
-                x2 = min(image_tensor.shape[2], x2)
-                y2 = min(image_tensor.shape[1], y2)
+        print()
+        print(f"[#{idx}]", end="", flush=True)
+        print(f"[FPS: {fps:05.2f}]", end="", flush=True)
+        print(f"[ETA: {eta_hours:02}h {eta_minutes:02}m {eta_seconds:02}s]", end="", flush=True)
+        print(f"[{percent_complete:05.2f}%]", end="", flush=True)
+        print(f"[{files_checked:010}/{total_files_count:010}]", end="", flush=True)
+        print(f"[{input_path}][{output_path}]", end="", flush=True)
 
-                metadata_data.append({
-                    'score': float(score),
-                    'score_threshold': float(score_threshold),
-                    'position': {'x1': int(x1), 'y1': int(y1), 'x2': int(x2), 'y2': int(y2)}
-                })
+        fd_lock = None
+        try:
+            try:
+                fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
+                fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                if fd_lock:
+                    os.close(fd_lock)
+                    fd_lock = None
+                print(f", frame is locked, skipping", end="", flush=True)
+                continue
 
-                if is_pass2 and score >= score_threshold:
-                    blur_face(image_tensor, x1, y1, x2, y2)
-                if is_debug_mode:
-                    draw_frame(image_tensor, x1, y1, x2, y2, score, score_threshold)
+            if is_pass1 and os.path.exists(metadata_path):
+                print(f", metadata file exists, skipping processing for pass 1", end="", flush=True)
+                continue
 
-        # Save metadata if not already saved
-        if not os.path.exists(metadata_path):
-            with open(metadata_path, 'w') as json_file:
-                json.dump(metadata_data, json_file, indent=4)
+            if is_pass2 and os.path.exists(output_path):
+                print(f", {output_path} already exists, skipping for pass 2", end="", flush=True)
+                continue
 
-        # Process other frames for pass 2
-        image_is_modified = False
-        if is_pass2:
-            if look_back > 0 and idx > 0:
-                image_is_modified |= process_other_frames(
-                    idx, max(0, idx - look_back), idx,
-                    image_files_list, output_dir, image_tensor,
-                    score_threshold_decimal, score_threshold, is_debug_mode
-                )
-            if look_ahead > 0 and idx < total_files_count - 1:
-                image_is_modified |= process_other_frames(
-                    idx, idx + 1, min(total_files_count, idx + look_ahead + 1),
-                    image_files_list, output_dir, image_tensor,
-                    score_threshold_decimal, score_threshold, is_debug_mode
-                )
+            # Read the current image
+            image = cv2.imread(input_path)
+            if image is None:
+                raise Exception(f", could not open or find the image: {filename}")
+            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        # Save the image
-        if is_pass2:
-            image_output = (image_tensor * 255).permute(1, 2, 0).cpu().numpy().astype(np.uint8)
-            image_output_bgr = cv2.cvtColor(image_output, cv2.COLOR_RGB2BGR)
-            cv2.imwrite(output_path, image_output_bgr)
+            # Convert image to tensor and move to GPU
+            image_tensor = torch.from_numpy(image_rgb).permute(2, 0, 1).to(device, dtype=torch.float32) / 255.0
+
+            retina_threshold = score_threshold
+            if is_debug_mode:
+                retina_threshold = 0.01  # Use a lower threshold for debug mode
+
+            image_is_modified = False
+            if is_pass2:
+                blurs_applied_prev = False
+                blurs_applied_next = False
+                if (look_back > 0) and (idx > 0):
+                    blurs_applied_prev = process_other_frames(
+                        idx,
+                        max(0, idx - look_back), idx,
+                        image_files_list, output_dir, image_tensor,
+                        score_threshold_decimal, score_threshold, is_debug_mode
+                    )
+                if (look_ahead > 0) and (idx < total_files_count - 1):
+                    blurs_applied_next = process_other_frames(
+                        idx,
+                        idx + 1, min(total_files_count, idx + look_ahead + 1),
+                        image_files_list, output_dir, image_tensor,
+                        score_threshold_decimal, score_threshold, is_debug_mode
+                    )
+                image_is_modified = blurs_applied_prev or blurs_applied_next
+
+            # Load metadata
+            metadata_data = None
+            if os.path.exists(metadata_path):
+                with open(metadata_path, 'r') as json_file:
+                    metadata_data = json.load(json_file)
+
+            if metadata_data is not None:
+                print(f", metadata found", end="", flush=True)
+                detected_faces = None
+            else:
+                print(f", detecting[{retina_threshold}][{score_threshold}]", end="", flush=True)
+                detection_start_time = time.time()
+                detected_faces = RetinaFace.detect_faces(image_rgb, threshold=retina_threshold)
+                detection_end_time = time.time()
+                detection_time = detection_end_time - detection_start_time
+                print(f" ({detection_time:.2f}s)", end="", flush=True)
+
+            detected_faces_count = 0
+            detected_faces_data = []
+
+            if detected_faces:
+                print(f", ", end="", flush=True)
+                for face_id, face_info in detected_faces.items():
+                    facial_area = face_info['facial_area']
+                    x1, y1, x2, y2 = facial_area
+                    score = face_info['score']
+                    if score >= score_threshold:
+                        print(f"[{score:.2f}+]", end="", flush=True)
+                    else:
+                        print(f"[{score:.2f}-]", end="", flush=True)
+
+                    x1 = max(0, x1)
+                    y1 = max(0, y1)
+                    x2 = min(image_tensor.shape[2], x2)
+                    y2 = min(image_tensor.shape[1], y2)
+
+                    detected_faces_data.append({
+                        'score': float(score),
+                        'score_threshold': float(score_threshold),
+                        'position': {'x1': int(x1), 'y1': int(y1), 'x2': int(x2), 'y2': int(y2)}
+                    })
+
+                    if is_pass2:
+                        if score >= score_threshold:
+                            blur_face(image_tensor, x1, y1, x2, y2)
+                        if is_debug_mode:
+                            draw_frame(image_tensor, x1, y1, x2, y2, score, score_threshold)
+                        image_is_modified = True
+
+                    detected_faces_count += 1
+
+                print(f", {detected_faces_count} face(s)", end="", flush=True)
+            else:
+                print(f", no faces detected", end="", flush=True)
+
+            if not metadata_data:
+                print(f", saving metadata", end="", flush=True)
+                json_output_path_tmp = metadata_path + ".tmp"
+                with open(json_output_path_tmp, 'w') as json_file:
+                    json.dump(detected_faces_data, json_file, indent=4)
+                os.rename(json_output_path_tmp, metadata_path)
+            else:
+                if is_pass2:
+                    print(f", blurring from metadata", end="", flush=True)
+                    for face in metadata_data:
+                        position = face['position']
+                        score = face['score']
+                        x1 = position['x1']
+                        y1 = position['y1']
+                        x2 = position['x2']
+                        y2 = position['y2']
+                        if score >= score_threshold:
+                            blur_face(image_tensor, x1, y1, x2, y2)
+                        if is_debug_mode:
+                            draw_frame(image_tensor, x1, y1, x2, y2, score, score_threshold)
+                        image_is_modified = True
+
+            if is_pass2:
+                tmp_output_path = output_path + ".tmp.png"
+                save_start_time = time.time()
+                if image_is_modified:
+                    # Save the image
+                    print(f", saving frame", end="", flush=True)
+                    image_output = (image_tensor * 255).permute(1, 2, 0).cpu().numpy().astype(np.uint8)
+                    image_output_bgr = cv2.cvtColor(image_output, cv2.COLOR_RGB2BGR)
+                    cv2.imwrite(tmp_output_path, image_output_bgr)
+                else:
+                    # Copy file from input to output
+                    print(f", copying file", end="", flush=True)
+                    shutil.copyfile(input_path, tmp_output_path)
+
+                os.rename(tmp_output_path, output_path)
+                save_time = time.time() - save_start_time
+                print(f" ({save_time:.2f}s)", end="", flush=True)
+
+            processed_files += 1
+
+        finally:
+            try:
+                if fd_lock:
+                    os.close(fd_lock)
+                    os.remove(lock_path)
+            except OSError as e:
+                print(f", warning: cannot remove lock file {lock_path}: {e}", flush=True)
+
+        # Calculate FPS if at least 2 files have been checked
+        if len(file_check_times) >= 2:
+            total_time_in_fps = file_check_times[-1] - file_check_times[0]
+            if total_time_in_fps > 0:
+                fps = len(file_check_times) / total_time_in_fps
+            else:
+                fps = float('inf')
+        else:
+            fps = 0
+
+        # Calculate dynamic ETA
+        if len(percent_changes) >= 2:
+            percent_change_rate = (percent_changes[-1] - percent_changes[0]) / (time_changes[-1] - time_changes[0])
+            if percent_change_rate > 0:
+                time_left_seconds = (100 - percent_complete) / percent_change_rate
+                time_left_seconds = max(time_left_seconds, 0)
+            else:
+                time_left_seconds = float('inf')
+
+            eta_hours = int(time_left_seconds // 3600)
+            eta_minutes = int((time_left_seconds % 3600) // 60)
+            eta_seconds = int(time_left_seconds % 60)
 
         # Clear GPU memory
         del image_tensor
         torch.cuda.empty_cache()
         gc.collect()
+        print(f", completed.", end="", flush=True)
+
+    print()
+    print("Processing complete.")
 
 if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
