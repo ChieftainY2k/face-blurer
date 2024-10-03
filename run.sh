@@ -15,7 +15,7 @@ fi
 # Detect number of GPUS from nvisia-smi
 GPU_COUNT=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 #GPU_COUNT=1
-WORKERS=${$WORKERS:-5}
+WORKERS={$WORKERS:-5}
 log_message "GPU_COUNT=$GPU_COUNT , WORKERS=$WORKERS , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE, BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 log_message "Press [Enter] key to continue..."
 read
