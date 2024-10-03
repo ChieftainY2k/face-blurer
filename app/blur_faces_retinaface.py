@@ -16,8 +16,8 @@ def blur_face(image, x1, y1, x2, y2):
     image[y1:y2, x1:x2] = face_roi_blurred
 
 
-def draw_frame(image, x1, y1, x2, y2, score, score_threshold, color_above=(0, 255, 0), color_below=(0, 0, 255)):
-    color = color_above if score >= score_threshold else color_below
+def draw_frame(image, x1, y1, x2, y2, score, my_score_threshold, color_above=(0, 255, 0), color_below=(0, 0, 255)):
+    color = color_above if score >= my_score_threshold else color_below
     cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
     score_percent = score * 100
     text = f"{score_percent:.2f}%"
@@ -51,11 +51,12 @@ def process_other_frames(idx_from, idx_to, image_files, my_output_dir, image, my
                         blur_face(image, x1, y1, x2, y2)
                     if my_is_debug_mode:
                         # Define colors based on how many frames back
-                        intensity = 128 - (idx - 1) * 16
+                        intensity = 255 - (abs(idx_from - idx) - 1) * 16
                         intensity = max(intensity, 0)
-                        color_above = (0, intensity, 0)
-                        color_below = (0, 0, intensity)
-                        draw_frame(image, x1, y1, x2, y2, score, my_score_threshold, color_above, color_below)
+                        color_above_threshold = (0, intensity, 0)
+                        color_below_threshold = (0, 0, intensity)
+                        draw_frame(image, x1, y1, x2, y2, score, my_score_threshold, color_above_threshold,
+                                   color_below_threshold)
                     image_is_modified = True
     return image_is_modified
 
