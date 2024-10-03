@@ -15,7 +15,7 @@ from retinaface import RetinaFace
 #     face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
 #     image[y1:y2, x1:x2] = face_roi_blurred
 
-def blur_face(image, x1, y1, x2, y2, blocks=20):
+def blur_face(image, x1, y1, x2, y2, blocks=10):
     face_roi = image[y1:y2, x1:x2]
     # Resize to a smaller size
     temp = cv2.resize(face_roi, (blocks, blocks), interpolation=cv2.INTER_LINEAR)
