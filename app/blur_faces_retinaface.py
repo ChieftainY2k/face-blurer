@@ -10,11 +10,18 @@ import gc
 from retinaface import RetinaFace
 
 
-def blur_face(image, x1, y1, x2, y2):
-    face_roi = image[y1:y2, x1:x2]
-    face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
-    image[y1:y2, x1:x2] = face_roi_blurred
+# def blur_face(image, x1, y1, x2, y2):
+#     face_roi = image[y1:y2, x1:x2]
+#     face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
+#     image[y1:y2, x1:x2] = face_roi_blurred
 
+def blur_face(image, x1, y1, x2, y2, blocks=10):
+    face_roi = image[y1:y2, x1:x2]
+    # Resize to a smaller size
+    temp = cv2.resize(face_roi, (blocks, blocks), interpolation=cv2.INTER_LINEAR)
+    # Resize back to the original size
+    face_roi_pixelated = cv2.resize(temp, (face_roi.shape[1], face_roi.shape[0]), interpolation=cv2.INTER_NEAREST)
+    image[y1:y2, x1:x2] = face_roi_pixelated
 
 def draw_frame(image, x1, y1, x2, y2, score, my_score_threshold, color_above=(0, 255, 0), color_below=(0, 0, 255)):
     color = color_above if score >= my_score_threshold else color_below
