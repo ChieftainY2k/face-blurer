@@ -60,11 +60,11 @@ cat $INFO_FILE
 log_message "AI run metadata:"
 cat $INFO_FILE_RUN
 
-# check all vars if they are not empty
-if [ -z "$RESOLUTION" ] || [ -z "$FPS" ] || [ -z "$DEBUG" ]; then
-  echo "Error: One or more required variables are empty."
-  exit 1
-fi
+## check all vars if they are not empty
+#if [ -z "$RESOLUTION" ] || [ -z "$FPS" ] || [ -z "$DEBUG" ]; then
+#  echo "Error: One or more required variables are empty."
+#  exit 1
+#fi
 
 FILE_MARKER="blurred"
 if [ "$DEBUG" -eq 1 ]; then
