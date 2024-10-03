@@ -220,7 +220,13 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                     x2 = min(image.shape[1], x2)
                     y2 = min(image.shape[0], y2)
 
-                    extra_percentage = 0.2
+                    detected_faces_data.append({
+                        'score': float(score),
+                        'score_threshold': float(score_threshold),
+                        'position': {'x1': int(x1), 'y1': int(y1), 'x2': int(x2), 'y2': int(y2)}
+                    })
+
+                    extra_percentage = 0.3
                     x1 = max(0, x1 - int((x2 - x1) * extra_percentage))
                     y1 = max(0, y1 - int((y2 - y1) * extra_percentage))
                     x2 = min(image.shape[1], x2 + int((x2 - x1) * extra_percentage))
@@ -234,12 +240,6 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                             blur_face(image, x1, y1, x2, y2)
                         if is_debug_mode:
                             draw_frame(image, x1, y1, x2, y2, score, score_threshold)
-
-                    detected_faces_data.append({
-                        'score': float(score),
-                        'score_threshold': float(score_threshold),
-                        'position': {'x1': int(x1), 'y1': int(y1), 'x2': int(x2), 'y2': int(y2)}
-                    })
 
                     detected_faces_count += 1
 
