@@ -160,8 +160,8 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
             if is_pass2:
                 blurs_applied_prev = False
                 blurs_applied_next = False
-                look_back = 2
-                look_ahead = 2
+                look_back = 10
+                look_ahead = 5
                 if idx > 0:
                     blurs_applied_prev = process_other_frames(
                         max(0, idx - look_back), max(0, idx),
