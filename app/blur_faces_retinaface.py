@@ -42,18 +42,22 @@ def blur_face(image, x1, y1, x2, y2, blocks=5):
     face_roi = image[y1:y2, x1:x2]
     h, w = face_roi.shape[:2]
 
-    # Calculate the size of each block
-    block_size_h = max(h // blocks, 1)
-    block_size_w = max(w // blocks, 1)
+    # Calculate padding to make dimensions divisible by 'blocks'
+    h_pad = (-h) % blocks
+    w_pad = (-w) % blocks
 
     # Pad the face ROI if necessary
-    h_pad = (blocks - h % blocks) % blocks
-    w_pad = (blocks - w % blocks) % blocks
     face_roi_padded = np.pad(face_roi, ((0, h_pad), (0, w_pad), (0, 0)), mode='reflect')
+
+    h_padded, w_padded = face_roi_padded.shape[:2]
+
+    # Compute the size of each block
+    block_size_h = h_padded // blocks
+    block_size_w = w_padded // blocks
 
     # Reshape and compute the mean color for each block
     face_roi_reshaped = face_roi_padded.reshape(
-        (blocks, -1, blocks, -1, 3)
+        blocks, block_size_h, blocks, block_size_w, 3
     ).mean(axis=(1, 3), dtype=int)
 
     # Upscale back to the original size
