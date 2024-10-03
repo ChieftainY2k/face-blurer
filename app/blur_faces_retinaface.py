@@ -437,7 +437,7 @@ if __name__ == "__main__":
     else:
         look_back = 10
 
-    process_mode = os.getenv('MODE', 'pass2')  # pass1, pass2
+    process_mode = os.getenv('MODE', 'pass1')  # pass1, pass2
     if process_mode not in ['pass1', 'pass2']:
         raise Exception("Error: MODE environment variable must be set to 'pass1' or 'pass2'.")
 
