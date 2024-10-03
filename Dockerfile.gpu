@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 #   && git lfs install \
 #   && git lfs pull
 
-RUN pip install opencv-contrib-python numpy opencv-python retina-face tf-keras torch torchvision torchaudio batch-face
+RUN pip install opencv-contrib-python numpy opencv-python retina-face tf-keras torch torchvision torchaudio batch-face torch
 
 # Copy the face blurring script into the container
 #COPY blur_faces.py /app/
