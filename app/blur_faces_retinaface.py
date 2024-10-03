@@ -333,9 +333,24 @@ if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     is_debug_mode = os.getenv('DEBUG', '').lower() in ['1', 'true', 'yes']
-    blur_extra_margin_percent = float(os.getenv('BLUR_EXTRA', 0.5))
-    look_ahead = int(os.getenv('BLUR_AHEAD', 3))
-    look_back = int(os.getenv('BLUR_BACK', 5))
+
+    blur_extra_margin_percent = os.getenv('BLUR_EXTRA')
+    if blur_extra_margin_percent:
+        blur_extra_margin_percent = float(blur_extra_margin_percent)
+    else:
+        blur_extra_margin_percent = 0.5
+
+    look_ahead = os.getenv('BLUR_AHEAD')
+    if look_ahead:
+        look_ahead = int(look_ahead)
+    else:
+        look_ahead = 5
+
+    look_back = os.getenv('BLUR_BACK')
+    if look_back:
+        look_back = int(look_back)
+    else:
+        look_back = 10
 
     process_mode = os.getenv('MODE', 'pass2')  # pass1, pass2
     if process_mode not in ['pass1', 'pass2']:
