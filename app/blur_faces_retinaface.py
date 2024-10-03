@@ -398,7 +398,7 @@ if __name__ == "__main__":
     if score_threshold:
         score_threshold = float(score_threshold)
     else:
-        score_threshold = 0.20
+        score_threshold = 0.1
 
     score_threshold_decimal = int(score_threshold * 1000)
 
