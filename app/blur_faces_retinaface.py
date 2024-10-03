@@ -129,6 +129,7 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                 fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except BlockingIOError:
                 oc.close(fd_lock)
+                fd_lock = None
                 print(f", skipping as file {lock_path} is locked", end="", flush=True)
                 continue
 
