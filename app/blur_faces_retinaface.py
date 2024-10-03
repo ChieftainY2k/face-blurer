@@ -10,22 +10,57 @@ import gc
 from retinaface import RetinaFace
 
 
-def blur_face(image, x1, y1, x2, y2, blocks=5):
+# def blur_face(image, x1, y1, x2, y2, blocks=5):
+#
+#     if x1 >= x2 or y1 >= y2:
+#         raise Exception(f"Invalid blur area, {x1}, {y1}, {x2}, {y2}")
+#
+#     # apply margin
+#     x1 = max(0, x1 - int((x2 - x1) * blur_extra_margin_percent))
+#     y1 = max(0, y1 - int((y2 - y1) * blur_extra_margin_percent))
+#     x2 = min(image.shape[1], x2 + int((x2 - x1) * blur_extra_margin_percent))
+#     y2 = min(image.shape[0], y2 + int((y2 - y1) * blur_extra_margin_percent))
+#
+#     face_roi = image[y1:y2, x1:x2]
+#     # Resize to a smaller size
+#     temp = cv2.resize(face_roi, (blocks, blocks), interpolation=cv2.INTER_LINEAR)
+#     # Resize back to the original size
+#     face_roi_pixelated = cv2.resize(temp, (face_roi.shape[1], face_roi.shape[0]), interpolation=cv2.INTER_NEAREST)
+#     image[y1:y2, x1:x2] = face_roi_pixelated
 
+
+def blur_face(image, x1, y1, x2, y2, blocks=5):
     if x1 >= x2 or y1 >= y2:
         raise Exception(f"Invalid blur area, {x1}, {y1}, {x2}, {y2}")
 
-    # apply margin
+    # Apply margin (assuming blur_extra_margin_percent is defined)
     x1 = max(0, x1 - int((x2 - x1) * blur_extra_margin_percent))
     y1 = max(0, y1 - int((y2 - y1) * blur_extra_margin_percent))
     x2 = min(image.shape[1], x2 + int((x2 - x1) * blur_extra_margin_percent))
     y2 = min(image.shape[0], y2 + int((y2 - y1) * blur_extra_margin_percent))
 
     face_roi = image[y1:y2, x1:x2]
-    # Resize to a smaller size
-    temp = cv2.resize(face_roi, (blocks, blocks), interpolation=cv2.INTER_LINEAR)
-    # Resize back to the original size
-    face_roi_pixelated = cv2.resize(temp, (face_roi.shape[1], face_roi.shape[0]), interpolation=cv2.INTER_NEAREST)
+    h, w = face_roi.shape[:2]
+
+    # Calculate the size of each block
+    block_size_h = max(h // blocks, 1)
+    block_size_w = max(w // blocks, 1)
+
+    # Pad the face ROI if necessary
+    h_pad = (blocks - h % blocks) % blocks
+    w_pad = (blocks - w % blocks) % blocks
+    face_roi_padded = np.pad(face_roi, ((0, h_pad), (0, w_pad), (0, 0)), mode='reflect')
+
+    # Reshape and compute the mean color for each block
+    face_roi_reshaped = face_roi_padded.reshape(
+        (blocks, -1, blocks, -1, 3)
+    ).mean(axis=(1, 3), dtype=int)
+
+    # Upscale back to the original size
+    face_roi_pixelated = np.kron(face_roi_reshaped, np.ones(
+        (block_size_h, block_size_w, 1), dtype=int
+    ))[:h, :w, :]
+
     image[y1:y2, x1:x2] = face_roi_pixelated
 
 
