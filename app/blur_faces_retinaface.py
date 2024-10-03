@@ -9,10 +9,12 @@ import json
 import gc
 from retinaface import RetinaFace
 
+
 def blur_face(image, x1, y1, x2, y2):
     face_roi = image[y1:y2, x1:x2]
     face_roi_blurred = cv2.GaussianBlur(face_roi, (99, 99), 30)
     image[y1:y2, x1:x2] = face_roi_blurred
+
 
 def draw_frame(image, x1, y1, x2, y2, score, score_threshold, color_above=(0, 255, 0), color_below=(0, 0, 255)):
     color = color_above if score >= score_threshold else color_below
@@ -24,18 +26,20 @@ def draw_frame(image, x1, y1, x2, y2, score, score_threshold, color_above=(0, 25
         text_y = y1 - 10
     cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
-def process_previous_frames(idx, image_files, output_dir, image, score_threshold_decimal, score_threshold, is_debug_mode):
+
+def process_other_frames(idx_from, idx_to, image_files, my_output_dir, image, my_score_threshold_decimal,
+                         my_score_threshold,
+                         my_is_debug_mode):
     image_is_modified = False
-    max_prev_frames = 10
-    for i in range(1, max_prev_frames + 1):
-        prev_idx = idx - i
-        prev_filename = image_files[prev_idx]
-        prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
+    # print(f"[{idx_from}, {idx_to}]", end="", flush=True)
+    for idx in range(idx_from, idx_to):
+        prev_filename = image_files[idx]
+        prev_metadata_path = os.path.join(my_output_dir, prev_filename) + f".{my_score_threshold_decimal}.metadata.json"
         if os.path.exists(prev_metadata_path):
             with open(prev_metadata_path, 'r') as json_file:
                 prev_face_data = json.load(json_file)
             if prev_face_data:
-                print(f", found blurs from prev {prev_idx}", end="", flush=True)
+                print(f", [F{idx + 1}]", end="", flush=True)
                 for face in prev_face_data:
                     position = face['position']
                     score = face['score']
@@ -43,48 +47,18 @@ def process_previous_frames(idx, image_files, output_dir, image, score_threshold
                     y1 = position['y1']
                     x2 = position['x2']
                     y2 = position['y2']
-                    if score >= score_threshold:
+                    if score >= my_score_threshold:
                         blur_face(image, x1, y1, x2, y2)
-                    if is_debug_mode:
+                    if my_is_debug_mode:
                         # Define colors based on how many frames back
-                        intensity = 128 - (i - 1) * 16
+                        intensity = 128 - (idx - 1) * 16
                         intensity = max(intensity, 0)
                         color_above = (0, intensity, 0)
                         color_below = (0, 0, intensity)
-                        draw_frame(image, x1, y1, x2, y2, score, score_threshold, color_above, color_below)
+                        draw_frame(image, x1, y1, x2, y2, score, my_score_threshold, color_above, color_below)
                     image_is_modified = True
     return image_is_modified
 
-def process_next_frames(idx, image_files, output_dir, image, score_threshold_decimal, score_threshold, is_debug_mode):
-    image_is_modified = False
-    max_prev_frames = 5
-    for i in range(1, max_prev_frames + 1):
-        prev_idx = idx + i
-        prev_filename = image_files[prev_idx]
-        prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
-        if os.path.exists(prev_metadata_path):
-            with open(prev_metadata_path, 'r') as json_file:
-                prev_face_data = json.load(json_file)
-            if prev_face_data:
-                print(f", found blurs from next {prev_idx}", end="", flush=True)
-                for face in prev_face_data:
-                    position = face['position']
-                    score = face['score']
-                    x1 = position['x1']
-                    y1 = position['y1']
-                    x2 = position['x2']
-                    y2 = position['y2']
-                    if score >= score_threshold:
-                        blur_face(image, x1, y1, x2, y2)
-                    if is_debug_mode:
-                        # Define colors based on how many frames back
-                        intensity = 128 - (i - 1) * 16
-                        intensity = max(intensity, 0)
-                        color_above = (0, intensity, 0)
-                        color_below = (0, 0, intensity)
-                        draw_frame(image, x1, y1, x2, y2, score, score_threshold, color_above, color_below)
-                    image_is_modified = True
-    return image_is_modified
 
 def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshold):
     # Ensure the output directory exists
@@ -94,7 +68,7 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
     files = sorted(os.listdir(input_dir))
 
     # Filter image files
-    image_files = [f for f in files if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    image_files_list = [f for f in files if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
     fps = 0
     eta_hours = 0
@@ -102,18 +76,18 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
     eta_seconds = 0
     percent_complete = 0
 
-    total_files = len(image_files)
+    total_files_count = len(image_files_list)
     processed_files = 0
     files_checked = 0
     file_check_times = []  # Stores times for the last 100 file checks
     percent_changes = []  # Store percent complete over time
-    time_changes = []     # Store timestamps of these percent changes
+    time_changes = []  # Store timestamps of these percent changes
 
-    if total_files == 0:
+    if total_files_count == 0:
         raise Exception("No image files found in the input directory.")
 
     # Loop through all image files in the input directory
-    for idx, filename in enumerate(image_files):
+    for idx, filename in enumerate(image_files_list):
         start_loop_time = time.time()
         files_checked += 1
         check_time = time.time()
@@ -124,7 +98,7 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
             file_check_times.pop(0)
 
         # Record percent complete and time
-        percent_complete = (files_checked / total_files) * 100
+        percent_complete = (files_checked / total_files_count) * 100
         percent_changes.append(percent_complete)
         time_changes.append(check_time)
 
@@ -145,16 +119,13 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
         print(f"* [FPS: {fps:05.2f}]", end="", flush=True)
         print(f"[ETA: {eta_hours:02}h {eta_minutes:02}m {eta_seconds:02}s]", end="", flush=True)
         print(f"[{percent_complete:05.2f}%]", end="", flush=True)
-        print(f"[{files_checked:010}/{total_files:010}]", end="", flush=True)
+        print(f"[{files_checked:010}/{total_files_count:010}]", end="", flush=True)
         print(f"[{input_path}][{output_path}]", end="", flush=True)
 
         fd_lock = None
         try:
 
             lock_path = output_path + '.lock'
-#             if os.path.exists(metadata_path):
-#                 print(f", skipping as file {lock_path} exists", end="", flush=True)
-#                 continue
             try:
                 fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
                 fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -187,18 +158,25 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
             # Process previous frames
             image_is_modified = False
             if is_pass2:
-                blurs_applied_prev = process_previous_frames(
-                    idx, image_files, output_dir, image,
-                    score_threshold_decimal, score_threshold, is_debug_mode
-                )
-                blurs_applied_next = process_next_frames(
-                    idx, image_files, output_dir, image,
-                    score_threshold_decimal, score_threshold, is_debug_mode
-                )
-
+                blurs_applied_prev = False
+                blurs_applied_next = False
+                look_back = 2
+                look_ahead = 2
+                if idx > 0:
+                    blurs_applied_prev = process_other_frames(
+                        max(0, idx - look_back), max(0, idx),
+                        image_files_list, output_dir, image,
+                        score_threshold_decimal, score_threshold, is_debug_mode
+                    )
+                if idx < total_files_count:
+                    blurs_applied_next = process_other_frames(
+                        min(total_files_count, idx + 1), min(total_files_count, idx + look_ahead + 1),
+                        image_files_list, output_dir, image,
+                        score_threshold_decimal, score_threshold, is_debug_mode
+                    )
                 image_is_modified = blurs_applied_prev or blurs_applied_next
 
-            #load metadata
+            # load metadata
             metadata_data = None
             if os.path.exists(metadata_path):
                 with open(metadata_path, 'r') as json_file:
@@ -340,12 +318,13 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
 
     print("Processing complete.")
 
+
 if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     is_debug_mode = os.getenv('DEBUG', '').lower() in ['1', 'true', 'yes']
 
-    process_mode = os.getenv('MODE', 'pass2') # pass1, pass2
+    process_mode = os.getenv('MODE', 'pass2')  # pass1, pass2
     if process_mode not in ['pass1', 'pass2']:
         raise Exception("Error: MODE environment variable must be set to 'pass1' or 'pass2'.")
         sys.exit(1)
