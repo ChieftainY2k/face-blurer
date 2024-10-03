@@ -13,7 +13,7 @@ log_message() {
 #THRESHOLD=$4
 #MODE=$5
 
-log_message "Running on GPU $GPU , instance $INSTANCE , DEBUG=$DEBUG, THRESHOLD=$THRESHOLD , MODE=$MODE ..."
+log_message "Running , GPU=$GPU , INSTANCE=$INSTANCE , DEBUG=$DEBUG, THRESHOLD=$THRESHOLD , MODE=$MODE ..."
 
 # change window title
 echo -ne "\033kGPU${GPU}/${INSTANCE}(WORK)\033\\"
