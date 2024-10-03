@@ -167,7 +167,7 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                 with open(metadata_path, 'r') as json_file:
                     metadata_data = json.load(json_file)
 
-            if metadata_data:
+            if metadata_data not None:
                 print(f", metadata found", end="", flush=True)
                 detected_faces = None
             else:
