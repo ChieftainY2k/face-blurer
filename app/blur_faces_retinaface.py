@@ -117,14 +117,13 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
         print(f"[{files_checked:010}/{total_files:010}]", end="", flush=True)
         print(f"[{input_path}][{output_path}]", end="", flush=True)
 
+        fd_lock = None
         try:
 
             lock_path = output_path + '.lock'
-            if os.path.exists(metadata_path):
-                print(f", skipping as file {lock_path} exists", end="", flush=True)
-                continue
-
-            fd_lock = None
+#             if os.path.exists(metadata_path):
+#                 print(f", skipping as file {lock_path} exists", end="", flush=True)
+#                 continue
             try:
                 fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
                 fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
