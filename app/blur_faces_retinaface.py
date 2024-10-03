@@ -127,6 +127,20 @@ def process_other_frames(origin_idx, idx_from, idx_to, image_files, my_output_di
                 image_is_modified = True
     return image_is_modified
 
+def find_image_files(directory):
+    image_files_list = []
+    index = 1
+
+    while True:
+        file_name = f"frame_{index:010}.png"
+        file_path = os.path.join(directory, file_name)
+        if os.path.exists(file_path):
+            image_files_list.append(file_name)
+        else:
+            break
+        index += 1
+
+    return image_files_list
 
 def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshold):
     # Ensure the output directory exists
@@ -136,7 +150,8 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
     files = sorted(os.listdir(input_dir))
 
     # Filter image files
-    image_files_list = [f for f in files if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    #image_files_list = [f for f in files if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    image_files_list = find_image_files(input_dir)
 
     fps = 0
     eta_hours = 0
@@ -177,7 +192,6 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
 
         input_path = os.path.join(input_dir, filename)
 
-
         #mkdir for metadata
         if not os.path.exists(os.path.join(output_dir, "metadata")):
             os.makedirs(os.path.join(output_dir, "metadata"))
@@ -191,7 +205,8 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
         lock_path = os.path.join(output_dir, filename) + ".lock"
 
         print()
-        print(f"* [FPS: {fps:05.2f}]", end="", flush=True)
+        print(f"[#{idx}]", end="", flush=True)
+        print(f"[FPS: {fps:05.2f}]", end="", flush=True)
         print(f"[ETA: {eta_hours:02}h {eta_minutes:02}m {eta_seconds:02}s]", end="", flush=True)
         print(f"[{percent_complete:05.2f}%]", end="", flush=True)
         print(f"[{files_checked:010}/{total_files_count:010}]", end="", flush=True)
@@ -200,14 +215,26 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
         fd_lock = None
         try:
 
-            try:
-                fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
-                fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            except BlockingIOError:
-                os.close(fd_lock)
-                fd_lock = None
-                print(f", skipping as file {lock_path} is locked", end="", flush=True)
-                continue
+            if is_pass2:
+                while True:
+                    try:
+                        fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
+                        fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                        break
+                    except BlockingIOError:
+                        os.close(fd_lock)
+                        fd_lock = None
+                        print(f", waiting for {lock_path} to be released", end="", flush=True)
+                        time.sleep(1)
+            else:
+                try:
+                    fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
+                    fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except BlockingIOError:
+                    os.close(fd_lock)
+                    fd_lock = None
+                    print(f", skipping as file {lock_path} is locked", end="", flush=True)
+                    continue
 
             if is_pass1:
                 if os.path.exists(metadata_path):
