@@ -316,6 +316,7 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
         gc.collect()
         print(f", completed.", end="", flush=True)
 
+    print()
     print("Processing complete.")
 
 
