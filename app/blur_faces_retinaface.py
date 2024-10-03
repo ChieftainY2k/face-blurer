@@ -34,10 +34,11 @@ def blur_face(image, x1, y1, x2, y2, blocks=5):
         raise Exception(f"Invalid blur area, {x1}, {y1}, {x2}, {y2}")
 
     # Apply margin (assuming blur_extra_margin_percent is defined)
-    x1 = max(0, x1 - int((x2 - x1) * blur_extra_margin_percent))
-    y1 = max(0, y1 - int((y2 - y1) * blur_extra_margin_percent))
-    x2 = min(image.shape[1], x2 + int((x2 - x1) * blur_extra_margin_percent))
-    y2 = min(image.shape[0], y2 + int((y2 - y1) * blur_extra_margin_percent))
+    if blur_extra_margin_percent:
+        x1 = max(0, x1 - int((x2 - x1) * blur_extra_margin_percent))
+        y1 = max(0, y1 - int((y2 - y1) * blur_extra_margin_percent))
+        x2 = min(image.shape[1], x2 + int((x2 - x1) * blur_extra_margin_percent))
+        y2 = min(image.shape[0], y2 + int((y2 - y1) * blur_extra_margin_percent))
 
     face_roi = image[y1:y2, x1:x2]
     h, w = face_roi.shape[:2]
@@ -79,19 +80,22 @@ def draw_frame(image, x1, y1, x2, y2, score, my_score_threshold, color_above=(0,
     cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
 
-def process_other_frames(idx_from, idx_to, image_files, my_output_dir, image, my_score_threshold_decimal,
+def process_other_frames(origin_idx, idx_from, idx_to, image_files, my_output_dir, image, my_score_threshold_decimal,
                          my_score_threshold,
                          my_is_debug_mode):
     image_is_modified = False
-    # print(f"[{idx_from}, {idx_to}]", end="", flush=True)
+    print(f", checking metadata from [{idx_from}-{idx_to}]", end="", flush=True)
+    #print(f"[{idx_from}, {idx_to}]", end="", flush=True)
     for idx in range(idx_from, idx_to):
         prev_filename = image_files[idx]
-        prev_metadata_path = os.path.join(my_output_dir, prev_filename) + f".{my_score_threshold_decimal}.metadata.json"
+        prev_metadata_path = os.path.join(my_output_dir + "/metadata/", prev_filename) + f".{my_score_threshold_decimal}.metadata.json"
 
         #wait for the file to be available
-        while not os.path.exists(prev_metadata_path):
+        if not os.path.exists(prev_metadata_path):
             print(f", waiting for metadata from frame {idx}...", end="", flush=True)
-            time.sleep(5)
+            while not os.path.exists(prev_metadata_path):
+                print(f".", end="", flush=True)
+                time.sleep(5)
 
         #if os.path.exists(prev_metadata_path):
         with open(prev_metadata_path, 'r') as json_file:
@@ -113,7 +117,7 @@ def process_other_frames(idx_from, idx_to, image_files, my_output_dir, image, my
                     blur_face(image, x1, y1, x2, y2)
                 if my_is_debug_mode:
                     # Define colors based on how many frames back
-                    intensity = 255 - (abs(idx_from - idx) - 1) * 16
+                    intensity = 255 - (abs(origin_idx - idx)) * 16
                     intensity = max(intensity, 0)
                     color_above_threshold = (0, intensity, 0)
                     color_below_threshold = (0, 0, intensity)
@@ -172,11 +176,18 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
 
         input_path = os.path.join(input_dir, filename)
 
-        metadata_path = os.path.join(output_dir, filename) + f".{score_threshold_decimal}.metadata.json"
+
+        #mkdir for metadata
+        if not os.path.exists(os.path.join(output_dir, "metadata")):
+            os.makedirs(os.path.join(output_dir, "metadata"))
+
+        metadata_path = os.path.join(output_dir+ "/metadata/", filename) + f".{score_threshold_decimal}.metadata.json"
         if is_debug_mode:
             output_path = os.path.join(output_dir, filename) + ".debug.png"
         else:
             output_path = os.path.join(output_dir, filename) + ".blurred.png"
+
+        lock_path = os.path.join(output_dir, filename) + ".lock"
 
         print()
         print(f"* [FPS: {fps:05.2f}]", end="", flush=True)
@@ -188,7 +199,6 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
         fd_lock = None
         try:
 
-            lock_path = output_path + '.lock'
             try:
                 fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
                 fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -227,13 +237,15 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                 # look_ahead = 5
                 if (look_back > 0) and (idx > 0):
                     blurs_applied_prev = process_other_frames(
+                        idx,
                         max(0, idx - look_back), max(0, idx),
                         image_files_list, output_dir, image,
                         score_threshold_decimal, score_threshold, is_debug_mode
                     )
                 if (look_ahead > 0) and (idx < total_files_count):
                     blurs_applied_next = process_other_frames(
-                        min(total_files_count, idx + 1), min(total_files_count, idx + look_ahead + 1),
+                        idx,
+                        min(total_files_count, idx + 2), min(total_files_count, idx + look_ahead),
                         image_files_list, output_dir, image,
                         score_threshold_decimal, score_threshold, is_debug_mode
                     )
@@ -295,7 +307,7 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
 
             if not metadata_data:
                 print(f", saving metadata", end="", flush=True)
-                json_output_path = os.path.join(output_dir, filename) + f".{score_threshold_decimal}.metadata.json"
+                json_output_path = os.path.join(output_dir+ "/metadata/", filename) + f".{score_threshold_decimal}.metadata.json"
                 json_output_path_tmp = json_output_path + ".tmp"
                 with open(json_output_path_tmp, 'w') as json_file:
                     json.dump(detected_faces_data, json_file, indent=4)
