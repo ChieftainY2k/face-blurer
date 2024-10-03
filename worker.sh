@@ -11,8 +11,9 @@ GPU=$1
 INSTANCE=$2
 DEBUG=$3
 THRESHOLD=$4
+MODE=$5
 
-log_message "Running on GPU $GPU , instance $INSTANCE , DEBUG=$DEBUG, THRESHOLD=$THRESHOLD ..."
+log_message "Running on GPU $GPU , instance $INSTANCE , DEBUG=$DEBUG, THRESHOLD=$THRESHOLD , MODE=$MODE ..."
 
 # change window title
 echo -ne "\033kGPU${GPU}/${INSTANCE}(WORK)\033\\"
@@ -23,12 +24,14 @@ echo "GPU=$GPU" > $INFO_FILE
 echo "INSTANCE=$INSTANCE" >> $INFO_FILE
 echo "DEBUG=$DEBUG" >> $INFO_FILE
 echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
+echo "MODE=$MODE" >> $INFO_FILE
 echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
 docker run --rm --gpus all \
   -e CUDA_VISIBLE_DEVICES=$GPU \
   -e DEBUG=$DEBUG \
   -e THRESHOLD=$THRESHOLD \
+  -e MODE=$MODE \
   -v ./app:/app \
   -v ./input:/input:ro \
   -v ./output:/output \
