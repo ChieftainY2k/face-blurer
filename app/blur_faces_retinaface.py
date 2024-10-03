@@ -87,29 +87,39 @@ def process_other_frames(idx_from, idx_to, image_files, my_output_dir, image, my
     for idx in range(idx_from, idx_to):
         prev_filename = image_files[idx]
         prev_metadata_path = os.path.join(my_output_dir, prev_filename) + f".{my_score_threshold_decimal}.metadata.json"
-        if os.path.exists(prev_metadata_path):
-            with open(prev_metadata_path, 'r') as json_file:
-                prev_face_data = json.load(json_file)
-            if prev_face_data:
-                print(f", [F{idx + 1}]", end="", flush=True)
-                for face in prev_face_data:
-                    position = face['position']
-                    score = face['score']
-                    x1 = position['x1']
-                    y1 = position['y1']
-                    x2 = position['x2']
-                    y2 = position['y2']
-                    if score >= my_score_threshold:
-                        blur_face(image, x1, y1, x2, y2)
-                    if my_is_debug_mode:
-                        # Define colors based on how many frames back
-                        intensity = 255 - (abs(idx_from - idx) - 1) * 16
-                        intensity = max(intensity, 0)
-                        color_above_threshold = (0, intensity, 0)
-                        color_below_threshold = (0, 0, intensity)
-                        draw_frame(image, x1, y1, x2, y2, score, my_score_threshold, color_above_threshold,
-                                   color_below_threshold)
-                    image_is_modified = True
+
+        #wait for the file to be available
+        while not os.path.exists(prev_metadata_path):
+            print(f", waiting for metadata from frame {idx}...", end="", flush=True)
+            time.sleep(5)
+
+        #if os.path.exists(prev_metadata_path):
+        with open(prev_metadata_path, 'r') as json_file:
+            prev_face_data = json.load(json_file)
+
+        if prev_face_data is None:
+            raise Exception(f", metadata file {prev_metadata_path} is empty")
+
+        if prev_face_data:
+            print(f", [F{idx + 1}]", end="", flush=True)
+            for face in prev_face_data:
+                position = face['position']
+                score = face['score']
+                x1 = position['x1']
+                y1 = position['y1']
+                x2 = position['x2']
+                y2 = position['y2']
+                if score >= my_score_threshold:
+                    blur_face(image, x1, y1, x2, y2)
+                if my_is_debug_mode:
+                    # Define colors based on how many frames back
+                    intensity = 255 - (abs(idx_from - idx) - 1) * 16
+                    intensity = max(intensity, 0)
+                    color_above_threshold = (0, intensity, 0)
+                    color_below_threshold = (0, 0, intensity)
+                    draw_frame(image, x1, y1, x2, y2, score, my_score_threshold, color_above_threshold,
+                               color_below_threshold)
+                image_is_modified = True
     return image_is_modified
 
 
