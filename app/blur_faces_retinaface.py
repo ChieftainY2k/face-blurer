@@ -120,6 +120,11 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
         try:
 
             lock_path = output_path + '.lock'
+            if os.path.exists(metadata_path):
+                print(f", skipping as file {lock_path} exists", end="", flush=True)
+                continue
+
+            fd_lock = None
             try:
                 fd_lock = os.open(lock_path, os.O_CREAT | os.O_WRONLY)
                 fcntl.flock(fd_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -261,8 +266,9 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
 
         finally:
             try:
-                os.close(fd_lock)
-                os.remove(lock_path)
+                if fd_lock:
+                    os.close(fd_lock)
+                    os.remove(lock_path)
             except OSError as e:
                 print(f", warning: cannot remove lock file {lock_path}: {e}", flush=True)
 
