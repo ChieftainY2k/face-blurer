@@ -13,7 +13,7 @@ log_message() {
 #THRESHOLD=$4
 #MODE=$5
 
-log_message "Running , GPU=$GPU , INSTANCE=$INSTANCE , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE ..."
+log_message "Running , GPU=$GPU , INSTANCE=$INSTANCE , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE , BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 
 # change window title
 echo -ne "\033kGPU${GPU}/${INSTANCE}(WORK)\033\\"
@@ -25,6 +25,9 @@ echo "INSTANCE=$INSTANCE" >> $INFO_FILE
 echo "DEBUG=$DEBUG" >> $INFO_FILE
 echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
 echo "MODE=$MODE" >> $INFO_FILE
+echo "BLUR_EXTRA=$BLUR_EXTRA" >> $INFO_FILE
+echo "BLUR_AHEAD=$BLUR_AHEAD" >> $INFO_FILE
+echo "BLUR_BACK=$BLUR_BACK" >> $INFO_FILE
 echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
 docker run --rm --gpus all \
@@ -32,6 +35,9 @@ docker run --rm --gpus all \
   -e DEBUG=$DEBUG \
   -e THRESHOLD=$THRESHOLD \
   -e MODE=$MODE \
+  -e BLUR_EXTRA=$BLUR_EXTRA \
+  -e BLUR_AHEAD=$BLUR_AHEAD \
+  -e BLUR_BACK=$BLUR_BACK \
   -v ./app:/app \
   -v ./input:/input:ro \
   -v ./output:/output \

@@ -16,7 +16,7 @@ fi
 GPU_COUNT=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 #GPU_COUNT=1
 WORKER_COUNT=5
-log_message "GPU_COUNT=$GPU_COUNT , WORKER_COUNT=$WORKER_COUNT , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD, MODE=$MODE"
+log_message "GPU_COUNT=$GPU_COUNT , WORKER_COUNT=$WORKER_COUNT , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE, BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 log_message "Press [Enter] key to continue..."
 read
 
@@ -25,6 +25,9 @@ INFO_FILE="./output/metadata-run"
 echo "DEBUG=$DEBUG" > $INFO_FILE
 echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
 echo "MODE=$MODE" >> $INFO_FILE
+echo "BLUR_EXTRA=$BLUR_EXTRA" >> $INFO_FILE
+echo "BLUR_AHEAD=$BLUR_AHEAD" >> $INFO_FILE
+echo "BLUR_BACK=$BLUR_BACK" >> $INFO_FILE
 echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
 #screen -t "INFO" -- watch -c -n 3 "uptime; free; pydf; nvidia-smi; ls output/*.lock"
@@ -34,7 +37,7 @@ for ((gpu_idx = 0; gpu_idx < GPU_COUNT; gpu_idx++)); do
   for ((worker_idx = 0; worker_idx < WORKER_COUNT; worker_idx++)); do
     log_message "Running on GPU ${gpu_idx}/${GPU_COUNT} , worker ${worker_idx}/${WORKER_COUNT} , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE ..."
     #screen -t "GPU${gpu_idx}/${worker_idx}" -- ./worker.sh "$gpu_idx" "$worker_idx" "$DEBUG" "$THRESHOLD" "$MODE"
-    screen -t "GPU${gpu_idx}/${worker_idx}" -- bash -c "GPU=${gpu_idx} INSTANCE=${worker_idx} DEBUG=${DEBUG} THRESHOLD=${THRESHOLD} MODE=${MODE} ./worker.sh"
+    screen -t "GPU${gpu_idx}/${worker_idx}" -- bash -c "GPU=${gpu_idx} INSTANCE=${worker_idx} DEBUG=${DEBUG} THRESHOLD=${THRESHOLD} MODE=${MODE} BLUR_EXTRA=$BLUR_EXTRA BLUR_AHEAD=$BLUR_AHEAD BLUR_BACK=$BLUR_BACK ./worker.sh"
     sleep 20
   done
 done
