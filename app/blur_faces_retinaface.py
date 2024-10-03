@@ -206,8 +206,8 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
 
         print()
         print(f"[#{idx}]", end="", flush=True)
-        print(f"[FPS: {fps:05.2f}]", end="", flush=True)
-        print(f"[ETA: {eta_hours:02}h {eta_minutes:02}m {eta_seconds:02}s]", end="", flush=True)
+        print(f"[FPS:{fps:05.2f}]", end="", flush=True)
+        print(f"[ETA:{eta_hours:02}h{eta_minutes:02}m{eta_seconds:02}s]", end="", flush=True)
         print(f"[{percent_complete:05.2f}%]", end="", flush=True)
         print(f"[{files_checked:010}/{total_files_count:010}]", end="", flush=True)
         print(f"[{input_path}][{output_path}]", end="", flush=True)
