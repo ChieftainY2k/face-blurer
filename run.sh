@@ -15,8 +15,8 @@ fi
 # Detect number of GPUS from nvisia-smi
 GPU_COUNT=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
 #GPU_COUNT=1
-WORKER_COUNT=5
-log_message "GPU_COUNT=$GPU_COUNT , WORKER_COUNT=$WORKER_COUNT , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE, BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
+WORKERS=${$WORKERS:-5}
+log_message "GPU_COUNT=$GPU_COUNT , WORKERS=$WORKERS , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE, BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 log_message "Press [Enter] key to continue..."
 read
 
@@ -34,8 +34,8 @@ echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
 #for gpu in "${GPUS[@]}"; do
 for ((gpu_idx = 0; gpu_idx < GPU_COUNT; gpu_idx++)); do
-  for ((worker_idx = 0; worker_idx < WORKER_COUNT; worker_idx++)); do
-    log_message "Running on GPU ${gpu_idx}/${GPU_COUNT} , worker ${worker_idx}/${WORKER_COUNT} , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE ..."
+  for ((worker_idx = 0; worker_idx < WORKERS; worker_idx++)); do
+    log_message "Running on GPU ${gpu_idx}/${GPU_COUNT} , worker ${worker_idx}/${WORKERS} , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE ..."
     #screen -t "GPU${gpu_idx}/${worker_idx}" -- ./worker.sh "$gpu_idx" "$worker_idx" "$DEBUG" "$THRESHOLD" "$MODE"
     screen -t "GPU${gpu_idx}/${worker_idx}" -- bash -c "GPU=${gpu_idx} INSTANCE=${worker_idx} DEBUG=${DEBUG} THRESHOLD=${THRESHOLD} MODE=${MODE} BLUR_EXTRA=$BLUR_EXTRA BLUR_AHEAD=$BLUR_AHEAD BLUR_BACK=$BLUR_BACK ./worker.sh"
     sleep 30
