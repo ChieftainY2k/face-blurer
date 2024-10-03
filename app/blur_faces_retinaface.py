@@ -23,6 +23,7 @@ def blur_face(image, x1, y1, x2, y2, blocks=5):
     face_roi_pixelated = cv2.resize(temp, (face_roi.shape[1], face_roi.shape[0]), interpolation=cv2.INTER_NEAREST)
     image[y1:y2, x1:x2] = face_roi_pixelated
 
+
 def draw_frame(image, x1, y1, x2, y2, score, my_score_threshold, color_above=(0, 255, 0), color_below=(0, 0, 255)):
     color = color_above if score >= my_score_threshold else color_below
     cv2.rectangle(image, (x1, y1), (x2, y2), color, 4)
@@ -168,15 +169,15 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
             if is_pass2:
                 blurs_applied_prev = False
                 blurs_applied_next = False
-                #look_back = 10
-                #look_ahead = 5
-                if idx > 0:
+                # look_back = 10
+                # look_ahead = 5
+                if (look_back > 0) and (idx > 0):
                     blurs_applied_prev = process_other_frames(
                         max(0, idx - look_back), max(0, idx),
                         image_files_list, output_dir, image,
                         score_threshold_decimal, score_threshold, is_debug_mode
                     )
-                if idx < total_files_count:
+                if (look_ahead > 0) and (idx < total_files_count):
                     blurs_applied_next = process_other_frames(
                         min(total_files_count, idx + 1), min(total_files_count, idx + look_ahead + 1),
                         image_files_list, output_dir, image,
@@ -226,11 +227,11 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                         'position': {'x1': int(x1), 'y1': int(y1), 'x2': int(x2), 'y2': int(y2)}
                     })
 
-#                     blur_margin_percent = 1
-                    x1 = max(0, x1 - int((x2 - x1) * blur_margin_percent))
-                    y1 = max(0, y1 - int((y2 - y1) * blur_margin_percent))
-                    x2 = min(image.shape[1], x2 + int((x2 - x1) * blur_margin_percent))
-                    y2 = min(image.shape[0], y2 + int((y2 - y1) * blur_margin_percent))
+                    # blur_margin_percent = 1
+                    x1 = max(0, x1 - int((x2 - x1) * blur_extra_margin_percent))
+                    y1 = max(0, y1 - int((y2 - y1) * blur_extra_margin_percent))
+                    x2 = min(image.shape[1], x2 + int((x2 - x1) * blur_extra_margin_percent))
+                    y2 = min(image.shape[0], y2 + int((y2 - y1) * blur_extra_margin_percent))
 
                     if x1 >= x2 or y1 >= y2:
                         raise Exception(f"Invalid face area, {x1}, {y1}, {x2}, {y2}")
@@ -332,14 +333,13 @@ if __name__ == "__main__":
     input_dir = os.getenv('INPUT_DIR', '/input')
     output_dir = os.getenv('OUTPUT_DIR', '/output')
     is_debug_mode = os.getenv('DEBUG', '').lower() in ['1', 'true', 'yes']
-    blur_margin_percent = float(os.getenv('BLUR_MARGIN', 1.0))
+    blur_extra_margin_percent = float(os.getenv('BLUR_EXTRA', 0.5))
     look_ahead = int(os.getenv('BLUR_AHEAD', 3))
     look_back = int(os.getenv('BLUR_BACK', 5))
 
     process_mode = os.getenv('MODE', 'pass2')  # pass1, pass2
     if process_mode not in ['pass1', 'pass2']:
         raise Exception("Error: MODE environment variable must be set to 'pass1' or 'pass2'.")
-        sys.exit(1)
 
     is_pass1 = process_mode == 'pass1'
     is_pass2 = process_mode == 'pass2'
