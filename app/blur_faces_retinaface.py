@@ -25,7 +25,7 @@ def draw_frame(image, x1, y1, x2, y2, score, score_threshold, color_above=(0, 25
     cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
 def process_previous_frames(idx, image_files, output_dir, image, score_threshold_decimal, score_threshold, is_debug_mode):
-    prev_blurs_applied = False
+    image_is_modified = False
     max_prev_frames = 10
     for i in range(1, max_prev_frames + 1):
         if idx >= i:
@@ -53,8 +53,40 @@ def process_previous_frames(idx, image_files, output_dir, image, score_threshold
                             color_above = (0, intensity, 0)
                             color_below = (0, 0, intensity)
                             draw_frame(image, x1, y1, x2, y2, score, score_threshold, color_above, color_below)
-                        prev_blurs_applied = True
-    return prev_blurs_applied
+                        image_is_modified = True
+    return image_is_modified
+
+def process_next_frames(idx, image_files, output_dir, image, score_threshold_decimal, score_threshold, is_debug_mode):
+    image_is_modified = False
+    max_prev_frames = 5
+    for i in range(1, max_prev_frames + 1):
+        if idx >= i:
+            prev_idx = idx + i
+            prev_filename = image_files[prev_idx]
+            prev_metadata_path = os.path.join(output_dir, prev_filename) + f".{score_threshold_decimal}.metadata.json"
+            if os.path.exists(prev_metadata_path):
+                with open(prev_metadata_path, 'r') as json_file:
+                    prev_face_data = json.load(json_file)
+                if prev_face_data:
+                    print(f", found blurs from {prev_idx}", end="", flush=True)
+                    for face in prev_face_data:
+                        position = face['position']
+                        score = face['score']
+                        x1 = position['x1']
+                        y1 = position['y1']
+                        x2 = position['x2']
+                        y2 = position['y2']
+                        if score >= score_threshold:
+                            blur_face(image, x1, y1, x2, y2)
+                        if is_debug_mode:
+                            # Define colors based on how many frames back
+                            intensity = 128 - (i - 1) * 16
+                            intensity = max(intensity, 0)
+                            color_above = (0, intensity, 0)
+                            color_below = (0, 0, intensity)
+                            draw_frame(image, x1, y1, x2, y2, score, score_threshold, color_above, color_below)
+                        image_is_modified = True
+    return image_is_modified
 
 def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshold):
     # Ensure the output directory exists
@@ -155,11 +187,18 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                 retina_threshold = 0.01
 
             # Process previous frames
+            image_is_modified = False
             if is_pass2:
-                prev_blurs_applied = process_previous_frames(
+                blurs_applied_prev = process_previous_frames(
                     idx, image_files, output_dir, image,
                     score_threshold_decimal, score_threshold, is_debug_mode
                 )
+                blurs_applied_next = process_next_frames(
+                    idx, image_files, output_dir, image,
+                    score_threshold_decimal, score_threshold, is_debug_mode
+                )
+
+                image_is_modified = blurs_applied_prev or blurs_applied_next
 
             #load metadata
             metadata_data = None
@@ -245,13 +284,13 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                             blur_face(image, x1, y1, x2, y2)
                         if is_debug_mode:
                             draw_frame(image, x1, y1, x2, y2, score, score_threshold)
-                        prev_blurs_applied = True
+                        image_is_modified = True
 
             if is_pass2:
 
                 tmp_output_path = output_path + ".tmp.png"
                 save_start_time = time.time()
-                if detected_faces or prev_blurs_applied:
+                if image_is_modified:
                     # Save the image
                     print(f", saving frame", end="", flush=True)
                     cv2.imwrite(tmp_output_path, image)
