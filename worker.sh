@@ -46,8 +46,8 @@ if [ $EXIT_CODE -ne 0 ]; then
   echo "ERROR=$EXIT_CODE" >> $INFO_FILE
 else
   echo -ne "\033kGPU${GPU}/${INSTANCE}(DONE)\033\\"
-  echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 fi
+echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
 log_message 'Press [Enter] key to continue...'
 read
