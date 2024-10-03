@@ -49,6 +49,10 @@ FPS=$(grep 'FPS=' $INFO_FILE | cut -d '=' -f 2)
 MD5_HASH=$(grep 'MD5_HASH=' $INFO_FILE | cut -d '=' -f 2)
 DEBUG=$(grep 'DEBUG=' $INFO_FILE_RUN | cut -d '=' -f 2)
 THRESHOLD=$(grep 'THRESHOLD=' $INFO_FILE_RUN | cut -d '=' -f 2)
+BLUR_EXTRA=$(grep 'BLUR_EXTRA=' $INFO_FILE_RUN | cut -d '=' -f 2)
+BLUR_AHEAD=$(grep 'BLUR_AHEAD=' $INFO_FILE_RUN | cut -d '=' -f 2)
+BLUR_BACK=$(grep 'BLUR_BACK=' $INFO_FILE_RUN | cut -d '=' -f 2)
+
 
 log_message "Input video metadata:"
 # show both files
@@ -68,7 +72,7 @@ if [ "$DEBUG" -eq 1 ]; then
 fi
 
 # Use variables in the ffmpeg command
-COMMAND="ffmpeg -r \"$FPS\" -hwaccel \"cuda\" -f image2 -s \"$RESOLUTION\" -i \"output/frame_%10d.png.${FILE_MARKER}.png\" -c:v h264_nvenc -preset slow -cq 20  \"output/video-${MD5_HASH}-${RESOLUTION}-${FPS}fps-${FILE_MARKER}-th${THRESHOLD}.mp4\" "
+COMMAND="ffmpeg -r \"$FPS\" -hwaccel \"cuda\" -f image2 -s \"$RESOLUTION\" -i \"output/frame_%10d.png.${FILE_MARKER}.png\" -c:v h264_nvenc -preset slow -cq 20  \"output/video-${MD5_HASH}-${RESOLUTION}-${FPS}fps-${FILE_MARKER}-th${THRESHOLD}-be${BLUR_EXTRA}-ba${BLUR_AHEAD}-bb${BLUR_BACK}.mp4\" "
 
 # show command , wait for ENTER
 log_message "About to exec the command: $COMMAND"
