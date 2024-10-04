@@ -56,7 +56,7 @@ while true; do
   echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
   log_message "Sleeping..."
-  countdown_seconds 300
+  countdown_seconds 120
 
 done
 
