@@ -1,4 +1,5 @@
 import cv2
+import cv2
 import os
 import sys
 import numpy as np
@@ -90,7 +91,7 @@ def draw_frame(image, x1, y1, x2, y2, score, my_score_threshold, color_above=(0,
     cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
 
-def metadata_exists(idx_from, idx_to, image_files, my_output_dir):
+def metadata_exists(idx_from, idx_to, image_files, my_score_threshold_decimal, my_output_dir):
     for idx in range(idx_from, idx_to):
         prev_filename = image_files[idx]
         prev_metadata_path = os.path.join(my_output_dir + "/metadata/", prev_filename) + f".{my_score_threshold_decimal}.metadata.json"
@@ -112,7 +113,7 @@ def process_other_frames(origin_idx, idx_from, idx_to, image_files, my_output_di
     #        while not os.path.exists(prev_metadata_path):
     #            print(f".", end="", flush=True)
     #            time.sleep(5)
-    medatata_exists = metadata_exists(idx_from, idx_to, image_files, my_output_dir)
+    medatata_exists = metadata_exists(idx_from, idx_to, image_files, my_score_threshold_decimal, my_output_dir)
     if not medatata_exists:
         raise Exception(f"some metadata files do not exist for frames {idx_from}-{idx_to}")
 
@@ -290,7 +291,7 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                 if (look_back > 0) and (idx > 0):
                     idx_from = max(0, idx - look_back)
                     idx_to = max(0, idx)
-                    is_metadata = metadata_exists(idx_from, idx_to, image_files_list, output_dir)
+                    is_metadata = metadata_exists(idx_from, idx_to, image_files_list, score_threshold_decimal, output_dir)
                     if not is_metadata:
                         print(f", missing metadata for frames {idx_from}-{idx_to}, skipping", end="", flush=True)
                         continue
@@ -302,7 +303,7 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                 if (look_ahead > 0) and (idx < total_files_count):
                     idx_from = min(total_files_count, idx + 1)
                     idx_to = min(total_files_count, idx + look_ahead)
-                    is_metadata = metadata_exists(idx_from, idx_to, image_files_list, output_dir)
+                    is_metadata = metadata_exists(idx_from, idx_to, image_files_list, score_threshold_decimal, output_dir)
                     if not is_metadata:
                         print(f", missing metadata for frames {idx_from}-{idx_to}, skipping", end="", flush=True)
                         continue
