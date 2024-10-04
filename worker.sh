@@ -66,7 +66,7 @@ while true; do
 
   log_message "Sleeping..."
   sleep_time=300
-  for ((i = 0; i < sleep_time; i++)); do
+  for ((i = sleep_time; i >= 0; i--)); do
     echo -n " ${i}"
     sleep 1
   done
