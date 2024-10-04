@@ -53,7 +53,6 @@ BLUR_EXTRA=$(grep 'BLUR_EXTRA=' $INFO_FILE_RUN | cut -d '=' -f 2)
 BLUR_AHEAD=$(grep 'BLUR_AHEAD=' $INFO_FILE_RUN | cut -d '=' -f 2)
 BLUR_BACK=$(grep 'BLUR_BACK=' $INFO_FILE_RUN | cut -d '=' -f 2)
 
-
 log_message "Input video metadata:"
 # show both files
 cat $INFO_FILE
@@ -67,7 +66,7 @@ cat $INFO_FILE_RUN
 #fi
 
 FILE_MARKER="blurred"
-if [ "$DEBUG" -eq 1 ]; then
+if [ "$DEBUG" == "1" ]; then
   FILE_MARKER="debug"
 fi
 
