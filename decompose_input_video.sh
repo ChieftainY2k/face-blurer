@@ -19,8 +19,11 @@ while ! grep -q "FINISHED=" "$PROVISION_INFO_FILE"; do
   countdown_seconds 10
 done
 
-log_message "Press [Enter] key to continue..."
-read
+#log_message "Press [Enter] key to continue..."
+#read
+
+log_message "waiting for a while..."
+countdown_seconds 15
 
 log_message "Collecting metadata..."
 INFO_FILE="./input/metadata-decompose"
