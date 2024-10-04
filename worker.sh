@@ -64,8 +64,12 @@ while true; do
   fi
   echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
-  log_message "Sleeping ..."
-  sleep 300
+  log_message "Sleeping..."
+  sleep_time=300
+  for ((i = 0; i < sleep_time; i++)); do
+    echo -n "."
+    sleep 1
+  done
 
 done
 
