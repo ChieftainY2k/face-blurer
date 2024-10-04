@@ -45,7 +45,7 @@ def blur_face(image, x1, y1, x2, y2):
     height = y2 - y1
 
     # Determine the number of blocks based on the size of the face region
-    if width < 200 or height < 200:
+    if width < 100 or height < 100:
         blocks = 2
     else:
         blocks = 5
