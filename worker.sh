@@ -13,24 +13,25 @@ log_message() {
 #THRESHOLD=$4
 #MODE=$5
 
-
 # change window title
 echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}\033\\"
 
+echo "GPU=$GPU" > $INFO_FILE
+echo "INSTANCE=$INSTANCE" >> $INFO_FILE
+echo "DEBUG=$DEBUG" >> $INFO_FILE
+echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
+echo "MODE=$MODE" >> $INFO_FILE
+echo "BLUR_EXTRA=$BLUR_EXTRA" >> $INFO_FILE
+echo "BLUR_AHEAD=$BLUR_AHEAD" >> $INFO_FILE
+echo "BLUR_BACK=$BLUR_BACK" >> $INFO_FILE
+
 INFO_FILE="./output/metadata-worker-$MODE-$GPU-$INSTANCE"
+DONE_COUNT=0
 
 while true; do
 
   log_message "Running , GPU=$GPU , INSTANCE=$INSTANCE , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE , BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 
-  echo "GPU=$GPU" > $INFO_FILE
-  echo "INSTANCE=$INSTANCE" >> $INFO_FILE
-  echo "DEBUG=$DEBUG" >> $INFO_FILE
-  echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
-  echo "MODE=$MODE" >> $INFO_FILE
-  echo "BLUR_EXTRA=$BLUR_EXTRA" >> $INFO_FILE
-  echo "BLUR_AHEAD=$BLUR_AHEAD" >> $INFO_FILE
-  echo "BLUR_BACK=$BLUR_BACK" >> $INFO_FILE
   echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
   docker run --rm --gpus all \
@@ -56,7 +57,9 @@ while true; do
     log_message 'Press [Enter] key to retry or [Ctrl+C] to exit...'
     read
   else
-    echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}/DONE)\033\\"
+    echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}/DONE(${DONE_COUNT})\033\\"
+    echo "DONE=1" >> $INFO_FILE
+    DONE_COUNT=$((DONE_COUNT + 1))
     log_message "Processing finished successfully."
   fi
   echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
