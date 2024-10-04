@@ -15,16 +15,25 @@ log_message() {
 
 # Get the current NVIDIA driver version
 nvidia-smi
-nvidia_version=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader)
-log_message "Current NVIDIA driver version: $nvidia_version"
+NVIDIA_VERSION=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader)
+log_message "Current NVIDIA driver version: $NVIDIA_VERSION"
+
+INFO_FILE="./input/metadata-drivers"
+# save vars to local file
+echo "NVIDIA_VERSION=$NVIDIA_VERSION" > $INFO_FILE
+echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
+log_message "Metadata saved to $INFO_FILE"
 
 # Check if the driver version is 535.xxxx
-if [[ $nvidia_version == 535.* ]]; then
+if [[ $NVIDIA_VERSION == 535.* ]]; then
   log_message "Driver version is 535.xxxx. Proceeding with drivers update."
-elif [[ $nvidia_version == 545.* ]]; then
+  echo "DRIVERS_NEED_UPDATE=1" >> $INFO_FILE
+elif [[ $NVIDIA_VERSION == 545.* ]]; then
   log_message "Driver version is 545. That's OK."
+  echo "DRIVERS_OK=1" >> $INFO_FILE
   exit 0
 else
+  echo "DRIVERS_ERROR=1" >> $INFO_FILE
   log_message "ERROR: Driver version is unknown."
   exit 1
 fi
@@ -35,7 +44,6 @@ held_packages=$(dpkg --get-selections | grep hold | awk '{print $1}')
 if [ -n "$held_packages" ]; then
   apt-mark unhold $held_packages
 fi
-
 
 # Remove old NVIDIA drivers and purge related packages
 apt remove -y --purge '^nvidia-.*'
@@ -59,6 +67,9 @@ apt-get install -y nvidia-container-toolkit
 # Configure NVIDIA runtime for Docker
 nvidia-ctk runtime configure --runtime=docker
 systemctl restart docker
+
+echo "DRIVERS_UPDATED=1" >> $INFO_FILE
+echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
 # Prompt user to reboot
 log_message "----------------------------------------------------------"

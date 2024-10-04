@@ -74,17 +74,6 @@ log_message "drivers check started"
 exec_remote "cd face-blurer && sudo ./drivers_reinstall.sh"
 log_message "drivers check finished"
 
-# Build Docker image
-log_message "docker image build starting"
-exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
-log_message "docker image build finished"
-
-# Uncomment if needed for rsync and Docker execution
-# rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video1.mp4 $TUSER@$THOST:/home/$TUSER/face-blurer/input/
-# exec_remote "cd face-blurer && docker run -v \$(pwd):/data linuxserver/ffmpeg -i \"/data/input/video1.mp4\" -fps_mode passthrough -q:v 0 -c:v png \"/data/input/frame_%10d.png\""
-# exec_remote "cd face-blurer && rm -f output/sample*"
-# exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface.py"
-
 log_message "rebooting server..."
 #exec_remote "sudo reboot"
 exec_remote "sudo bash -c \"sleep 3 && sudo reboot\" &"
@@ -99,6 +88,16 @@ sleep 20
 log_message "server is up"
 exec_remote nvidia-smi
 
+# Build Docker image
+log_message "docker image build starting"
+exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
+log_message "docker image build finished"
+
+# Uncomment if needed for rsync and Docker execution
+# rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video1.mp4 $TUSER@$THOST:/home/$TUSER/face-blurer/input/
+# exec_remote "cd face-blurer && docker run -v \$(pwd):/data linuxserver/ffmpeg -i \"/data/input/video1.mp4\" -fps_mode passthrough -q:v 0 -c:v png \"/data/input/frame_%10d.png\""
+# exec_remote "cd face-blurer && rm -f output/sample*"
+# exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface.py"
 
 log_message "provisioning finished"
 
