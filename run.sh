@@ -12,34 +12,14 @@ if [ -z "$STY" ]; then
   exit 1
 fi
 
-# Detect number of GPUS from nvisia-smi
-GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
-WORKERS=${WORKERS:-6}
-
 log_message "GPUS=$GPUS , WORKERS=$WORKERS , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE, BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
-#log_message "Press [Enter] key to continue..."
-#read
 log_message "Sleeping for a while..."
 sleep 15
 
-INFO_FILE="./output/metadata-run-$MODE"
-# save vars to local file
-echo "DEBUG=$DEBUG" > $INFO_FILE
-echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
-echo "MODE=$MODE" >> $INFO_FILE
-echo "BLUR_EXTRA=$BLUR_EXTRA" >> $INFO_FILE
-echo "BLUR_AHEAD=$BLUR_AHEAD" >> $INFO_FILE
-echo "BLUR_BACK=$BLUR_BACK" >> $INFO_FILE
-echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
+log_message "Running pass 1"
+WORKERS=5 MODE=pass1 ./run_pass.sh
+log_message "Sleeping for a while..."
+sleep 15
 
-#screen -t "INFO" -- watch -c -n 3 "uptime; free; pydf; nvidia-smi; ls output/*.lock"
-
-#for gpu in "${GPUS[@]}"; do
-for ((gpu_idx = 0; gpu_idx < GPUS; gpu_idx++)); do
-  for ((worker_idx = 0; worker_idx < WORKERS; worker_idx++)); do
-    log_message "Running on GPU ${gpu_idx}/${GPUS} , worker ${worker_idx}/${WORKERS} , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE ..."
-    #screen -t "GPU${gpu_idx}/${worker_idx}" -- ./worker.sh "$gpu_idx" "$worker_idx" "$DEBUG" "$THRESHOLD" "$MODE"
-    screen -t "GPU${gpu_idx}/${worker_idx}" -- bash -c "GPU=${gpu_idx} INSTANCE=${worker_idx} DEBUG=${DEBUG} THRESHOLD=${THRESHOLD} MODE=${MODE} BLUR_EXTRA=$BLUR_EXTRA BLUR_AHEAD=$BLUR_AHEAD BLUR_BACK=$BLUR_BACK ./worker.sh"
-    sleep 30
-  done
-done
+log_message "Running pass 2"
+WORKERS=7 MODE=pass2 ./run_pass.sh
