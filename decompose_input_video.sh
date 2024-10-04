@@ -20,7 +20,7 @@ log_message "Press [Enter] key to continue..."
 read
 
 log_message "Collecting metadata..."
-INFO_FILE="./input/metadata-video"
+INFO_FILE="./input/metadata-decompose"
 # save vars to local file
 echo "SOURCE=$SOURCE" >$INFO_FILE
 echo "RESOLUTION=$RESOLUTION" >>$INFO_FILE

@@ -42,7 +42,7 @@ log_message() {
 #log_message "Finished decomposing video $SOURCE"
 
 # Define variables from the metadata file
-INFO_FILE="./input/metadata-video"
+INFO_FILE="./input/metadata-decompose"
 INFO_FILE_RUN="./output/metadata-run"
 RESOLUTION=$(grep 'RESOLUTION=' $INFO_FILE | cut -d '=' -f 2)
 FPS=$(grep 'FPS=' $INFO_FILE | cut -d '=' -f 2)
