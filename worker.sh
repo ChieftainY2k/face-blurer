@@ -58,6 +58,7 @@ while true; do
   else
     echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}/DONE(${DONE_COUNT})\033\\"
     echo "DONE=1" >> $INFO_FILE
+    echo "DONE_COUNT=$DONE_COUNT" >> $INFO_FILE
     DONE_COUNT=$((DONE_COUNT + 1))
     log_message "Processing finished successfully."
   fi
