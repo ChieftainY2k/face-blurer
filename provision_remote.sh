@@ -74,19 +74,6 @@ log_message "drivers check started"
 exec_remote "cd face-blurer && sudo ./drivers_reinstall.sh"
 log_message "drivers check finished"
 
-log_message "rebooting server..."
-#exec_remote "sudo reboot"
-exec_remote "sudo bash -c \"sleep 3 && sudo reboot\" &"
-log_message_local "waiting..."
-sleep 10
-# wait until server is reabooted, check every 1 second
-while ! exec_remote "uptime"; do
-#  echo -n "."
-  sleep 1
-done
-sleep 20
-log_message "OK, server is up"
-
 # Build Docker image
 log_message "docker image build starting"
 exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
@@ -98,7 +85,22 @@ log_message "docker image build finished"
 # exec_remote "cd face-blurer && rm -f output/sample*"
 # exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface.py"
 
-log_message "finished"
+log_message "rebooting server..."
+#exec_remote "sudo reboot"
+exec_remote "sudo bash -c \"sleep 3 && sudo reboot\" &"
+log_message_local "waiting..."
+sleep 10
+# wait until server is reabooted, check every 1 second
+while ! exec_remote "uptime"; do
+#  echo -n "."
+  sleep 1
+done
+sleep 20
+log_message "server is up"
+exec_remote nvidia-smi
+
+
+log_message "provisioning finished"
 
 ##!/bin/bash
 ## shellcheck disable=SC2086
