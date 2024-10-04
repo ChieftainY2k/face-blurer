@@ -13,9 +13,6 @@ log_message() {
 #THRESHOLD=$4
 #MODE=$5
 
-# change window title
-echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}\033\\"
-
 echo "GPU=$GPU" > $INFO_FILE
 echo "INSTANCE=$INSTANCE" >> $INFO_FILE
 echo "DEBUG=$DEBUG" >> $INFO_FILE
@@ -26,9 +23,11 @@ echo "BLUR_AHEAD=$BLUR_AHEAD" >> $INFO_FILE
 echo "BLUR_BACK=$BLUR_BACK" >> $INFO_FILE
 
 INFO_FILE="./output/metadata-worker-$MODE-$GPU-$INSTANCE"
-DONE_COUNT=0
+DONE_COUNT=1
 
 while true; do
+
+  echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}(${DONE_COUNT})\033\\"
 
   log_message "Running , GPU=$GPU , INSTANCE=$INSTANCE , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE , BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 
