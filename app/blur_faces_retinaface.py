@@ -90,22 +90,36 @@ def draw_frame(image, x1, y1, x2, y2, score, my_score_threshold, color_above=(0,
     cv2.putText(image, text, (x1, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
 
+def metadata_exists(idx_from, idx_to, image_files, my_output_dir):
+    for idx in range(idx_from, idx_to):
+        prev_filename = image_files[idx]
+        prev_metadata_path = os.path.join(my_output_dir + "/metadata/", prev_filename) + f".{my_score_threshold_decimal}.metadata.json"
+        if not os.path.exists(prev_metadata_path):
+            return False
+    return True
+
 def process_other_frames(origin_idx, idx_from, idx_to, image_files, my_output_dir, image, my_score_threshold_decimal,
                          my_score_threshold,
                          my_is_debug_mode):
     image_is_modified = False
     print(f", checking metadata #{idx_from}-#{idx_to}", end="", flush=True)
     #print(f"[{idx_from}, {idx_to}]", end="", flush=True)
+
+    # Check if the metadata file exists
+    #for idx in range(idx_from, idx_to):
+    #    if not os.path.exists(prev_metadata_path):
+    #        print(f", waiting for metadata from #{idx}...", end="", flush=True)
+    #        while not os.path.exists(prev_metadata_path):
+    #            print(f".", end="", flush=True)
+    #            time.sleep(5)
+    medatata_exists = metadata_exists(idx_from, idx_to, image_files, my_output_dir)
+    if not medatata_exists:
+        raise Exception(f"some metadata files do not exist for frames {idx_from}-{idx_to}")
+
+    # Process the metadata files
     for idx in range(idx_from, idx_to):
         prev_filename = image_files[idx]
         prev_metadata_path = os.path.join(my_output_dir + "/metadata/", prev_filename) + f".{my_score_threshold_decimal}.metadata.json"
-
-        #wait for the file to be available
-        if not os.path.exists(prev_metadata_path):
-            print(f", waiting for metadata from #{idx}...", end="", flush=True)
-            while not os.path.exists(prev_metadata_path):
-                print(f".", end="", flush=True)
-                time.sleep(5)
 
         #if os.path.exists(prev_metadata_path):
         with open(prev_metadata_path, 'r') as json_file:
@@ -274,16 +288,26 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                 # look_back = 10
                 # look_ahead = 5
                 if (look_back > 0) and (idx > 0):
+                    idx_from = max(0, idx - look_back)
+                    idx_to = max(0, idx)
+                    metadata_exists = metadata_exists(idx_from, idx_to, image_files_list, output_dir)
+                    if not metadata_exists:
+                        print(f", missing metadata for frames {idx_from}-{idx_to}, skipping", end="", flush=True)
+                        continue
                     blurs_applied_prev = process_other_frames(
-                        idx,
-                        max(0, idx - look_back), max(0, idx),
+                        idx,idx_from, idx_to,
                         image_files_list, output_dir, image,
                         score_threshold_decimal, score_threshold, is_debug_mode
                     )
                 if (look_ahead > 0) and (idx < total_files_count):
+                    idx_from = min(total_files_count, idx + 1)
+                    idx_to = min(total_files_count, idx + look_ahead)
+                    metadata_exists = metadata_exists(idx_from, idx_to, image_files_list, output_dir)
+                    if not metadata_exists:
+                        print(f", missing metadata for frames {idx_from}-{idx_to}, skipping", end="", flush=True)
+                        continue
                     blurs_applied_next = process_other_frames(
-                        idx,
-                        min(total_files_count, idx + 2), min(total_files_count, idx + look_ahead),
+                        idx, idx_from, idx_to,
                         image_files_list, output_dir, image,
                         score_threshold_decimal, score_threshold, is_debug_mode
                     )
