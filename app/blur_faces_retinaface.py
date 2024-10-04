@@ -487,6 +487,10 @@ if __name__ == "__main__":
     else:
         score_threshold = 0.1
 
+    # must be between 0 and 1
+    if score_threshold < 0 or score_threshold > 1:
+        raise Exception("Error: THRESHOLD environment variable must be a float between 0 and 1.")
+
     score_threshold_decimal = int(score_threshold * 1000)
 
     # Call the main processing function
