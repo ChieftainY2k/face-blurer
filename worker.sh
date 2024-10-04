@@ -2,16 +2,7 @@
 # shellcheck disable=SC2086,SC2129
 #set -e
 
-log_message() {
-  echo "[$(date +'%Y-%m-%d %H:%M:%S')] $@"
-}
-
-# get GPU from arg
-#GPU=$1
-#INSTANCE=$2
-#DEBUG=$3
-#THRESHOLD=$4
-#MODE=$5
+. ./functions.sh
 
 INFO_FILE="./output/metadata-worker-$MODE-$GPU-$INSTANCE"
 echo "GPU=$GPU" > $INFO_FILE
@@ -65,11 +56,7 @@ while true; do
   echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
   log_message "Sleeping..."
-  sleep_time=300
-  for ((i = sleep_time; i >= 0; i--)); do
-    echo -n " ${i}"
-    sleep 1
-  done
+  countdown_seconds 300
 
 done
 

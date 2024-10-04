@@ -1,17 +1,13 @@
 #!/bin/bash
-
 set -ex
+
+. ./functions.sh
 
 # Ensure script is run as root
 if [[ "$EUID" -ne 0 ]]; then
   echo "Please run as root"
   exit 1
 fi
-
-log_message() {
-  local message="$1"
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"
-}
 
 # Get the current NVIDIA driver version
 nvidia-smi

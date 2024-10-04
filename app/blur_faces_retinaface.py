@@ -131,7 +131,7 @@ def process_other_frames(origin_idx, idx_from, idx_to, image_files, my_output_di
 
         if prev_face_data:
             data_length = len(prev_face_data)
-            print(f", #F{idx + 1}({data_length})", end="", flush=True)
+            print(f" #F{idx + 1}({data_length})", end="", flush=True)
             for face in prev_face_data:
                 position = face['position']
                 score = face['score']

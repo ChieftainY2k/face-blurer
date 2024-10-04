@@ -1,7 +1,7 @@
 #!/bin/bash
-
-# Exit immediately on error
 set -euo pipefail
+
+. ./functions.sh
 
 # Required variables
 required_vars=("THOST" "TPORT" "TUSER")
@@ -25,18 +25,18 @@ exec_remote() {
   fi
 }
 
-# Log start time
-log_message() {
-  local message="$1"
-  log_message_local "$message"
-  exec_remote "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] $message\" >> /home/user/provision-log.txt"
-}
-
-# Log start time
-log_message_local() {
-  local message="$1"
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"
-}
+## Log start time
+#log_message() {
+#  local message="$1"
+#  log_message_local "$message"
+#  exec_remote "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] $message\" >> /home/user/provision-log.txt"
+#}
+#
+## Log start time
+#log_message_local() {
+#  local message="$1"
+#  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"
+#}
 
 # Inject SSH keys
 echo "Injecting keys..."
@@ -77,14 +77,14 @@ log_message "drivers check finished"
 log_message "rebooting server..."
 #exec_remote "sudo reboot"
 exec_remote "sudo bash -c \"sleep 3 && sudo reboot\" &"
-log_message_local "waiting..."
-sleep 10
+log_message "waiting..."
+countdown_seconds 10
 # wait until server is reabooted, check every 1 second
 while ! exec_remote "uptime"; do
 #  echo -n "."
   sleep 1
 done
-sleep 20
+countdown_seconds 20
 log_message "server is up"
 exec_remote nvidia-smi
 

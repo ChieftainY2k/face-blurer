@@ -1,6 +1,8 @@
 #!/bin/bash
 # shellcheck disable=SC2086
 
+. ./functions.sh
+
 # check variablews
 if [ -z "$THOST" ]; then
   echo "THOST is not set"
@@ -17,10 +19,6 @@ if [ -z "$TUSER" ]; then
   exit 1
 fi
 
-log_message() {
-  echo "[$(date +'%Y-%m-%d %H:%M:%S')] $@"
-}
-
 #REMOTE_SOURCE={$1:-"vi*"}
 REMOTE_SOURCE=${1:-"vi*"}
 LOCAL_DEST="/tmp/output-$THOST"
@@ -35,11 +33,11 @@ while true; do
       break
     else
       log_message "transfer failed, retrying in 10 seconds..."
-      sleep 10
+      countdown_seconds 10
     fi
   done
   log_message "transfer complete, checking if there are more files to download... , press [Ctrl+C] to stop"
-  sleep 10
+  countdown_seconds 10
 done
 
 log_message "download complete"
