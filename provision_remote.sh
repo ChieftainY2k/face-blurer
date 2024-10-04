@@ -57,6 +57,7 @@ exec_remote "curl -s https://gist.githubusercontent.com/ChieftainY2k/0a6fa487ac1
 log_message "repo clone starting"
 exec_remote "[ -d ~/face-blurer ] || git clone https://github.com/ChieftainY2k/face-blurer.git"
 exec_remote "cd face-blurer && git pull"
+exec_remote "cd face-blurer && git checkout metadata4"
 log_message "repo clone finished"
 
 # Run driver check script
