@@ -25,18 +25,7 @@ exec_remote() {
   fi
 }
 
-## Log start time
-#log_message() {
-#  local message="$1"
-#  log_message_local "$message"
-#  exec_remote "echo \"[$(date '+%Y-%m-%d %H:%M:%S')] $message\" >> /home/user/provision-log.txt"
-#}
-#
-## Log start time
-#log_message_local() {
-#  local message="$1"
-#  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"
-#}
+INFO_FILE="./input/metadata-provision"
 
 # Inject SSH keys
 echo "Injecting keys..."
@@ -45,6 +34,7 @@ cat ~/.ssh/id_rsa.pub | ssh "$TUSER@$THOST" -p "$TPORT" 'cat >> ~/.ssh/authorize
 echo "Keys injected."
 
 log_message "started"
+exec_remote "cd face-blurer && echo \"STARTED=$(date +'%Y-%m-%d %H:%M:%S')\" > ${INFO_FILE}"
 
 # set timezone to warsaw
 exec_remote "sudo timedatectl set-timezone Europe/Warsaw"
@@ -81,7 +71,7 @@ log_message "waiting..."
 countdown_seconds 10
 # wait until server is reabooted, check every 1 second
 while ! exec_remote "uptime"; do
-#  echo -n "."
+  #  echo -n "."
   log_message "still waiting..."
   countdown_seconds 3
 done
@@ -94,6 +84,8 @@ log_message "docker image build starting"
 exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
 log_message "docker image build finished"
 
+exec_remote "cd face-blurer && echo \"FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" > ${INFO_FILE}"
+
 # Uncomment if needed for rsync and Docker execution
 # rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video1.mp4 $TUSER@$THOST:/home/$TUSER/face-blurer/input/
 # exec_remote "cd face-blurer && docker run -v \$(pwd):/data linuxserver/ffmpeg -i \"/data/input/video1.mp4\" -fps_mode passthrough -q:v 0 -c:v png \"/data/input/frame_%10d.png\""
@@ -101,4 +93,3 @@ log_message "docker image build finished"
 # exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface.py"
 
 log_message "provisioning finished"
-
