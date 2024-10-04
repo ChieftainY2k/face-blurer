@@ -14,8 +14,8 @@ FPS=$(ffprobe -v 0 -select_streams v:0 -show_entries stream=r_frame_rate -of csv
 log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FPS_FFPROBE = $FPS_FFPROBE , FRAMES_COUNT = $FRAMES_COUNT"
 
 PROVISION_INFO_FILE="./input/metadata-provision"
+log_message "Waiting for provision to finish..."
 while ! grep -q "FINISHED=" "$PROVISION_INFO_FILE"; do
-  log_message "Waiting for provision to finish..."
   countdown_seconds 10
 done
 
