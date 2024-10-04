@@ -13,47 +13,59 @@ log_message() {
 #THRESHOLD=$4
 #MODE=$5
 
-log_message "Running , GPU=$GPU , INSTANCE=$INSTANCE , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE , BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 
 # change window title
-echo -ne "\033kGPU${GPU}/${INSTANCE}(${MODE}/WORK)\033\\"
+echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}\033\\"
 
 INFO_FILE="./output/metadata-worker-$MODE-$GPU-$INSTANCE"
-# save vars to local file
-echo "GPU=$GPU" > $INFO_FILE
-echo "INSTANCE=$INSTANCE" >> $INFO_FILE
-echo "DEBUG=$DEBUG" >> $INFO_FILE
-echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
-echo "MODE=$MODE" >> $INFO_FILE
-echo "BLUR_EXTRA=$BLUR_EXTRA" >> $INFO_FILE
-echo "BLUR_AHEAD=$BLUR_AHEAD" >> $INFO_FILE
-echo "BLUR_BACK=$BLUR_BACK" >> $INFO_FILE
-echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
-docker run --rm --gpus all \
-  -e CUDA_VISIBLE_DEVICES=$GPU \
-  -e DEBUG=$DEBUG \
-  -e THRESHOLD=$THRESHOLD \
-  -e MODE=$MODE \
-  -e BLUR_EXTRA=$BLUR_EXTRA \
-  -e BLUR_AHEAD=$BLUR_AHEAD \
-  -e BLUR_BACK=$BLUR_BACK \
-  -v ./app:/app \
-  -v ./input:/input:ro \
-  -v ./output:/output \
-  -v /tmp/blurer-cache/deepface:/root/.deepface \
-  -v /tmp/blurer-cache/root:/root/.cache \
-  blurer python blur_faces_retinaface.py
+while true; do
+
+  log_message "Running , GPU=$GPU , INSTANCE=$INSTANCE , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE , BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
+
+  echo "GPU=$GPU" > $INFO_FILE
+  echo "INSTANCE=$INSTANCE" >> $INFO_FILE
+  echo "DEBUG=$DEBUG" >> $INFO_FILE
+  echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
+  echo "MODE=$MODE" >> $INFO_FILE
+  echo "BLUR_EXTRA=$BLUR_EXTRA" >> $INFO_FILE
+  echo "BLUR_AHEAD=$BLUR_AHEAD" >> $INFO_FILE
+  echo "BLUR_BACK=$BLUR_BACK" >> $INFO_FILE
+  echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
+
+  docker run --rm --gpus all \
+    -e CUDA_VISIBLE_DEVICES=$GPU \
+    -e DEBUG=$DEBUG \
+    -e THRESHOLD=$THRESHOLD \
+    -e MODE=$MODE \
+    -e BLUR_EXTRA=$BLUR_EXTRA \
+    -e BLUR_AHEAD=$BLUR_AHEAD \
+    -e BLUR_BACK=$BLUR_BACK \
+    -v ./app:/app \
+    -v ./input:/input:ro \
+    -v ./output:/output \
+    -v /tmp/blurer-cache/deepface:/root/.deepface \
+    -v /tmp/blurer-cache/root:/root/.cache \
+    blurer python blur_faces_retinaface.py
+
+  EXIT_CODE=$?
+  if [ $EXIT_CODE -ne 0 ]; then
+    echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}/ERROR)\033\\"
+    echo "ERROR=$EXIT_CODE" >> $INFO_FILE
+    # change window title to DONE on success, ERROR on error
+    log_message 'Press [Enter] key to retry or [Ctrl+C] to exit...'
+    read
+  else
+    echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}/DONE)\033\\"
+    log_message "Processing finished successfully."
+  fi
+  echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
+
+  log_message "Sleeping for 60 seconds..."
+  sleep 60
+
+done
 
 # change window title to DONE on success, ERROR on error
-EXIT_CODE=$?
-if [ $EXIT_CODE -ne 0 ]; then
-  echo -ne "\033kGPU${GPU}/${INSTANCE}(${MODE}/ERROR)\033\\"
-  echo "ERROR=$EXIT_CODE" >> $INFO_FILE
-else
-  echo -ne "\033kGPU${GPU}/${INSTANCE}(${MODE}/DONE)\033\\"
-fi
-echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
-
 log_message 'Press [Enter] key to continue...'
 read
