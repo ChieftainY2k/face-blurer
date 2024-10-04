@@ -37,7 +37,7 @@ while true; do
     fi
   done
   log_message "transfer complete, checking if there are more files to download... , press [Ctrl+C] to stop"
-  countdown_seconds 10
+  countdown_seconds 30
 done
 
 log_message "download complete"
