@@ -13,6 +13,7 @@ log_message() {
 #THRESHOLD=$4
 #MODE=$5
 
+INFO_FILE="./output/metadata-worker-$MODE-$GPU-$INSTANCE"
 echo "GPU=$GPU" > $INFO_FILE
 echo "INSTANCE=$INSTANCE" >> $INFO_FILE
 echo "DEBUG=$DEBUG" >> $INFO_FILE
@@ -22,7 +23,6 @@ echo "BLUR_EXTRA=$BLUR_EXTRA" >> $INFO_FILE
 echo "BLUR_AHEAD=$BLUR_AHEAD" >> $INFO_FILE
 echo "BLUR_BACK=$BLUR_BACK" >> $INFO_FILE
 
-INFO_FILE="./output/metadata-worker-$MODE-$GPU-$INSTANCE"
 DONE_COUNT=1
 
 while true; do
