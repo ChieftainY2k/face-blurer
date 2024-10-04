@@ -8,6 +8,7 @@ import fcntl
 import shutil
 import json
 import gc
+import random
 from retinaface import RetinaFace
 
 
@@ -51,7 +52,7 @@ def blur_face(image, x1, y1, x2, y2):
     else:
         blocks = 6
 
-    blocks = blocks + random.randint(1, 3)
+    blocks += random.randint(1, 3)
 
     face_roi = image[y1:y2, x1:x2]
     h, w = face_roi.shape[:2]
