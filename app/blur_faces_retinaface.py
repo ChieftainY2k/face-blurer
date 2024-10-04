@@ -290,8 +290,8 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                 if (look_back > 0) and (idx > 0):
                     idx_from = max(0, idx - look_back)
                     idx_to = max(0, idx)
-                    metadata_exists = metadata_exists(idx_from, idx_to, image_files_list, output_dir)
-                    if not metadata_exists:
+                    is_metadata = metadata_exists(idx_from, idx_to, image_files_list, output_dir)
+                    if not is_metadata:
                         print(f", missing metadata for frames {idx_from}-{idx_to}, skipping", end="", flush=True)
                         continue
                     blurs_applied_prev = process_other_frames(
@@ -302,8 +302,8 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                 if (look_ahead > 0) and (idx < total_files_count):
                     idx_from = min(total_files_count, idx + 1)
                     idx_to = min(total_files_count, idx + look_ahead)
-                    metadata_exists = metadata_exists(idx_from, idx_to, image_files_list, output_dir)
-                    if not metadata_exists:
+                    is_metadata = metadata_exists(idx_from, idx_to, image_files_list, output_dir)
+                    if not is_metadata:
                         print(f", missing metadata for frames {idx_from}-{idx_to}, skipping", end="", flush=True)
                         continue
                     blurs_applied_next = process_other_frames(
