@@ -29,7 +29,7 @@ from retinaface import RetinaFace
 #     image[y1:y2, x1:x2] = face_roi_pixelated
 
 
-def blur_face(image, x1, y1, x2, y2, blocks=5):
+def blur_face(image, x1, y1, x2, y2):
     if x1 >= x2 or y1 >= y2:
         raise Exception(f"Invalid blur area, {x1}, {y1}, {x2}, {y2}")
 
@@ -39,6 +39,16 @@ def blur_face(image, x1, y1, x2, y2, blocks=5):
         y1 = max(0, y1 - int((y2 - y1) * blur_extra_margin_percent))
         x2 = min(image.shape[1], x2 + int((x2 - x1) * blur_extra_margin_percent))
         y2 = min(image.shape[0], y2 + int((y2 - y1) * blur_extra_margin_percent))
+
+   # Calculate the width and height of the face region
+    width = x2 - x1
+    height = y2 - y1
+
+    # Determine the number of blocks based on the size of the face region
+    if width < 300 or height < 300:
+        blocks = 2
+    else:
+        blocks = 5
 
     face_roi = image[y1:y2, x1:x2]
     h, w = face_roi.shape[:2]
