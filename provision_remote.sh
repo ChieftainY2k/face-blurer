@@ -82,7 +82,8 @@ countdown_seconds 10
 # wait until server is reabooted, check every 1 second
 while ! exec_remote "uptime"; do
 #  echo -n "."
-  sleep 1
+  log_message "still waiting..."
+  countdown_seconds 3
 done
 countdown_seconds 20
 log_message "server is up"
