@@ -17,9 +17,9 @@ log_message "Sleeping for a while..."
 sleep 15
 
 log_message "Running pass 1"
-WORKERS=5 MODE=pass1 ./run_pass.sh
+WORKERS=6 MODE=pass1 ./run_pass.sh
 log_message "Sleeping for a while..."
 sleep 15
 
 log_message "Running pass 2"
-WORKERS=7 MODE=pass2 ./run_pass.sh
+GPUS=1 WORKERS=7 MODE=pass2 ./run_pass.sh

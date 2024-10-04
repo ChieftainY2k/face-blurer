@@ -13,7 +13,9 @@ if [ -z "$STY" ]; then
 fi
 
 # Detect number of GPUS from nvisia-smi
-GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
+if [ -z "$GPUS" ]; then
+  GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
+fi
 WORKERS=${WORKERS:-6}
 
 log_message "GPUS=$GPUS , WORKERS=$WORKERS , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE, BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
