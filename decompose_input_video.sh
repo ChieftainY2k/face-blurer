@@ -1,11 +1,7 @@
 #!/bin/bash
 # shellcheck disable=SC2129
-set -e
 
-log_message() {
-  local message="$1"
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"
-}
+. ./functions.sh
 
 SOURCE=${1:-"input/video1.mp4"}
 
@@ -16,6 +12,13 @@ FPS_FFPROBE=$(ffprobe -v 0 -select_streams v:0 -show_entries stream=r_frame_rate
 FPS=$(ffprobe -v 0 -select_streams v:0 -show_entries stream=r_frame_rate -of csv=p=0 "$SOURCE" | bc -l)
 
 log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FPS_FFPROBE = $FPS_FFPROBE , FRAMES_COUNT = $FRAMES_COUNT"
+
+PROVISION_INFO_FILE="./input/metadata-provision"
+while ! grep -q "FINISHED=" "$PROVISION_INFO_FILE"; do
+  log_message "Waiting for provision to finish..."
+  countdown_seconds 10
+done
+
 log_message "Press [Enter] key to continue..."
 read
 
