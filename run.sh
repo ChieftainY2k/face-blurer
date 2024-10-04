@@ -20,7 +20,7 @@ log_message "GPUS=$GPUS , WORKERS=$WORKERS , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD
 log_message "Press [Enter] key to continue..."
 read
 
-INFO_FILE="./output/metadata-run"
+INFO_FILE="./output/metadata-run-$MODE"
 # save vars to local file
 echo "DEBUG=$DEBUG" > $INFO_FILE
 echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
