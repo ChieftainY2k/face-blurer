@@ -18,7 +18,7 @@ log_message "Running , GPU=$GPU , INSTANCE=$INSTANCE , DEBUG=$DEBUG , THRESHOLD=
 # change window title
 echo -ne "\033kGPU${GPU}/${INSTANCE}(${MODE}/WORK)\033\\"
 
-INFO_FILE="./output/metadata-worker-$GPU-$INSTANCE"
+INFO_FILE="./output/metadata-worker-$MODE-$GPU-$INSTANCE"
 # save vars to local file
 echo "GPU=$GPU" > $INFO_FILE
 echo "INSTANCE=$INSTANCE" >> $INFO_FILE
