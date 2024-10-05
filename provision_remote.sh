@@ -97,6 +97,6 @@ exec_remote "echo \"DOCKER_IMAGE_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" > ${INF
 
 log_message "provisioning finished"
 
-if [ -n "$VIDEO" ]; then
-  ./upload_video.sh "$VIDEO"
-fi
+#if [ -n "$VIDEO" ]; then
+#  ./upload_video.sh "$VIDEO"
+#fi
