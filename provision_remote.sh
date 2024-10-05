@@ -94,3 +94,7 @@ exec_remote "echo \"FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" > ${INFO_FILE}"
 # exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface.py"
 
 log_message "provisioning finished"
+
+if [ -n "$VIDEO" ]; then
+  ./upload_video.sh "$VIDEO"
+fi

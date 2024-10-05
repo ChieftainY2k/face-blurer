@@ -12,6 +12,11 @@ FPS_FFPROBE=$(ffprobe -v 0 -select_streams v:0 -show_entries stream=r_frame_rate
 FPS=$(ffprobe -v 0 -select_streams v:0 -show_entries stream=r_frame_rate -of csv=p=0 "$SOURCE" | bc -l)
 
 log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FPS_FFPROBE = $FPS_FFPROBE , FRAMES_COUNT = $FRAMES_COUNT"
+# if any is empty, quit
+if [ -z "$FRAMES_COUNT" ] || [ -z "$RESOLUTION" ] || [ -z "$FPS" ] || [ -z "$FPS_FFPROBE" ]; then
+  log_message "Error getting metadata, quitting..."
+  exit 1
+fi
 
 PROVISION_INFO_FILE="../metadata-provision"
 log_message "Waiting for provision to finish..."
