@@ -24,6 +24,8 @@ REMOTE_SOURCE=${1:-"vi*"}
 LOCAL_DEST="/tmp/output-$THOST"
 #echo "Downloading '$REMOTE_SOURCE' files from $THOST"
 
+mkdir -p $LOCAL_DEST
+
 # Loop until transfer is complete
 while true; do
   while true; do
