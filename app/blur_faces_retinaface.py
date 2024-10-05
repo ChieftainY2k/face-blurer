@@ -294,7 +294,7 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                 # look_ahead = 5
 
                 if metadata_missing_count > 100:
-                    print(f"Too many metadata files missing ({metadata_missing_count}), aborting further processing.")
+                    print(f", too many metadata files missing ({metadata_missing_count}), aborting further processing.")
                     break
 
                 if (look_back > 0) and (idx > 0):
