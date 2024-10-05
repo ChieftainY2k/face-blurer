@@ -381,11 +381,15 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
 
             if not metadata_data:
                 print(f", saving metadata", end="", flush=True)
+                save_start_time = time.time()
                 json_output_path = os.path.join(output_dir+ "/metadata/", filename) + f".{score_threshold_decimal}.metadata.json"
                 json_output_path_tmp = json_output_path + ".tmp"
                 with open(json_output_path_tmp, 'w') as json_file:
                     json.dump(detected_faces_data, json_file, indent=4)
                 os.rename(json_output_path_tmp, json_output_path)
+                save_time = time.time() - save_start_time
+                print(f" ({save_time:.2f}s)", end="", flush=True)
+
             else:
                 if is_pass2:
                     print(f", blurring from metadata", end="", flush=True)
