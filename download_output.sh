@@ -21,7 +21,7 @@ fi
 
 
 #REMOTE_SOURCE={$1:-"vi*"}
-REMOTE_SOURCE=${1:-"vi*"}
+REMOTE_SOURCE=${1:-"video"}
 LOCAL_DEST="/tmp/output-$THOST"
 
 mkdir -p $LOCAL_DEST
@@ -31,7 +31,7 @@ check_error "Failed to create directory $LOCAL_DEST"
 while true; do
   while true; do
     log_message "downloading '$REMOTE_SOURCE' files from $THOST to $LOCAL_DEST"
-    rsync -avz --partial --info=progress2 -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/$REMOTE_SOURCE $LOCAL_DEST
+    rsync -ravz --partial --info=progress2 -e "ssh -p $TPORT" $TUSER@$THOST:/home/$TUSER/face-blurer/output/$REMOTE_SOURCE $LOCAL_DEST
     if [ $? -eq 0 ]; then
       break
     else

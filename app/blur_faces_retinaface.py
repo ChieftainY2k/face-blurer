@@ -293,6 +293,10 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                 # look_back = 10
                 # look_ahead = 5
 
+                if metadata_missing_count > 100:
+                    print(f"Too many metadata files missing ({metadata_missing_count}), aborting further processing.")
+                    break
+
                 if (look_back > 0) and (idx > 0):
                     idx_from = max(0, idx - look_back)
                     idx_to = max(0, idx)
@@ -320,10 +324,6 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                         score_threshold_decimal, score_threshold, is_debug_mode
                     )
                 image_is_modified = blurs_applied_prev or blurs_applied_next
-
-                if metadata_missing_count > 100:
-                    print(f"Too many metadata files missing ({metadata_missing_count}), aborting further processing.")
-                    break
 
             # load metadata
             metadata_data = None
