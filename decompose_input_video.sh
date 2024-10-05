@@ -35,7 +35,6 @@ log_message "Provision finished, continuing..."
 #log_message "Press [Enter] key to continue..."
 #read
 
-
 log_message "Collecting metadata..."
 INFO_FILE="./input/metadata-decompose"
 # save vars to local file
