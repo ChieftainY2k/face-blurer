@@ -11,12 +11,19 @@ RESOLUTION=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,hei
 FPS_FFPROBE=$(ffprobe -v 0 -select_streams v:0 -show_entries stream=r_frame_rate -of csv=p=0 "$SOURCE")
 FPS=$(ffprobe -v 0 -select_streams v:0 -show_entries stream=r_frame_rate -of csv=p=0 "$SOURCE" | bc -l)
 
-log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FPS_FFPROBE = $FPS_FFPROBE , FRAMES_COUNT = $FRAMES_COUNT"
 # if any is empty, quit
-if [ -z "$FRAMES_COUNT" ] || [ -z "$RESOLUTION" ] || [ -z "$FPS" ] || [ -z "$FPS_FFPROBE" ]; then
-  log_message "Error getting metadata, quitting..."
-  exit 1
-fi
+while true; do
+  if [ -z "$FRAMES_COUNT" ] || [ -z "$RESOLUTION" ] || [ -z "$FPS" ] || [ -z "$FPS_FFPROBE" ]; then
+    log_message "Error getting metadata, quitting..."
+    countdown_seconds 10
+  else
+    break
+  fi
+done
+
+log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FPS_FFPROBE = $FPS_FFPROBE , FRAMES_COUNT = $FRAMES_COUNT"
+log_message "waiting for a while..."
+countdown_seconds 15
 
 PROVISION_INFO_FILE="../metadata-provision"
 log_message "Waiting for provision to finish..."
@@ -28,19 +35,17 @@ log_message "Provision finished, continuing..."
 #log_message "Press [Enter] key to continue..."
 #read
 
-log_message "waiting for a while..."
-countdown_seconds 15
 
 log_message "Collecting metadata..."
 INFO_FILE="./input/metadata-decompose"
 # save vars to local file
-echo "SOURCE=$SOURCE" > $INFO_FILE
-echo "RESOLUTION=$RESOLUTION" >> $INFO_FILE
-echo "FRAMES_COUNT=$FRAMES_COUNT" >> $INFO_FILE
-echo "FPS=$FPS" >> $INFO_FILE
-echo "FPS_FFPROBE=$FPS_FFPROBE" >> $INFO_FILE
-echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
-echo "MD5_HASH=$(md5sum "$SOURCE" | awk '{ print $1 }')" >> $INFO_FILE
+echo "SOURCE=$SOURCE" >$INFO_FILE
+echo "RESOLUTION=$RESOLUTION" >>$INFO_FILE
+echo "FRAMES_COUNT=$FRAMES_COUNT" >>$INFO_FILE
+echo "FPS=$FPS" >>$INFO_FILE
+echo "FPS_FFPROBE=$FPS_FFPROBE" >>$INFO_FILE
+echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >>$INFO_FILE
+echo "MD5_HASH=$(md5sum "$SOURCE" | awk '{ print $1 }')" >>$INFO_FILE
 log_message "Metadata saved to $INFO_FILE"
 cat $INFO_FILE
 
@@ -60,6 +65,6 @@ fi
 # set starting and ending frame
 #FRAME_FIRST=1000 FRAME_LAST=1100 ffmpeg -i input/video.mp4 -start_number $FRAME_FIRST -vf trim=start_frame=$FRAME_FIRST:end_frame=$FRAME_LAST -q:v 0 -vsync vfr -c:v png "input/frame_%10d.png"
 
-echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
+echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >>$INFO_FILE
 log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FPS_FFPROBE = $FPS_FFPROBE , FRAMES_COUNT = $FRAMES_COUNT"
 log_message "Finished decomposing video $SOURCE"
