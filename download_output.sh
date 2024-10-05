@@ -19,12 +19,13 @@ if [ -z "$TUSER" ]; then
   exit 1
 fi
 
+
 #REMOTE_SOURCE={$1:-"vi*"}
 REMOTE_SOURCE=${1:-"vi*"}
 LOCAL_DEST="/tmp/output-$THOST"
-#echo "Downloading '$REMOTE_SOURCE' files from $THOST"
 
 mkdir -p $LOCAL_DEST
+check_error "Failed to create directory $LOCAL_DEST"
 
 # Loop until transfer is complete
 while true; do
