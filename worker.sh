@@ -55,6 +55,7 @@ while true; do
   fi
   echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
+  echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}/SLEEP(${DONE_COUNT})\033\\"
   log_message "Sleeping..."
   countdown_seconds 120
 
