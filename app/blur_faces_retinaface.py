@@ -186,6 +186,7 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
     eta_minutes = 0
     eta_seconds = 0
     percent_complete = 0
+    metadata_missing_count = 0
 
     total_files_count = len(image_files_list)
     processed_files = 0
@@ -291,12 +292,18 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                 blurs_applied_next = False
                 # look_back = 10
                 # look_ahead = 5
+
+                if metadata_missing_count > 100:
+                    print(f"Too many metadata files are missing ({metadata_missing_count}), aborting further processing.")
+                    break
+
                 if (look_back > 0) and (idx > 0):
                     idx_from = max(0, idx - look_back)
                     idx_to = max(0, idx)
                     is_metadata = metadata_exists(idx_from, idx_to, image_files_list, score_threshold_decimal, output_dir)
                     if not is_metadata:
-                        print(f", missing metadata for frames {idx_from}-{idx_to}, skipping", end="", flush=True)
+                        print(f", missing metadata for frames {idx_from}-{idx_to}, skipping ({metadata_missing_count})", end="", flush=True)
+                        metadata_missing_count += 1
                         continue
                     blurs_applied_prev = process_other_frames(
                         idx,idx_from, idx_to,
@@ -308,7 +315,8 @@ def blur_faces_in_directory(input_dir, output_dir, is_debug_mode, score_threshol
                     idx_to = min(total_files_count, idx + look_ahead)
                     is_metadata = metadata_exists(idx_from, idx_to, image_files_list, score_threshold_decimal, output_dir)
                     if not is_metadata:
-                        print(f", missing metadata for frames {idx_from}-{idx_to}, skipping", end="", flush=True)
+                        print(f", missing metadata for frames {idx_from}-{idx_to}, skipping ({metadata_missing_count})", end="", flush=True)
+                        metadata_missing_count += 1
                         continue
                     blurs_applied_next = process_other_frames(
                         idx, idx_from, idx_to,
