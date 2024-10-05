@@ -41,13 +41,13 @@ while true; do
 
   EXIT_CODE=$?
   if [ $EXIT_CODE -ne 0 ]; then
-    echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}/ERROR)\033\\"
+    echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}/ERR(${DONE_COUNT}))\033\\"
     echo "ERROR=$EXIT_CODE" >> $INFO_FILE
     # change window title to DONE on success, ERROR on error
     log_message 'Press [Enter] key to retry or [Ctrl+C] to exit...'
     read
   else
-    echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}/DONE(${DONE_COUNT})\033\\"
+    echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}/OK(${DONE_COUNT})\033\\"
     echo "DONE=1" >> $INFO_FILE
     echo "DONE_COUNT=$DONE_COUNT" >> $INFO_FILE
     DONE_COUNT=$((DONE_COUNT + 1))
@@ -55,7 +55,7 @@ while true; do
   fi
   echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
-  echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}/SLEEP(${DONE_COUNT})\033\\"
+  echo -ne "\033kGPU${GPU}/${INSTANCE}/${MODE}/SLP(${DONE_COUNT})\033\\"
   log_message "Sleeping..."
   countdown_seconds 120
 
