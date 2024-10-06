@@ -55,12 +55,12 @@ while true; do
   fi
   echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
 
-  echo -ne "\033k${GPU}/${INSTANCE}/${MODE}/SLP(${DONE_COUNT})\033\\"
+  echo -ne "\033kG${GPU}/${INSTANCE}/${MODE}/SLP(${DONE_COUNT})\033\\"
   log_message "Sleeping..."
   countdown_seconds 120
 
 done
 
-echo -ne "\033k${GPU}/${INSTANCE}/${MODE}/DONE(${DONE_COUNT})\033\\"
+echo -ne "\033kG${GPU}/${INSTANCE}/${MODE}/DONE(${DONE_COUNT})\033\\"
 log_message 'Press [Enter] key to continue...'
 read
