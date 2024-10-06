@@ -39,7 +39,7 @@ for ((gpu_idx = 0; gpu_idx < GPUS; gpu_idx++)); do
   for ((worker_idx = 0; worker_idx < WORKERS; worker_idx++)); do
     log_message "Running on GPU ${gpu_idx}/${GPUS} , worker ${worker_idx}/${WORKERS} , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE ..."
     #screen -t "GPU${gpu_idx}/${worker_idx}" -- ./worker.sh "$gpu_idx" "$worker_idx" "$DEBUG" "$THRESHOLD" "$MODE"
-    screen -t "G${gpu_idx}/${worker_idx}" -- bash -c "GPU=${gpu_idx} INSTANCE=${worker_idx} DEBUG=${DEBUG} THRESHOLD=${THRESHOLD} MODE=${MODE} BLUR_EXTRA=$BLUR_EXTRA BLUR_AHEAD=$BLUR_AHEAD BLUR_BACK=$BLUR_BACK ./worker.sh"
+    screen -t "$MODE/G${gpu_idx}/${worker_idx}" -- bash -c "GPU=${gpu_idx} INSTANCE=${worker_idx} DEBUG=${DEBUG} THRESHOLD=${THRESHOLD} MODE=${MODE} BLUR_EXTRA=$BLUR_EXTRA BLUR_AHEAD=$BLUR_AHEAD BLUR_BACK=$BLUR_BACK ./worker.sh"
     countdown_seconds 30
   done
 done
