@@ -34,7 +34,8 @@ cat ~/.ssh/id_rsa.pub | ssh "$TUSER@$THOST" -p "$TPORT" 'cat >> ~/.ssh/authorize
 echo "Keys injected."
 
 log_message "started"
-exec_remote "echo \"STARTED=$(date +'%Y-%m-%d %H:%M:%S')\" > ${INFO_FILE}"
+exec_remote "touch ${INFO_FILE}"
+exec_remote "echo \"STARTED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE}"
 
 # set timezone to warsaw
 exec_remote "sudo timedatectl set-timezone Europe/Warsaw"
