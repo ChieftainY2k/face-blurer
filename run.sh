@@ -1,6 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC2086,SC2129
-set -e
+#set -e
 
 . ./functions.sh
 
@@ -10,7 +10,7 @@ if [ -z "$STY" ]; then
   exit 1
 fi
 
-log_message "DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE, BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
+log_message "DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 
 PROVISION_INFO_FILE="../metadata-provision"
 log_message "Waiting for provision to finish..."
@@ -23,9 +23,9 @@ log_message "Sleeping for a while..."
 countdown_seconds 10
 
 log_message "Running pass 1"
-WORKERS=6 MODE=pass1 ./run_pass.sh
+MODE=pass1 DEBUG=$DEBUG WORKERS=6 BLUR_EXTRA=$BLUR_EXTRA BLUR_AHEAD=$BLUR_AHEAD BLUR_BACK=$BLUR_BACK ./run_pass.sh
 log_message "Sleeping for a while..."
 countdown_seconds 10
 
 log_message "Running pass 2"
-GPUS=1 WORKERS=7 MODE=pass2 ./run_pass.sh
+MODE=pass2 DEBUG=$DEBUG GPUS=1 WORKERS=7 BLUR_EXTRA=$BLUR_EXTRA BLUR_AHEAD=$BLUR_AHEAD BLUR_BACK=$BLUR_BACK ./run_pass.sh
