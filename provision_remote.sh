@@ -57,7 +57,7 @@ exec_remote "curl -s https://gist.githubusercontent.com/ChieftainY2k/0a6fa487ac1
 log_message "repo clone starting"
 exec_remote "[ -d ~/face-blurer ] || git clone https://github.com/ChieftainY2k/face-blurer.git"
 exec_remote "cd face-blurer && git pull"
-exec_remote "cd face-blurer && git checkout metadata4"
+exec_remote "cd face-blurer && git checkout metadata5"
 log_message "repo clone finished"
 
 # Run driver check script
@@ -80,14 +80,14 @@ countdown_seconds 20
 log_message "server is up"
 exec_remote nvidia-smi
 
-exec_remote "echo \"PROVISIONING_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" > ${INFO_FILE}"
+exec_remote "echo \"PROVISIONING_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE}"
 
 # Build Docker image
 log_message "docker image build starting"
 exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
 log_message "docker image build finished"
 
-exec_remote "echo \"DOCKER_BUILD_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" > ${INFO_FILE}"
+exec_remote "echo \"DOCKER_BUILD_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE}"
 
 # Uncomment if needed for rsync and Docker execution
 # rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video1.mp4 $TUSER@$THOST:/home/$TUSER/face-blurer/input/
