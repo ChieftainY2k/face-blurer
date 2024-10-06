@@ -5,24 +5,27 @@
 . ./functions.sh
 
 INFO_FILE="./output/metadata-worker-$MODE-$GPU-$INSTANCE"
-echo "GPU=$GPU" > $INFO_FILE
-echo "INSTANCE=$INSTANCE" >> $INFO_FILE
-echo "DEBUG=$DEBUG" >> $INFO_FILE
-echo "THRESHOLD=$THRESHOLD" >> $INFO_FILE
-echo "MODE=$MODE" >> $INFO_FILE
-echo "BLUR_EXTRA=$BLUR_EXTRA" >> $INFO_FILE
-echo "BLUR_AHEAD=$BLUR_AHEAD" >> $INFO_FILE
-echo "BLUR_BACK=$BLUR_BACK" >> $INFO_FILE
+echo "GPU=$GPU" >$INFO_FILE
+echo "INSTANCE=$INSTANCE" >>$INFO_FILE
+echo "DEBUG=$DEBUG" >>$INFO_FILE
+echo "THRESHOLD=$THRESHOLD" >>$INFO_FILE
+echo "MODE=$MODE" >>$INFO_FILE
+echo "BLUR_EXTRA=$BLUR_EXTRA" >>$INFO_FILE
+echo "BLUR_AHEAD=$BLUR_AHEAD" >>$INFO_FILE
+echo "BLUR_BACK=$BLUR_BACK" >>$INFO_FILE
 
-DONE_COUNT=1
+LOOP_COUNT=0
 
 while true; do
 
-  echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}(${DONE_COUNT})\033\\"
+  LOOP_COUNT=$((LOOP_COUNT + 1))
+  echo "LOOP_COUNT=$LOOP_COUNT" >>$INFO_FILE
+
+  echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}(${LOOP_COUNT})\033\\"
 
   log_message "Running , GPU=$GPU , INSTANCE=$INSTANCE , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE , BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 
-  echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
+  echo "STARTED=$(date +'%Y-%m-%d %H:%M:%S')" >>$INFO_FILE
 
   docker run --rm --gpus all \
     -e CUDA_VISIBLE_DEVICES=$GPU \
@@ -41,26 +44,29 @@ while true; do
 
   EXIT_CODE=$?
   if [ $EXIT_CODE -ne 0 ]; then
-    echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}(${DONE_COUNT})/ERR\033\\"
-    echo "ERROR=$EXIT_CODE" >> $INFO_FILE
-    # change window title to DONE on success, ERROR on error
-    log_message 'Press [Enter] key to retry or [Ctrl+C] to exit...'
-    read
-  else
-    echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}(${DONE_COUNT})/OK\033\\"
-    echo "DONE=1" >> $INFO_FILE
-    echo "DONE_COUNT=$DONE_COUNT" >> $INFO_FILE
-    DONE_COUNT=$((DONE_COUNT + 1))
-    log_message "Processing finished successfully."
-  fi
-  echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
+    log_message "Error occurred. Exit code: $EXIT_CODE"
+    echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}(${LOOP_COUNT})/ERR\033\\"
+    echo "ERROR=$EXIT_CODE" >>$INFO_FILE
+    #    log_message 'Press [Enter] key to retry or [Ctrl+C] to exit...'
+    #    read
+    #    echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}/${MODE}(${LOOP_COUNT})/S\033\\"
+    log_message "Sleeping..."
+    countdown_seconds 600
 
-  echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}/${MODE}(${DONE_COUNT})/SLEEP\033\\"
-  log_message "Sleeping..."
-  countdown_seconds 120
+  else
+    log_message "Processing finished successfully."
+    echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}(${LOOP_COUNT})/OK\033\\"
+    echo "DONE=1" >>$INFO_FILE
+    #    echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}/${MODE}(${LOOP_COUNT})/SLEEP\033\\"
+    log_message "Sleeping..."
+    countdown_seconds 120
+
+  fi
+  
+  echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >>$INFO_FILE
 
 done
 
-#echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}(${DONE_COUNT})/EXIT\033\\"
+#echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}(${LOOP_COUNT})/EXIT\033\\"
 #log_message 'Press [Enter] key to continue...'
 #read
