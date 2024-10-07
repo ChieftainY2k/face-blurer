@@ -13,8 +13,8 @@ fi
 log_message "DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 
 PROVISION_INFO_FILE="../metadata-provision"
-log_message "Waiting for docker builds to finish..."
 while ! grep -q "DOCKER_BUILD_FINISHED=" "$PROVISION_INFO_FILE"; do
+  log_message "Waiting for docker builds to finish..."
   countdown_seconds 10
 done
 log_message "Docker build finished"
