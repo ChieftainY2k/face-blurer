@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2086
 set -ex
 
 . ./functions.sh
@@ -12,7 +13,7 @@ fi
 function update_drivers() {
   # Unhold NVIDIA packages if held
   #apt-mark unhold $(dpkg --get-selections | grep hold | awk '{print $1}')
-  held_packages=$(dpkg --get-selections | grep hold | awk '{print $1}')
+  local held_packages=$(dpkg --get-selections | grep hold | awk '{print $1}')
   if [ -n "$held_packages" ]; then
     apt-mark unhold $held_packages
   fi
