@@ -53,13 +53,13 @@ cat $INFO_FILE
 log_message "Decomposing video $SOURCE ..."
 set_sceen_name "Decomposing(working)"
 
-if [ -z "$NOCUDA" ]; then
-  log_message "Using ffmpeg with cuda"
-  ffmpeg -hwaccel cuda -i "$SOURCE" -q:v 0 -c:v png -n "input/frame_%10d.png"
-else
-  log_message "Using ffmpeg without cuda"
-  ffmpeg -i "$SOURCE" -q:v 0 -c:v png -n "input/frame_%10d.png"
-fi
+#if [ -z "$NOCUDA" ]; then
+#  log_message "Using ffmpeg with cuda"
+#  ffmpeg -hwaccel cuda -i "$SOURCE" -q:v 0 -c:v png -n "input/frame_%10d.png"
+#else
+log_message "Using ffmpeg without cuda"
+ffmpeg -i "$SOURCE" -q:v 0 -c:v png -n "input/frame_%10d.png"
+#fi
 
 #docker run --gpus all -v $(pwd):/data linuxserver/ffmpeg -i "/data/$SOURCE" -q:v 0 -c:v png -n "/data/input/frame_%10d.png"
 
