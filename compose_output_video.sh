@@ -41,6 +41,8 @@ log_message() {
 #log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FPS_FFPROBE = $FPS_FFPROBE , FRAMES_COUNT = $FRAMES_COUNT"
 #log_message "Finished decomposing video $SOURCE"
 
+set_sceen_name "Composing(wait)"
+
 # Define variables from the metadata file
 INFO_FILE="./input/metadata-decompose"
 INFO_FILE_RUN="./output/metadata-run-pass1"
@@ -80,5 +82,6 @@ log_message "About to exec the command: $COMMAND"
 log_message "Press [Enter] key to continue..."
 read
 
-# run the command
+set_sceen_name "Composing(working)"
 eval $COMMAND
+set_sceen_name "Composing(DONE)"
