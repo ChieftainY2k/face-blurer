@@ -50,6 +50,7 @@ cat $INFO_FILE
 
 # decompose video to frames
 log_message "Decomposing video $SOURCE ..."
+set_sceen_name "Decomposing"
 
 if [ -z "$NOCUDA" ]; then
   log_message "Using ffmpeg with cuda"
@@ -67,3 +68,4 @@ fi
 echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >>$INFO_FILE
 log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FPS_FFPROBE = $FPS_FFPROBE , FRAMES_COUNT = $FRAMES_COUNT"
 log_message "Finished decomposing video $SOURCE"
+set_sceen_name "Decomposing(DONE)"
