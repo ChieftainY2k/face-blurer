@@ -99,6 +99,3 @@ exec_remote "echo \"DOCKER_BUILD_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${IN
 
 log_message "provisioning finished"
 
-#if [ -n "$VIDEO" ]; then
-#  ./upload_video.sh "$VIDEO"
-#fi
