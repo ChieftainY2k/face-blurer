@@ -76,8 +76,9 @@ COMMAND="ffmpeg -r \"$FPS\" -hwaccel \"cuda\" -f image2 -s \"$RESOLUTION\" -i \"
 
 # show command , wait for ENTER
 log_message "About to exec the command: $COMMAND"
-log_message "Press [Enter] key to continue..."
-read
+#log_message "Press [Enter] key to continue..."
+#read
+countdown_seconds 15
 
 set_sceen_name "Composing(working)"
 eval $COMMAND
