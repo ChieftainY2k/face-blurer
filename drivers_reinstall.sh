@@ -63,17 +63,14 @@ log_message "Metadata saved to $INFO_FILE"
 if [[ $NVIDIA_VERSION == 535.* ]]; then
   log_message "Driver version is 535.xxxx. Proceeding with drivers update."
   update_drivers
-  install_docker_support
   echo "DRIVERS_NEED_UPDATE=1" >> $INFO_FILE
 elif [[ $NVIDIA_VERSION == 550.* ]]; then
   log_message "Driver version is 550. That's OK."
   sudo apt-get install -y libnvidia-encode-550
-  install_docker_support
   echo "DRIVERS_OK=1" >> $INFO_FILE
   exit 0
 elif [[ $NVIDIA_VERSION == 545.* ]]; then
   log_message "Driver version is 545. That's OK."
-  install_docker_support
   echo "DRIVERS_OK=1" >> $INFO_FILE
   exit 0
 else
@@ -83,7 +80,7 @@ else
 fi
 
 #update_drivers
-#install_docker_support
+install_docker_support
 
 echo "DRIVERS_UPDATED=1" >> $INFO_FILE
 echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
