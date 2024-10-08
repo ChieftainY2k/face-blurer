@@ -72,6 +72,7 @@ exec_remote "sudo bash -c \"sleep 3 && sudo reboot\" &"
 log_message "waiting..."
 countdown_seconds 10
 # wait until server is reabooted, check every 1 second
+set +e
 while ! exec_remote "uptime"; do
   #  echo -n "."
   log_message "still waiting..."
@@ -79,6 +80,8 @@ while ! exec_remote "uptime"; do
 done
 countdown_seconds 20
 log_message "server is up"
+
+set -e
 exec_remote nvidia-smi
 
 exec_remote "echo \"PROVISIONING_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE}"

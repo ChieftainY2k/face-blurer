@@ -61,14 +61,18 @@ log_message "Metadata saved to $INFO_FILE"
 
 # Check if the driver version is 535.xxxx
 if [[ $NVIDIA_VERSION == 535.* ]]; then
-  log_message "Driver version is 535.xxxx. Proceeding with drivers update."
-  update_drivers
+  log_message "Driver version needs to be upgraded. Proceeding with drivers update."
   echo "DRIVERS_NEED_UPDATE=1" >> $INFO_FILE
+  update_drivers
 elif [[ $NVIDIA_VERSION == 550.* ]]; then
-  log_message "Driver version is 550. That's OK."
-  sudo apt-get install -y libnvidia-encode-550
-  echo "DRIVERS_OK=1" >> $INFO_FILE
-  exit 0
+  log_message "Driver version needs to be upgraded. Proceeding with drivers update."
+  echo "DRIVERS_NEED_UPDATE=1" >> $INFO_FILE
+  update_drivers
+#elif [[ $NVIDIA_VERSION == 550.* ]]; then
+#  log_message "Driver version is 550. That's OK."
+#  sudo apt-get install -y libnvidia-encode-550 nvidia-utils-550
+#  echo "DRIVERS_OK=1" >> $INFO_FILE
+#  exit 0
 elif [[ $NVIDIA_VERSION == 545.* ]]; then
   log_message "Driver version is 545. That's OK."
   echo "DRIVERS_OK=1" >> $INFO_FILE
