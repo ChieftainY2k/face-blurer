@@ -6,4 +6,4 @@
 # change window title
 set_sceen_name "INFO"
 
-watch -c -n 3 'uptime; free; pydf; nvidia-smi; ls output/*.lock; for file in output/metadata-*; do echo "$file : $(tail -n 1 "$file")"; done'
+watch -c -n 3 'uptime; free; pydf; nvidia-smi; for file in output/metadata-*; do echo "$file : $(tail -n 1 "$file")"; done; ls output/*.lock; '
