@@ -70,6 +70,7 @@ elif [[ $NVIDIA_VERSION == 550.* ]]; then
   exit 0
 elif [[ $NVIDIA_VERSION == 545.* ]]; then
   log_message "Driver version is 545. That's OK."
+  install_docker_support
   echo "DRIVERS_OK=1" >> $INFO_FILE
   exit 0
 else
