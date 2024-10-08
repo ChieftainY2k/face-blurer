@@ -73,6 +73,8 @@ mkdir -p "output/video"
 
 # Use variables in the ffmpeg command
 COMMAND="ffmpeg -y -r \"$FPS\" -hwaccel \"cuda\" -f image2 -s \"$RESOLUTION\" -i \"output/frame_%10d.png.${FILE_MARKER}.png\" -c:v h264_nvenc -preset slow -cq 20  \"output/video/video-${MD5_HASH}-${RESOLUTION}-${FPS}fps-${FILE_MARKER}-th${THRESHOLD}-be${BLUR_EXTRA}-ba${BLUR_AHEAD}-bb${BLUR_BACK}.mp4\" "
+
+# use this command to add audio to the video
 # ffmpeg -y -r 30.00000000000000000000 -hwaccel cuda -f image2 -s 1920x1080 -i "output/frame_%10d.png.blurred.png" -i input/video1.mp4 -map 0:v -map 1:a? -c:v h264_nvenc -preset slow -cq 20 -shortest "output/video/video-2eb3b8795e6d96c8985d0b4506e2ea85-1920x1080-30fps-blurred-th0.3-be-ba-bb-audio.mp4"
 
 # show command , wait for ENTER
