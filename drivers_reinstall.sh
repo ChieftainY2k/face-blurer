@@ -64,6 +64,7 @@ if [[ $NVIDIA_VERSION == 535.* ]]; then
   log_message "Driver version needs to be upgraded. Proceeding with drivers update."
   echo "DRIVERS_NEED_UPDATE=1" >> $INFO_FILE
   update_drivers
+  install_docker_support
 #elif [[ $NVIDIA_VERSION == 550.* ]]; then
 #  log_message "Driver version needs to be upgraded. Proceeding with drivers update."
 #  echo "DRIVERS_NEED_UPDATE=1" >> $INFO_FILE
@@ -74,12 +75,14 @@ if [[ $NVIDIA_VERSION == 535.* ]]; then
 #  echo "DRIVERS_OK=1" >> $INFO_FILE
 #  exit 0
 elif [[ $NVIDIA_VERSION == 550.* ]]; then
-  log_message "Driver version is 545. That's OK."
+  log_message "Driver version is 550. That's OK."
   echo "DRIVERS_OK=1" >> $INFO_FILE
+  install_docker_support
   exit 0
-elif [[ $NVIDIA_VERSION == 500.* ]]; then
+elif [[ $NVIDIA_VERSION == 545.* ]]; then
   log_message "Driver version is 545. That's OK."
   echo "DRIVERS_OK=1" >> $INFO_FILE
+  install_docker_support
   exit 0
 else
   echo "DRIVERS_ERROR=1" >> $INFO_FILE
@@ -88,7 +91,6 @@ else
 fi
 
 #update_drivers
-install_docker_support
 
 echo "DRIVERS_UPDATED=1" >> $INFO_FILE
 echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
