@@ -21,6 +21,7 @@ while true; do
   fi
 done
 
+set_sceen_name "Decomposing(wait)"
 log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FPS_FFPROBE = $FPS_FFPROBE , FRAMES_COUNT = $FRAMES_COUNT"
 log_message "waiting for a while..."
 countdown_seconds 15
@@ -50,7 +51,7 @@ cat $INFO_FILE
 
 # decompose video to frames
 log_message "Decomposing video $SOURCE ..."
-set_sceen_name "Decomposing"
+set_sceen_name "Decomposing(working)"
 
 if [ -z "$NOCUDA" ]; then
   log_message "Using ffmpeg with cuda"
