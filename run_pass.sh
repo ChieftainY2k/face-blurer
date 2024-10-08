@@ -43,3 +43,5 @@ for ((gpu_idx = 0; gpu_idx < GPUS; gpu_idx++)); do
     countdown_seconds 30
   done
 done
+
+echo "FINISHED=$(date +'%Y-%m-%d %H:%M:%S')" >> $INFO_FILE
