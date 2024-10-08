@@ -41,11 +41,11 @@ set -e
 set_sceen_name "Composing(wait)"
 
 # Define variables from the metadata file
-INFO_FILE="./input/metadata-decompose"
+INFO_FILE_DECOMPOSE="./input/metadata-decompose"
 INFO_FILE_RUN="./output/metadata-run-pass1"
-RESOLUTION=$(grep 'RESOLUTION=' $INFO_FILE | cut -d '=' -f 2)
-FPS=$(grep 'FPS=' $INFO_FILE | cut -d '=' -f 2)
-MD5_HASH=$(grep 'MD5_HASH=' $INFO_FILE | cut -d '=' -f 2)
+RESOLUTION=$(grep 'RESOLUTION=' $INFO_FILE_DECOMPOSE | cut -d '=' -f 2)
+FPS=$(grep 'FPS=' $INFO_FILE_DECOMPOSE | cut -d '=' -f 2)
+MD5_HASH=$(grep 'MD5_HASH=' $INFO_FILE_DECOMPOSE | cut -d '=' -f 2)
 DEBUG=$(grep 'DEBUG=' $INFO_FILE_RUN | cut -d '=' -f 2)
 THRESHOLD=$(grep 'THRESHOLD=' $INFO_FILE_RUN | cut -d '=' -f 2)
 BLUR_EXTRA=$(grep 'BLUR_EXTRA=' $INFO_FILE_RUN | cut -d '=' -f 2)
@@ -54,7 +54,7 @@ BLUR_BACK=$(grep 'BLUR_BACK=' $INFO_FILE_RUN | cut -d '=' -f 2)
 
 log_message "Input video metadata:"
 # show both files
-cat $INFO_FILE
+cat $INFO_FILE_DECOMPOSE
 log_message "AI run metadata:"
 cat $INFO_FILE_RUN
 
