@@ -26,3 +26,10 @@ function check_error() {
   fi
 }
 
+function set_sceen_name() {
+  local SCREEN_NAME=$1
+  # check if inside screen, then set the title
+  if [ -n "$STY" ]; then
+    echo -ne "\033k$SCREEN_NAME\033\\"
+  fi
+}

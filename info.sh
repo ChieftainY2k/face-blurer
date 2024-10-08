@@ -1,6 +1,8 @@
 #!/bin/bash
 
+. ./functions.sh
+
 # change window title
-echo -ne "\033kINFO\033\\"
+set_sceen_name "INFO"
 
 watch -c -n 3 "uptime; free; pydf; nvidia-smi; ls output/*.lock"

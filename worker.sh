@@ -21,7 +21,7 @@ while true; do
   LOOP_COUNT=$((LOOP_COUNT + 1))
   echo "LOOP_COUNT=$LOOP_COUNT" >>$INFO_FILE
 
-  echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}(${LOOP_COUNT})\033\\"
+  set_sceen_name "${MODE}/G${GPU}/${INSTANCE}(${LOOP_COUNT})"
 
   log_message "Running , GPU=$GPU , INSTANCE=$INSTANCE , DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , MODE=$MODE , BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 
@@ -45,7 +45,7 @@ while true; do
   EXIT_CODE=$?
   if [ $EXIT_CODE -ne 0 ]; then
     log_message "Error occurred. Exit code: $EXIT_CODE"
-    echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}(${LOOP_COUNT})/ERR\033\\"
+    set_sceen_name "${MODE}/G${GPU}/${INSTANCE}(${LOOP_COUNT})/ERR"
     echo "ERROR=$EXIT_CODE" >>$INFO_FILE
     #    log_message 'Press [Enter] key to retry or [Ctrl+C] to exit...'
     #    read
@@ -55,7 +55,7 @@ while true; do
 
   else
     log_message "Processing finished successfully."
-    echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}(${LOOP_COUNT})/OK\033\\"
+    set_sceen_name "${MODE}/G${GPU}/${INSTANCE}(${LOOP_COUNT})/OK"
     echo "DONE=1" >>$INFO_FILE
     #    echo -ne "\033k${MODE}/G${GPU}/${INSTANCE}/${MODE}(${LOOP_COUNT})/SLEEP\033\\"
     log_message "Sleeping..."

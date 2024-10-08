@@ -30,7 +30,7 @@ LOOP_COUNT=0
 while true; do
   LOOP_COUNT=$((LOOP_COUNT + 1))
   log_message "uploading '$LOCAL_SOURCE' to $THOST:$REMOTE_DEST , attempt $LOOP_COUNT"
-  echo -ne "\033kUpload($LOOP_COUNT)/uploading\033\\"
+  set_sceen_name "Upload($LOOP_COUNT)/uploading"
   rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" $LOCAL_SOURCE $REMOTE_DEST
   if [ $? -eq 0 ]; then
     #log_message "Transfer complete"
@@ -42,4 +42,4 @@ while true; do
 done
 
 log_message "upload complete"
-echo -ne "\033kUpload($LOOP_COUNT)/DONE\033\\"
+set_sceen_name "Upload($LOOP_COUNT)/DONE"
