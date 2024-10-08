@@ -57,7 +57,7 @@ set_sceen_name "Decomposing(working)"
 #  log_message "Using ffmpeg with cuda"
 #  ffmpeg -hwaccel cuda -i "$SOURCE" -q:v 0 -c:v png -n "input/frame_%10d.png"
 #else
-log_message "Using ffmpeg without cuda"
+#log_message "Using ffmpeg without cuda"
 ffmpeg -i "$SOURCE" -q:v 0 -c:v png -n "input/frame_%10d.png"
 #fi
 
