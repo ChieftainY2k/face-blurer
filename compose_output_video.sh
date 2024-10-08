@@ -2,10 +2,7 @@
 # shellcheck disable=SC2129
 set -e
 
-log_message() {
-  local message="$1"
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $message"
-}
+. ./functions.sh
 
 #SOURCE=${1:-"input/video1.mp4"}
 
