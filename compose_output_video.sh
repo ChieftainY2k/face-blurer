@@ -82,7 +82,7 @@ COMMAND="ffmpeg -y -thread_queue_size 32 -r \"$FPS\" -hwaccel \"cuda\" -f image2
 log_message "About to exec the command: $COMMAND"
 #log_message "Press [Enter] key to continue..."
 #read
-countdown_seconds 15
+countdown_seconds 5
 
 set_sceen_name "Composing(working)"
 eval $COMMAND
