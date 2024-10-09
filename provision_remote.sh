@@ -3,27 +3,7 @@ set -euo pipefail
 
 . ./functions.sh
 
-# Required variables
-required_vars=("THOST" "TPORT" "TUSER")
-
-# Check if required variables are set
-for var in "${required_vars[@]}"; do
-  if [ -z "${!var:-}" ]; then
-    echo "$var is not set"
-    exit 1
-  fi
-done
-
-# Function to execute commands remotely
-exec_remote() {
-  local exit_code=$?
-  echo "exec_remote: $@"
-  ssh "$TUSER@$THOST" -p "$TPORT" "$@"
-  if [ $exit_code -ne 0 ]; then
-    echo "ERROR: exec_remote: $@ failed with exit code $exit_code"
-    exit $exit_code
-  fi
-}
+check_required_vars
 
 INFO_FILE="./metadata-provision"
 

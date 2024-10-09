@@ -3,22 +3,7 @@
 
 . ./functions.sh
 
-# check variablews
-if [ -z "$THOST" ]; then
-  echo "THOST is not set"
-  exit 1
-fi
-
-if [ -z "$TPORT" ]; then
-  echo "TPORT is not set"
-  exit 1
-fi
-
-if [ -z "$TUSER" ]; then
-  echo "$TUSER is not set"
-  exit 1
-fi
-
+check_required_vars
 
 #REMOTE_SOURCE={$1:-"vi*"}
 REMOTE_SOURCE=${1:-"video"}
