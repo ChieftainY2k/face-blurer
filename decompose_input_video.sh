@@ -28,12 +28,8 @@ log_message "SOURCE = $SOURCE , RESOLUTION = $RESOLUTION , FPS = $FPS , FPS_FFPR
 log_message "waiting for a while..."
 countdown_seconds 15
 
-PROVISION_INFO_FILE="../metadata-provision"
-log_message "Waiting for provision to finish..."
-while ! grep -q "PROVISIONING_FINISHED=" "$PROVISION_INFO_FILE"; do
-  countdown_seconds 10
-done
-log_message "Provision finished, continuing..."
+
+wait_for_provision
 
 #log_message "Press [Enter] key to continue..."
 #read

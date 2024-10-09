@@ -74,3 +74,13 @@ function check_required_vars() {
     fi
   done
 }
+
+function wait_for_provision() {
+  local PROVISION_INFO_FILE="../metadata-provision"
+  log_message "Waiting for provision to finish..."
+  while ! grep -q "FINISHED=" "$PROVISION_INFO_FILE"; do
+    countdown_seconds 10
+  done
+  log_message "Provision finished, continuing..."
+}
+

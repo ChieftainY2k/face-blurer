@@ -62,7 +62,7 @@ log_message "server is up"
 
 exec_remote nvidia-smi
 
-exec_remote "echo \"PROVISIONING_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE}"
+exec_remote "echo \"FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE}"
 
 ## Build Docker image
 #log_message "docker image build starting"
