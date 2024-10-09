@@ -18,10 +18,10 @@ while ! grep -q "DOCKER_BUILD_FINISHED=" "$PROVISION_INFO_FILE"; do
 done
 log_message "Docker build finished"
 
-docker pull chieftainy2k/blurer:latest
-check_error
-docker tag chieftainy2k/blurer:latest blurer
-check_error
+#docker pull chieftainy2k/blurer:latest
+#check_error
+#docker tag chieftainy2k/blurer:latest blurer
+#check_error
 
 log_message "Sleeping for a while..."
 countdown_seconds 10

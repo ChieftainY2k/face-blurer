@@ -89,7 +89,10 @@ exec_remote "echo \"PROVISIONING_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${IN
 ##exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
 #exec_remote "cd face-blurer && docker build -f Dockerfile.gpu . -t blurer"
 #log_message "docker image build finished"
-#exec_remote "echo \"DOCKER_BUILD_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE}"
+
+exec_remote "docker pull chieftainy2k/blurer:latest"
+exec_remote "docker tag chieftainy2k/blurer:latest blurer"
+exec_remote "echo \"DOCKER_BUILD_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE}"
 
 # Uncomment if needed for rsync and Docker execution
 # rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video1.mp4 $TUSER@$THOST:/home/$TUSER/face-blurer/input/
@@ -97,5 +100,5 @@ exec_remote "echo \"PROVISIONING_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${IN
 # exec_remote "cd face-blurer && rm -f output/sample*"
 # exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface.py"
 
-log_message "provisioning finished"
+log_message "Finished"
 
