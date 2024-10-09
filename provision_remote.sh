@@ -90,7 +90,8 @@ exec_remote "echo \"PROVISIONING_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${IN
 #exec_remote "cd face-blurer && docker build -f Dockerfile.gpu . -t blurer"
 #log_message "docker image build finished"
 
-IMAGE_NAME="chieftainy2k/blurer:latest-flattened"
+#IMAGE_NAME="chieftainy2k/blurer:latest-flattened"
+IMAGE_NAME="chieftainy2k/blurer:latest"
 exec_remote "docker pull $IMAGE_NAME"
 exec_remote "docker tag $IMAGE_NAME blurer"
 exec_remote "echo \"DOCKER_BUILD_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE}"
