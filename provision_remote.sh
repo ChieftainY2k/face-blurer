@@ -84,13 +84,12 @@ exec_remote nvidia-smi
 
 exec_remote "echo \"PROVISIONING_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE}"
 
-# Build Docker image
-log_message "docker image build starting"
-#exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
-exec_remote "cd face-blurer && docker build -f Dockerfile.gpu . -t blurer"
-log_message "docker image build finished"
-
-exec_remote "echo \"DOCKER_BUILD_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE}"
+## Build Docker image
+#log_message "docker image build starting"
+##exec_remote "cd face-blurer && docker build -f Dockerfile.gpu --progress=plain . -t blurer"
+#exec_remote "cd face-blurer && docker build -f Dockerfile.gpu . -t blurer"
+#log_message "docker image build finished"
+#exec_remote "echo \"DOCKER_BUILD_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE}"
 
 # Uncomment if needed for rsync and Docker execution
 # rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" ./input/video1.mp4 $TUSER@$THOST:/home/$TUSER/face-blurer/input/
