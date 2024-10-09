@@ -12,6 +12,10 @@ REMOTE_DEST="$TUSER@$THOST:/home/$TUSER/face-blurer/input/video1.mp4"
 
 LOOP_COUNT=0
 
+INFO_FILE_UPLOAD="./metadata-upload"
+exec_remote "echo \"STARTED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE_UPLOAD}"
+exec_remote "echo \"LOCAL_FILENAME=$LOCAL_SOURCE\" >> ${INFO_FILE_UPLOAD}"
+
 # Loop until transfer is complete
 while true; do
   LOOP_COUNT=$((LOOP_COUNT + 1))
@@ -28,4 +32,5 @@ while true; do
 done
 
 log_message "upload complete"
+exec_remote "echo \"FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE_UPLOAD}"
 set_sceen_name "Upload($LOOP_COUNT)/DONE"

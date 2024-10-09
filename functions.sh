@@ -43,6 +43,15 @@ function wait_for_docker_builds() {
   log_message "Docker build finished"
 }
 
+function wait_for_upload_complete() {
+  local UPLOAD_INFO_FILE="../metadata-upload"
+  while ! grep -q "FINISHED=" "$UPLOAD_INFO_FILE"; do
+    log_message "Waiting for upload to finish..."
+    countdown_seconds 10
+  done
+  log_message "Upload finished"
+}
+
 exec_remote() {
   local exit_code=$?
   echo "exec_remote: $@"

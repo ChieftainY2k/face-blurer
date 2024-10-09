@@ -5,6 +5,8 @@
 
 SOURCE=${1:-"input/video1.mp4"}
 
+wait_for_upload_complete
+
 log_message "Getting info on $SOURCE ..."
 FRAMES_COUNT=$(ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=nb_read_packets -of csv=p=0 "$SOURCE")
 RESOLUTION=$(ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 "$SOURCE")
