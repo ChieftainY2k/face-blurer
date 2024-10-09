@@ -1,5 +1,5 @@
 #!/bin/bash
-# shellcheck disable=SC2129
+# shellcheck disable=SC2129,SC2086
 set -e
 
 . ./functions.sh
@@ -86,4 +86,12 @@ countdown_seconds 15
 
 set_sceen_name "Composing(working)"
 eval $COMMAND
-set_sceen_name "Composing(DONE)"
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+  set_sceen_name "Composing(ERROR)"
+  log_message "ERROR: exit code $EXIT_CODE"
+  log_message "Press ENTER to continue"
+  exit $EXIT_CODE
+else
+  set_sceen_name "Composing(DONE)"
+fi
