@@ -10,6 +10,8 @@ if [ -z "$STY" ]; then
   exit 1
 fi
 
+wait_for_docker_builds
+
 # Detect number of GPUS from nvisia-smi
 if [ -z "$GPUS" ]; then
   GPUS=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)

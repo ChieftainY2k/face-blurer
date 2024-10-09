@@ -33,3 +33,14 @@ function set_sceen_name() {
     echo -ne "\033k$SCREEN_NAME\033\\"
   fi
 }
+
+function wait_for_docker_builds() {
+  local PROVISION_INFO_FILE="../metadata-provision"
+  while ! grep -q "DOCKER_BUILD_FINISHED=" "$PROVISION_INFO_FILE"; do
+    log_message "Waiting for docker builds to finish..."
+    countdown_seconds 10
+  done
+  log_message "Docker build finished"
+}
+
+
