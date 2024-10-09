@@ -11,6 +11,9 @@ if [[ "$EUID" -ne 0 ]]; then
 fi
 
 function update_drivers() {
+
+  local VERSION=$1
+
   # Unhold NVIDIA packages if held
   #apt-mark unhold $(dpkg --get-selections | grep hold | awk '{print $1}')
   local held_packages=$(dpkg --get-selections | grep hold | awk '{print $1}')
@@ -65,11 +68,16 @@ if [[ $NVIDIA_VERSION == 545.* ]]; then
   echo "DRIVERS_OK=1" >> $INFO_FILE
   install_docker_support
   exit 0
-#elif [[ $NVIDIA_VERSION == 535.* ]]; then
-#  log_message "Driver version is $NVIDIA_VERSION. Driver version needs to be upgraded. Proceeding with drivers update."
-#  echo "DRIVERS_NEED_UPDATE=1" >> $INFO_FILE
-#  update_drivers
-#  install_docker_support
+elif [[ $NVIDIA_VERSION == 535.* ]]; then
+  log_message "Driver version is $NVIDIA_VERSION. Driver version needs to be upgraded. Proceeding with drivers update."
+  echo "DRIVERS_NEED_UPDATE=1" >> $INFO_FILE
+  update_drivers 545
+  install_docker_support
+elif [[ $NVIDIA_VERSION == 550.* ]]; then
+  log_message "Driver version is $NVIDIA_VERSION. Driver version needs to be upgraded. Proceeding with drivers update."
+  echo "DRIVERS_NEED_UPDATE=1" >> $INFO_FILE
+  update_drivers 550
+  install_docker_support
 #elif [[ $NVIDIA_VERSION == 550.* ]]; then
 #  log_message "Driver version is $NVIDIA_VERSION. Driver version needs to be upgraded. Proceeding with drivers update."
 #  echo "DRIVERS_NEED_UPDATE=1" >> $INFO_FILE
