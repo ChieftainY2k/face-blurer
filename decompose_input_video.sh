@@ -6,6 +6,7 @@
 SOURCE=${1:-"input/video1.mp4"}
 
 wait_for_upload_complete
+wait_for_provision
 
 log_message "Getting info on $SOURCE ..."
 FRAMES_COUNT=$(ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=nb_read_packets -of csv=p=0 "$SOURCE")
