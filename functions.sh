@@ -4,8 +4,7 @@ function log_message() {
   echo "[$(date +'%Y-%m-%d %H:%M:%S')] $@"
 }
 
-function countdown_seconds()
-{
+function countdown_seconds() {
   local count=$1
   while [ $count -gt 0 ]; do
     echo -ne " $count"
@@ -77,10 +76,9 @@ function check_required_vars() {
 
 function wait_for_provision() {
   local PROVISION_INFO_FILE="../metadata-provision"
-  log_message "Waiting for provision to finish..."
   while ! grep -q "FINISHED=" "$PROVISION_INFO_FILE"; do
+    log_message "Waiting for provision to finish..."
     countdown_seconds 10
   done
   log_message "Provision finished, continuing..."
 }
-
