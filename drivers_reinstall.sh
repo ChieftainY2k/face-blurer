@@ -12,7 +12,7 @@ fi
 
 function update_drivers() {
 
-  local VERSION=$1
+  local VERSION=${1:-545}
 
   # Unhold NVIDIA packages if held
   #apt-mark unhold $(dpkg --get-selections | grep hold | awk '{print $1}')
@@ -30,7 +30,7 @@ function update_drivers() {
 
   # Update package lists and install the new NVIDIA driver version
   apt update
-  apt install -y nvidia-driver-545
+  apt install -y nvidia-driver-$VERSION
 
 }
 
@@ -64,19 +64,19 @@ log_message "Metadata saved to $INFO_FILE"
 
 # Check if the driver version is 535.xxxx
 if [[ $NVIDIA_VERSION == 545.* ]]; then
-  log_message "Driver version is $NVIDIA_VERSION. That's OK."
+  log_message "Driver version is $NVIDIA_VERSION."
   echo "DRIVERS_OK=1" >> $INFO_FILE
   install_docker_support
   exit 0
 elif [[ $NVIDIA_VERSION == 535.* ]]; then
-  log_message "Driver version is $NVIDIA_VERSION. Driver version needs to be upgraded. Proceeding with drivers update."
+  log_message "Driver version is $NVIDIA_VERSION."
   echo "DRIVERS_NEED_UPDATE=1" >> $INFO_FILE
   update_drivers 545
   install_docker_support
 elif [[ $NVIDIA_VERSION == 550.* ]]; then
-  log_message "Driver version is $NVIDIA_VERSION. Driver version needs to be upgraded. Proceeding with drivers update."
+  log_message "Driver version is $NVIDIA_VERSION."
   echo "DRIVERS_NEED_UPDATE=1" >> $INFO_FILE
-  update_drivers 550
+  apt install -y nvidia-driver-550 libnvidia-encode-550 nvidia-utils-550
   install_docker_support
 #elif [[ $NVIDIA_VERSION == 550.* ]]; then
 #  log_message "Driver version is $NVIDIA_VERSION. Driver version needs to be upgraded. Proceeding with drivers update."
