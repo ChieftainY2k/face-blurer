@@ -12,6 +12,8 @@ LOCAL_DEST="/tmp/output-$THOST"
 mkdir -p $LOCAL_DEST
 check_error "Failed to create directory $LOCAL_DEST"
 
+set_sceen_name "Download"
+
 # Loop until transfer is complete
 while true; do
   while true; do
@@ -21,14 +23,17 @@ while true; do
       break
     else
       log_message "transfer failed, retrying in 10 seconds..."
+      set_sceen_name "Download(wait)"
       countdown_seconds 10
     fi
   done
   log_message "transfer complete, checking if there are more files to download... , press [Ctrl+C] to stop"
+  set_sceen_name "Download(wait)"
   countdown_seconds 30
 done
 
 log_message "download complete"
+set_sceen_name "Download(DONE)"
 
 # Download videos
 
