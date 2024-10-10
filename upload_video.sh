@@ -28,8 +28,8 @@ while true; do
     break
   else
     log_message "transfer failed, retrying in 10 seconds..."
-    countdown_seconds 10
     set_sceen_name "Upload($LOOP_COUNT)/RETRY"
+    countdown_seconds 10
   fi
 done
 
