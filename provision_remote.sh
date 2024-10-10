@@ -3,9 +3,12 @@ set -euo pipefail
 
 . ./functions.sh
 
+check_if_inside_screen_session
 check_required_vars
 
 INFO_FILE="./metadata-provision"
+
+set_sceen_name "Provisioning"
 
 # Inject SSH keys
 echo "Injecting keys..."
@@ -83,4 +86,4 @@ exec_remote "echo \"DOCKER_BUILD_FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${IN
 # exec_remote "cd face-blurer && docker run --rm --gpus all -v ./app:/app -v ./test-samples:/input:ro -v ./output:/output -v /tmp/blurer-cache/deepface:/root/.deepface -v /tmp/blurer-cache/root:/root/.cache blurer python blur_faces_retinaface.py"
 
 log_message "Finished"
-
+set_sceen_name "Provisioning(DONE)"

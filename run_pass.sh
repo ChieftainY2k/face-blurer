@@ -4,12 +4,7 @@ set -e
 
 . ./functions.sh
 
-# check if you are inside screen session
-if [ -z "$STY" ]; then
-  log_message "Please run this script inside a screen session"
-  exit 1
-fi
-
+check_if_inside_screen_session
 wait_for_docker_builds
 
 # Detect number of GPUS from nvisia-smi

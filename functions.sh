@@ -27,8 +27,9 @@ function check_error() {
 
 function set_sceen_name() {
   local SCREEN_NAME=$1
+  local session=${STY:-""}
   # check if inside screen, then set the title
-  if [ -n "$STY" ]; then
+  if [ -n "$session" ]; then
     echo -ne "\033k$SCREEN_NAME\033\\"
   fi
 }
@@ -81,4 +82,12 @@ function wait_for_provision() {
     countdown_seconds 10
   done
   log_message "Provision finished, continuing..."
+}
+
+function check_if_inside_screen_session() {
+  local session=${STY:-""}
+  if [ -z "$session" ]; then
+    log_message "Please run this script inside a screen session"
+    exit 1
+  fi
 }

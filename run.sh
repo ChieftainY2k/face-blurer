@@ -4,10 +4,7 @@
 
 . ./functions.sh
 
-if [ -z "$STY" ]; then
-  log_message "Please run this script inside a screen session"
-  exit 1
-fi
+check_if_inside_screen_session
 
 log_message "DEBUG=$DEBUG , THRESHOLD=$THRESHOLD , BLUR_EXTRA=$BLUR_EXTRA , BLUR_AHEAD=$BLUR_AHEAD , BLUR_BACK=$BLUR_BACK"
 
