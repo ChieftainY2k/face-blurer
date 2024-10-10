@@ -36,3 +36,4 @@ done
 log_message "upload complete"
 exec_remote "echo \"FINISHED=$(date +'%Y-%m-%d %H:%M:%S')\" >> ${INFO_FILE_UPLOAD}"
 set_sceen_name "Upload($LOOP_COUNT)/DONE"
+read -p "Press ENTER to continue"
