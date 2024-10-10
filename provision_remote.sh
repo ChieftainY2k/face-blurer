@@ -6,6 +6,7 @@ set -euo pipefail
 check_if_inside_screen_session
 check_required_vars
 
+VIDEO=${VIDEO:-""}
 INFO_FILE="./metadata-provision"
 
 set_sceen_name "Provisioning"
@@ -43,6 +44,12 @@ exec_remote "[ -d ~/face-blurer ] || git clone https://github.com/ChieftainY2k/f
 exec_remote "cd face-blurer && git pull"
 exec_remote "cd face-blurer && git checkout metadata5"
 log_message "repo clone finished"
+
+# start upload if VIDEO is set
+if [ -n "$VIDEO" ]; then
+  log_message "uploading video $VIDEO"
+  screen -t "Upload" -- ./upload_video.sh "$VIDEO"
+fi
 
 # Run driver check script
 log_message "drivers check started"

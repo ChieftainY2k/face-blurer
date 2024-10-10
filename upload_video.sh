@@ -24,10 +24,12 @@ while true; do
   rsync -avz --partial --info=progress2 --delete -e "ssh -p $TPORT" "$LOCAL_SOURCE" $REMOTE_DEST
   if [ $? -eq 0 ]; then
     #log_message "Transfer complete"
+    #set_sceen_name "Upload($LOOP_COUNT)/DONE"
     break
   else
     log_message "transfer failed, retrying in 10 seconds..."
     countdown_seconds 10
+    set_sceen_name "Upload($LOOP_COUNT)/RETRY"
   fi
 done
 
